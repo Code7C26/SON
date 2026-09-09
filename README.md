@@ -8,7 +8,7 @@
 
 ## 📖 Sobre el Proyecto
 
-**SON** (anteriormente conocido como Sima Operation) es una plataforma Full-Stack diseñada para digitalizar, controlar y automatizar la gestión de servicios de campo en el rubro de Seguridad, Higiene y Medio Ambiente. 
+**SON** (Sima Operation) es una plataforma Full-Stack diseñada para digitalizar, controlar y automatizar la gestión de servicios de campo en el rubro de Seguridad, Higiene y Medio Ambiente. 
 
 El sistema conecta una aplicación móvil para los técnicos en la calle con un panel de administración web centralizado, respaldados por una API robusta y una base de datos relacional.
 
