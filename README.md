@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="DESINGS/2.png" alt="Logo SON" width="200"/>
+  <img src="DESINGS/COLOR1.png" alt="Logo SON" width="200"/>
   <h1>SON - Sistema de Gestión Operativa</h1>
   <p><em>Plataforma integral para empresas de Seguridad, Higiene y Medio Ambiente.</em></p>
 </div>
