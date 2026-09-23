@@ -1,6 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+
 const Color simaDarkGreen = Color(0xFF003024);
 const Color simaLightGreen = Color(0xFF7AEB67);
 const Color simaBackground = Color(0xFFF4F4F4);
@@ -20,15 +24,113 @@ class SimaAdminWeb extends StatelessWidget {
       theme: ThemeData(
         primaryColor: simaDarkGreen,
         scaffoldBackgroundColor: simaBackground,
-        fontFamily: 'TuFuente', // Tipografía unificada
+        fontFamily: 'TuFuente',
       ),
-      home: const LayoutAdministrador(),
+      home: const PantallaLogin(),
     );
   }
 }
 
+// --- PANTALLA DE LOGIN ---
+class PantallaLogin extends StatefulWidget {
+  const PantallaLogin({super.key});
+
+  @override
+  State<PantallaLogin> createState() => _PantallaLoginState();
+}
+
+class _PantallaLoginState extends State<PantallaLogin> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _cargando = false;
+  String _mensajeError = '';
+
+  Future<void> _iniciarSesion() async {
+    setState(() { _cargando = true; _mensajeError = ''; });
+
+    try {
+      final respuesta = await http.post(
+        Uri.parse('http://127.0.0.1:3000/api/admin/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'email': _emailController.text.trim(),
+          'password': _passwordController.text.trim(),
+        }),
+      );
+
+      if (respuesta.statusCode == 200) {
+        final datosAdmin = json.decode(respuesta.body);
+        if (mounted) {
+          Navigator.pushReplacement(
+            context, 
+            MaterialPageRoute(
+              builder: (context) => LayoutAdministrador(adminData: datosAdmin),
+            ),
+          );
+        }
+      } else {
+        setState(() => _mensajeError = 'Credenciales incorrectas. Intenta nuevamente.');
+      }
+    } catch (e) {
+      setState(() => _mensajeError = 'Error de conexión con el servidor.');
+    } finally {
+      setState(() => _cargando = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Container(
+          width: 400,
+          padding: const EdgeInsets.all(40),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10)]),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset('assets/images/COLOR4.png', height: 100, errorBuilder: (c, e, s) => const Icon(Icons.security, size: 80, color: simaDarkGreen)),
+              const SizedBox(height: 32),
+              const Text('Acceso Administrativo', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: simaDarkGreen)),
+              const SizedBox(height: 24),
+              TextField(
+                controller: _emailController,
+                decoration: const InputDecoration(labelText: 'Correo Electrónico', border: OutlineInputBorder()),
+                keyboardType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _passwordController,
+                decoration: const InputDecoration(labelText: 'Contraseña', border: OutlineInputBorder()),
+                obscureText: true,
+              ),
+              const SizedBox(height: 16),
+              if (_mensajeError.isNotEmpty) 
+                Text(_mensajeError, style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: simaLightGreen),
+                  onPressed: _cargando ? null : _iniciarSesion,
+                  child: _cargando 
+                      ? const CircularProgressIndicator(color: simaDarkGreen) 
+                      : const Text('Ingresar al Sistema', style: TextStyle(color: simaDarkGreen, fontSize: 18, fontWeight: FontWeight.bold)),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// --- LAYOUT DEL DASHBOARD ---
 class LayoutAdministrador extends StatefulWidget {
-  const LayoutAdministrador({super.key});
+  final Map<String, dynamic> adminData;
+  const LayoutAdministrador({super.key, required this.adminData});
 
   @override
   State<LayoutAdministrador> createState() => _LayoutAdministradorState();
@@ -36,28 +138,101 @@ class LayoutAdministrador extends StatefulWidget {
 
 class _LayoutAdministradorState extends State<LayoutAdministrador> {
   int _indiceActual = 0;
+  late Map<String, dynamic> _adminActual;
 
-  final List<Widget> _pantallas = [
-    const PantallaDashboard(),
-    const PantallaMapa(),
-    const PantallaOrdenes(),
-    const PantallaTecnicos(),
-    const PantallaInformes(),
-    const PantallaAnalisis(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _adminActual = widget.adminData;
+  }
+
+  void _mostrarPerfil() {
+    final TextEditingController nombreController = TextEditingController(text: _adminActual['nombre']);
+    final TextEditingController emailController = TextEditingController(text: _adminActual['email']);
+    final TextEditingController passwordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Mi Perfil de Administrador', style: TextStyle(color: simaDarkGreen, fontWeight: FontWeight.bold)),
+          content: SizedBox(
+            width: 400,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nombreController,
+                  decoration: const InputDecoration(labelText: 'Nombre Completo'),
+                ),
+                TextField(
+                  controller: emailController,
+                  decoration: const InputDecoration(labelText: 'Correo Electrónico'),
+                ),
+                TextField(
+                  controller: passwordController,
+                  decoration: const InputDecoration(labelText: 'Nueva Contraseña (dejar en blanco para no cambiar)'),
+                  obscureText: true,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancelar', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: simaLightGreen),
+              onPressed: () async {
+                try {
+                  final res = await http.put(
+                    Uri.parse('http://127.0.0.1:3000/api/admin/actualizar/${_adminActual['id']}'),
+                    headers: {'Content-Type': 'application/json'},
+                    body: json.encode({
+                      'nombre': nombreController.text,
+                      'email': emailController.text,
+                      'password': passwordController.text.isNotEmpty ? passwordController.text : '123456',
+                    }),
+                  );
+
+                  if (res.statusCode == 200) {
+                    setState(() {
+                      _adminActual = json.decode(res.body);
+                    });
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Perfil actualizado con éxito')),
+                    );
+                  }
+                } catch (e) {
+                  print('Error al actualizar: $e');
+                }
+              },
+              child: const Text('Guardar Cambios', style: TextStyle(color: simaDarkGreen, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> pantallas = [
+      const PantallaDashboard(),
+      const PantallaOrdenes(),
+      const PantallaTecnicos(),
+      const PantallaInformes(),
+      const PantallaAnalisis(),
+    ];
+
     return Scaffold(
       body: Row(
         children: [
           NavigationRail(
             selectedIndex: _indiceActual,
-            onDestinationSelected: (int index) {
-              setState(() {
-                _indiceActual = index;
-              });
-            },
+            onDestinationSelected: (int index) => setState(() => _indiceActual = index),
             backgroundColor: simaDarkGreen,
             unselectedIconTheme: const IconThemeData(color: Colors.white54),
             selectedIconTheme: const IconThemeData(color: simaLightGreen),
@@ -68,33 +243,120 @@ class _LayoutAdministradorState extends State<LayoutAdministrador> {
             leading: Padding(
               padding: const EdgeInsets.symmetric(vertical: 32.0),
               child: Image.asset(
-                'assets/images/LOGO2.png',
-                height: 80,
+                'assets/images/3.png', 
+                height: 60,
                 errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, color: Colors.white, size: 50),
               ),
             ),
             destinations: const [
               NavigationRailDestination(icon: Icon(Icons.dashboard), label: Text('Panel de Control')),
-              NavigationRailDestination(icon: Icon(Icons.map), label: Text('Mapa en vivo')),
               NavigationRailDestination(icon: Icon(Icons.assignment), label: Text('Órdenes de Trabajo')),
               NavigationRailDestination(icon: Icon(Icons.people), label: Text('Técnicos')),
               NavigationRailDestination(icon: Icon(Icons.folder), label: Text('Informes')),
               NavigationRailDestination(icon: Icon(Icons.bar_chart), label: Text('Análisis')),
             ],
+            trailing: Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.account_circle, color: simaLightGreen, size: 28),
+                        onPressed: _mostrarPerfil,
+                        tooltip: 'Ver Perfil',
+                      ),
+                      const SizedBox(width: 16),
+                      IconButton(
+                        icon: const Icon(Icons.logout, color: Colors.white54, size: 28),
+                        onPressed: () {
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const PantallaLogin()));
+                        },
+                        tooltip: 'Cerrar Sesión',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
-          Expanded(child: _pantallas[_indiceActual]),
+          Expanded(child: pantallas[_indiceActual]),
         ],
       ),
     );
   }
 }
 
-// --- 1. DASHBOARD ---
-class PantallaDashboard extends StatelessWidget {
+// --- 1. DASHBOARD DINÁMICO CON MAPA EN TIEMPO REAL ---
+class PantallaDashboard extends StatefulWidget {
   const PantallaDashboard({super.key});
 
   @override
+  State<PantallaDashboard> createState() => _PantallaDashboardState();
+}
+
+class _PantallaDashboardState extends State<PantallaDashboard> {
+  int _ordenesActivas = 0;
+  int _tecnicosTotal = 0;
+  List<dynamic> _tecnicosUbicaciones = [];
+  bool _cargando = true;
+  Timer? _timerUbicaciones;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarMetricasYMapa();
+    // Temporizador para refrescar las posiciones GPS de los técnicos cada 5 segundos en tiempo real
+    _timerUbicaciones = Timer.periodic(const Duration(seconds: 5), (timer) {
+      _actualizarUbicacionesTecnicos();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timerUbicaciones?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _cargarMetricasYMapa() async {
+    try {
+      final resOrd = await http.get(Uri.parse('http://127.0.0.1:3000/api/ordenes'));
+      final resTec = await http.get(Uri.parse('http://127.0.0.1:3000/api/tecnicos'));
+      
+      if (resOrd.statusCode == 200 && resTec.statusCode == 200) {
+        final ordenes = json.decode(resOrd.body) as List;
+        final tecnicos = json.decode(resTec.body) as List;
+        setState(() {
+          _ordenesActivas = ordenes.where((o) => o['estado'] == 'Pendiente').length;
+          _tecnicosTotal = tecnicos.length;
+          _tecnicosUbicaciones = tecnicos;
+          _cargando = false;
+        });
+      }
+    } catch (e) {
+      setState(() => _cargando = false);
+    }
+  }
+
+  Future<void> _actualizarUbicacionesTecnicos() async {
+    try {
+      final resTec = await http.get(Uri.parse('http://127.0.0.1:3000/api/tecnicos'));
+      if (resTec.statusCode == 200 && mounted) {
+        setState(() {
+          _tecnicosUbicaciones = json.decode(resTec.body) as List;
+        });
+      }
+    } catch (e) {
+      // Silenciar errores de sondeo en segundo plano
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_cargando) return const Center(child: CircularProgressIndicator(color: simaDarkGreen));
+    
     return Padding(
       padding: const EdgeInsets.all(40.0),
       child: Column(
@@ -102,33 +364,72 @@ class PantallaDashboard extends StatelessWidget {
         children: [
           const Text('Panel de Control', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: simaDarkGreen)),
           const SizedBox(height: 8),
-          const Text('Resumen en tiempo real de operaciones.', style: TextStyle(color: Colors.grey, fontSize: 16)),
-          const SizedBox(height: 32),
+          const Text('Resumen en tiempo real de operaciones y geolocalización de operarios.', style: TextStyle(color: Colors.grey, fontSize: 16)),
+          const SizedBox(height: 24),
           Row(
             children: [
-              _tarjetaMetricaWeb('Órdenes Activas', '12', Colors.orange),
+              _tarjetaMetrica('Órdenes Activas', _ordenesActivas.toString(), Colors.orange),
               const SizedBox(width: 24),
-              _tarjetaMetricaWeb('Completadas Hoy', '4', Colors.blue),
-              const SizedBox(width: 24),
-              _tarjetaMetricaWeb('Técnicos en Calle', '3', simaLightGreen),
+              _tarjetaMetrica('Técnicos Registrados', _tecnicosTotal.toString(), simaLightGreen),
             ],
           ),
-          const SizedBox(height: 32),
-          const Text('Últimas Órdenes', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: simaDarkGreen)),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
+          const Text('Mapa en Vivo - Técnicos en Campo', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: simaDarkGreen)),
+          const SizedBox(height: 12),
           Expanded(
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade300)),
-              child: const Center(child: Text('Tabla de órdenes recientes', style: TextStyle(color: Colors.grey))),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: FlutterMap(
+                  options: const MapOptions(
+                    initialCenter: LatLng(-31.4201, -64.1888), // Coordenadas centrales por defecto (ej. Córdoba)
+                    initialZoom: 13.0,
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      userAgentPackageName: 'com.sima.admin',
+                    ),
+                    MarkerLayer(
+                      markers: _tecnicosUbicaciones.map((tecnico) {
+                        // Lee lat y lng provistos por la base de datos (si no existen, usa centro por defecto o simulación)
+                        double lat = tecnico['lat'] != null ? double.parse(tecnico['lat'].toString()) : -31.4201;
+                        double lng = tecnico['lng'] != null ? double.parse(tecnico['lng'].toString()) : -64.1888;
+
+                        return Marker(
+                          point: LatLng(lat, lng),
+                          width: 80,
+                          height: 80,
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(color: simaDarkGreen, borderRadius: BorderRadius.circular(4)),
+                                child: Text(
+                                  tecnico['nombre'] ?? 'Técnico', 
+                                  style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const Icon(Icons.location_on, color: Colors.red, size: 36),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
-  Widget _tarjetaMetricaWeb(String titulo, String valor, Color colorAcento) {
+  Widget _tarjetaMetrica(String titulo, String valor, Color colorAcento) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(24),
@@ -146,42 +447,7 @@ class PantallaDashboard extends StatelessWidget {
   }
 }
 
-// --- 2. MAPA ---
-class PantallaMapa extends StatelessWidget {
-  const PantallaMapa({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(40.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Mapa de Técnicos', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: simaDarkGreen)),
-          const SizedBox(height: 8),
-          const Text('Seguimiento GPS en tiempo real.', style: TextStyle(color: Colors.grey, fontSize: 16)),
-          const SizedBox(height: 24),
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(12)),
-              child: const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.map, size: 80, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text('Aquí se integrará Google Maps o Flutter Map', style: TextStyle(color: Colors.grey, fontSize: 18)),
-                ],
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-  }
-}
-
-// --- 3. ÓRDENES DE TRABAJO (CONECTADA A BASE DE DATOS) ---
+// --- PANTALLA ÓRDENES DE TRABAJO ---
 class PantallaOrdenes extends StatefulWidget {
   const PantallaOrdenes({super.key});
 
@@ -191,27 +457,232 @@ class PantallaOrdenes extends StatefulWidget {
 
 class _PantallaOrdenesState extends State<PantallaOrdenes> {
   List<dynamic> _ordenes = [];
+  List<dynamic> _tecnicos = [];
   bool _cargando = true;
+
+  // Controladores principales
+  final TextEditingController _clienteController = TextEditingController();
+  final TextEditingController _direccionController = TextEditingController();
+  final TextEditingController _tareaController = TextEditingController();
+  int? _tecnicoSeleccionado;
+
+  // Controladores de Recurrencia (Estilo Google Calendar)
+  bool _esRecurrente = false;
+  final TextEditingController _recurrenciaValorCtrl = TextEditingController(text: '1');
+  String _recurrenciaTipo = 'día'; // día, semana, mes
+  final TextEditingController _horaCtrl = TextEditingController(text: '12:30');
+  String _terminaCondicion = 'Nunca'; // Nunca, Fecha, Repeticiones
+  DateTime? _terminaFecha;
+  final TextEditingController _terminaRepeticionesCtrl = TextEditingController(text: '30');
 
   @override
   void initState() {
     super.initState();
-    _obtenerOrdenes();
+    _obtenerDatos();
   }
 
-  Future<void> _obtenerOrdenes() async {
+  Future<void> _obtenerDatos() async {
     try {
-      final respuesta = await http.get(Uri.parse('http://localhost:3000/api/ordenes'));
-      if (respuesta.statusCode == 200) {
+      final resOrdenes = await http.get(Uri.parse('http://127.0.0.1:3000/api/ordenes'));
+      final resTecnicos = await http.get(Uri.parse('http://127.0.0.1:3000/api/tecnicos'));
+
+      if (resOrdenes.statusCode == 200 && resTecnicos.statusCode == 200) {
         setState(() {
-          _ordenes = json.decode(respuesta.body);
+          _ordenes = json.decode(resOrdenes.body);
+          _tecnicos = json.decode(resTecnicos.body);
           _cargando = false;
         });
       }
     } catch (e) {
-      print('Error de conexión: $e');
+      print('Error al cargar: $e');
       setState(() => _cargando = false);
     }
+  }
+
+  Future<void> _guardarOrden({int? idAEditar}) async {
+    if (_tecnicoSeleccionado == null || _clienteController.text.isEmpty || _direccionController.text.isEmpty) return;
+
+    try {
+      final url = idAEditar == null 
+          ? 'http://127.0.0.1:3000/api/ordenes' 
+          : 'http://127.0.0.1:3000/api/ordenes/$idAEditar';
+          
+      final metodo = idAEditar == null ? http.post : http.put;
+
+      final respuesta = await metodo(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'tecnico_id': _tecnicoSeleccionado,
+          'nombre_cliente': _clienteController.text,
+          'direccion_trabajo': _direccionController.text,
+          'descripcion_tarea': _tareaController.text,
+          // Datos de recurrencia
+          'es_recurrente': _esRecurrente,
+          'recurrencia_valor': int.tryParse(_recurrenciaValorCtrl.text) ?? 1,
+          'recurrencia_tipo': _recurrenciaTipo,
+          'hora_ejecucion': _horaCtrl.text,
+          'termina_condicion': _terminaCondicion,
+          'termina_fecha': _terminaFecha?.toIso8601String().split('T')[0],
+          'termina_repeticiones': int.tryParse(_terminaRepeticionesCtrl.text) ?? 30,
+        }),
+      );
+
+      if (respuesta.statusCode == 200) {
+        Navigator.of(context).pop();
+        setState(() => _cargando = true);
+        _obtenerDatos();
+      }
+    } catch (e) {
+      print('Error al guardar: $e');
+    }
+  }
+
+  Future<void> _eliminarOrden(int id) async {
+    bool confirmar = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Eliminar Orden'),
+        content: const Text('¿Estás seguro de eliminar esta orden de trabajo?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Eliminar', style: TextStyle(color: Colors.red))),
+        ],
+      ),
+    );
+
+    if (confirmar) {
+      await http.delete(Uri.parse('http://127.0.0.1:3000/api/ordenes/$id'));
+      _obtenerDatos();
+    }
+  }
+
+  void _mostrarDialogoOrden({Map<String, dynamic>? ordenAEditar}) {
+    // Si estamos editando, rellenamos los campos
+    if (ordenAEditar != null) {
+      _clienteController.text = ordenAEditar['cliente'] ?? '';
+      _direccionController.text = ordenAEditar['direccion_trabajo'] ?? '';
+      _tareaController.text = ordenAEditar['descripcion_tarea'] ?? '';
+      _tecnicoSeleccionado = ordenAEditar['tecnico_id'];
+    } else {
+      _clienteController.clear();
+      _direccionController.clear();
+      _tareaController.clear();
+      _tecnicoSeleccionado = null;
+      _esRecurrente = false;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateModal) {
+            return AlertDialog(
+              title: Text(ordenAEditar == null ? 'Crear Nueva Orden' : 'Editar Orden', style: const TextStyle(color: simaDarkGreen, fontWeight: FontWeight.bold)),
+              content: SizedBox(
+                width: 500,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      DropdownButtonFormField<int>(
+                        decoration: const InputDecoration(labelText: 'Técnico asignado'),
+                        value: _tecnicoSeleccionado,
+                        items: _tecnicos.map<DropdownMenuItem<int>>((t) => DropdownMenuItem(value: t['id'], child: Text(t['nombre']))).toList(),
+                        onChanged: ordenAEditar == null ? (valor) => setStateModal(() => _tecnicoSeleccionado = valor) : null,
+                      ),
+                      TextField(controller: _clienteController, decoration: const InputDecoration(labelText: 'Empresa / Cliente'), enabled: ordenAEditar == null),
+                      TextField(controller: _direccionController, decoration: const InputDecoration(labelText: 'Dirección exacta del trabajo')),
+                      TextField(controller: _tareaController, decoration: const InputDecoration(labelText: 'Checklist / Descripción'), maxLines: 3),
+                      const SizedBox(height: 20),
+                      
+                      // --- SECCIÓN GOOGLE CALENDAR ---
+                      if (ordenAEditar == null) ...[
+                        SwitchListTile(
+                          title: const Text('Se repite', style: TextStyle(fontWeight: FontWeight.bold)),
+                          activeColor: simaLightGreen,
+                          value: _esRecurrente,
+                          onChanged: (val) => setStateModal(() => _esRecurrente = val),
+                        ),
+                        if (_esRecurrente) Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(8)),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Se repite cada', style: TextStyle(color: Colors.grey)),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 60,
+                                    child: TextField(controller: _recurrenciaValorCtrl, keyboardType: TextInputType.number, textAlign: TextAlign.center)
+                                  ),
+                                  const SizedBox(width: 16),
+                                  DropdownButton<String>(
+                                    value: _recurrenciaTipo,
+                                    items: ['día', 'semana', 'mes', 'año'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                                    onChanged: (v) => setStateModal(() => _recurrenciaTipo = v!),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              TextField(controller: _horaCtrl, decoration: const InputDecoration(labelText: 'Hora (Ej: 12:30)')),
+                              const SizedBox(height: 16),
+                              const Text('Termina', style: TextStyle(color: Colors.grey)),
+                              RadioListTile(
+                                title: const Text('Nunca'), value: 'Nunca', groupValue: _terminaCondicion,
+                                onChanged: (v) => setStateModal(() => _terminaCondicion = v.toString()),
+                              ),
+                              RadioListTile(
+                                title: Row(
+                                  children: [
+                                    const Text('El '),
+                                    TextButton(
+                                      onPressed: () async {
+                                        DateTime? fecha = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime(2030));
+                                        if (fecha != null) setStateModal(() { _terminaFecha = fecha; _terminaCondicion = 'Fecha'; });
+                                      },
+                                      child: Text(_terminaFecha == null ? 'Seleccionar fecha' : _terminaFecha.toString().split(' ')[0])
+                                    )
+                                  ],
+                                ),
+                                value: 'Fecha', groupValue: _terminaCondicion,
+                                onChanged: (v) => setStateModal(() => _terminaCondicion = v.toString()),
+                              ),
+                              RadioListTile(
+                                title: Row(
+                                  children: [
+                                    const Text('Después de '),
+                                    SizedBox(width: 50, child: TextField(controller: _terminaRepeticionesCtrl, textAlign: TextAlign.center)),
+                                    const Text(' repeticiones'),
+                                  ],
+                                ),
+                                value: 'Repeticiones', groupValue: _terminaCondicion,
+                                onChanged: (v) => setStateModal(() => _terminaCondicion = v.toString()),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ]
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar', style: TextStyle(color: Colors.grey))),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: simaLightGreen),
+                  onPressed: () => _guardarOrden(idAEditar: ordenAEditar?['id']),
+                  child: Text(ordenAEditar == null ? 'Asignar Trabajo' : 'Guardar Cambios', style: const TextStyle(color: simaDarkGreen, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            );
+          }
+        );
+      },
+    );
   }
 
   @override
@@ -224,25 +695,19 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                children: const [
                   Text('Órdenes de Trabajo', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: simaDarkGreen)),
                   SizedBox(height: 4),
-                  Text('Listado oficial desde PostgreSQL.', style: TextStyle(color: Colors.grey, fontSize: 16)),
+                  Text('Listado oficial con funciones de edición.', style: TextStyle(color: Colors.grey, fontSize: 16)),
                 ],
               ),
               ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: simaLightGreen,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
+                style: ElevatedButton.styleFrom(backgroundColor: simaLightGreen, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18)),
                 icon: const Icon(Icons.add, color: simaDarkGreen),
                 label: const Text('Crear Nueva Orden', style: TextStyle(color: simaDarkGreen, fontSize: 16, fontWeight: FontWeight.bold)),
-                onPressed: () {
-                  // Futuro formulario
-                },
+                onPressed: () => _mostrarDialogoOrden(),
               )
             ],
           ),
@@ -254,33 +719,39 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
               child: _cargando
                   ? const Center(child: CircularProgressIndicator(color: simaDarkGreen))
                   : _ordenes.isEmpty
-                      ? const Center(child: Text('No hay órdenes registradas.', style: TextStyle(color: Colors.grey)))
+                      ? const Center(child: Text('No hay órdenes registradas.'))
                       : SingleChildScrollView(
                           scrollDirection: Axis.vertical,
                           child: DataTable(
-                            headingRowColor: WidgetStateProperty.all(simaBackground),
+                            headingRowColor: MaterialStateProperty.all(simaBackground),
                             columns: const [
                               DataColumn(label: Text('ID', style: TextStyle(fontWeight: FontWeight.bold))),
                               DataColumn(label: Text('Cliente', style: TextStyle(fontWeight: FontWeight.bold))),
                               DataColumn(label: Text('Dirección', style: TextStyle(fontWeight: FontWeight.bold))),
                               DataColumn(label: Text('Tarea', style: TextStyle(fontWeight: FontWeight.bold))),
                               DataColumn(label: Text('Estado', style: TextStyle(fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text('Acciones', style: TextStyle(fontWeight: FontWeight.bold))), // NUEVA COLUMNA
                             ],
                             rows: _ordenes.map((orden) {
                               return DataRow(cells: [
                                 DataCell(Text('#${orden['id']}')),
-                                DataCell(Text(orden['cliente'], style: const TextStyle(fontWeight: FontWeight.bold, color: simaDarkGreen))),
-                                DataCell(Text(orden['direccion'])),
-                                DataCell(Text(orden['tarea'])),
+                                DataCell(Text(orden['cliente'] ?? 'Desconocido', style: const TextStyle(fontWeight: FontWeight.bold, color: simaDarkGreen))),
+                                DataCell(Text(orden['direccion_trabajo'] ?? '')),
+                                DataCell(Text(orden['descripcion_tarea'] ?? '')),
                                 DataCell(
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                    decoration: BoxDecoration(
-                                      color: orden['estado'] == 'Pendiente' ? Colors.orange.shade100 : simaLightGreen.withValues(alpha: 0.3),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
+                                    decoration: BoxDecoration(color: orden['estado'] == 'Pendiente' ? Colors.orange.shade100 : simaLightGreen.withOpacity(0.3), borderRadius: BorderRadius.circular(20)),
                                     child: Text(orden['estado'], style: TextStyle(color: orden['estado'] == 'Pendiente' ? Colors.orange.shade900 : simaDarkGreen, fontWeight: FontWeight.bold)),
                                   ),
+                                ),
+                                DataCell(
+                                  Row(
+                                    children: [
+                                      IconButton(icon: const Icon(Icons.edit, color: Colors.blue), onPressed: () => _mostrarDialogoOrden(ordenAEditar: orden)),
+                                      IconButton(icon: const Icon(Icons.delete, color: Colors.red), onPressed: () => _eliminarOrden(orden['id'])),
+                                    ],
+                                  )
                                 ),
                               ]);
                             }).toList(),
@@ -294,7 +765,7 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
   }
 }
 
-// --- 4. TÉCNICOS (CONECTADA A BASE DE DATOS) ---
+// --- 3. TÉCNICOS ---
 class PantallaTecnicos extends StatefulWidget {
   const PantallaTecnicos({super.key});
 
@@ -306,7 +777,6 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
   List<dynamic> _tecnicos = [];
   bool _cargando = true;
 
-  // Controladores para leer lo que el administrador escribe
   final TextEditingController _nombreController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -317,10 +787,9 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
     _obtenerTecnicos();
   }
 
-  // Leer técnicos desde Node.js
   Future<void> _obtenerTecnicos() async {
     try {
-      final respuesta = await http.get(Uri.parse('http://localhost:3000/api/tecnicos'));
+      final respuesta = await http.get(Uri.parse('http://127.0.0.1:3000/api/tecnicos'));
       if (respuesta.statusCode == 200) {
         setState(() {
           _tecnicos = json.decode(respuesta.body);
@@ -328,20 +797,16 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
         });
       }
     } catch (e) {
-      print('Error de conexión: $e');
       setState(() => _cargando = false);
     }
   }
 
-  // Enviar nuevo técnico a Node.js
   Future<void> _registrarTecnico() async {
-    if (_nombreController.text.isEmpty || _emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      return; // Validación simple para no enviar campos vacíos
-    }
+    if (_nombreController.text.isEmpty || _emailController.text.isEmpty || _passwordController.text.isEmpty) return; 
 
     try {
       final respuesta = await http.post(
-        Uri.parse('http://localhost:3000/api/tecnicos'),
+        Uri.parse('http://127.0.0.1:3000/api/tecnicos'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'nombre': _nombreController.text,
@@ -354,15 +819,15 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
         _nombreController.clear();
         _emailController.clear();
         _passwordController.clear();
-        Navigator.of(context).pop(); // Cerrar el cuadro de diálogo
-        _obtenerTecnicos(); // Refrescar la lista automáticamente
+        Navigator.of(context).pop(); 
+        setState(() => _cargando = true);
+        _obtenerTecnicos(); 
       }
     } catch (e) {
       print('Error al registrar: $e');
     }
   }
 
-  // Dibujar el cuadro de diálogo emergente
   void _mostrarDialogoNuevoTecnico() {
     showDialog(
       context: context,
@@ -373,7 +838,7 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(controller: _nombreController, decoration: const InputDecoration(labelText: 'Nombre completo')),
-              TextField(controller: _emailController, decoration: const InputDecoration(labelText: 'Correo electrónico (para la app)')),
+              TextField(controller: _emailController, decoration: const InputDecoration(labelText: 'Correo electrónico')),
               TextField(controller: _passwordController, decoration: const InputDecoration(labelText: 'Contraseña'), obscureText: true),
             ],
           ),
@@ -408,7 +873,7 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
                 children: [
                   Text('Gestión de Técnicos', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: simaDarkGreen)),
                   SizedBox(height: 4),
-                  Text('Administración de cuentas, correos y contraseñas de la app.', style: TextStyle(color: Colors.grey, fontSize: 16)),
+                  Text('Administración de cuentas, correos y credenciales de la app.', style: TextStyle(color: Colors.grey, fontSize: 16)),
                 ],
               ),
               ElevatedButton.icon(
@@ -419,7 +884,7 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
                 ),
                 icon: const Icon(Icons.person_add, color: simaDarkGreen),
                 label: const Text('Registrar Técnico', style: TextStyle(color: simaDarkGreen, fontSize: 16, fontWeight: FontWeight.bold)),
-                onPressed: _mostrarDialogoNuevoTecnico, // Abre el modal
+                onPressed: _mostrarDialogoNuevoTecnico, 
               )
             ],
           ),
@@ -440,12 +905,10 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
                             final tecnico = _tecnicos[index];
                             return ListTile(
                               leading: const CircleAvatar(backgroundColor: simaDarkGreen, child: Icon(Icons.person, color: simaLightGreen)),
-                              title: Text(tecnico['nombre'], style: const TextStyle(fontWeight: FontWeight.bold)),
-                              subtitle: Text(tecnico['email']),
+                              title: Text(tecnico['nombre'] ?? 'Sin Nombre', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              subtitle: Text(tecnico['email'] ?? 'Sin correo'),
                               trailing: OutlinedButton(
-                                onPressed: () {
-                                  // Próximamente: Editar o cambiar clave
-                                },
+                                onPressed: () {},
                                 child: const Text('Editar', style: TextStyle(color: simaDarkGreen)),
                               ),
                             );
@@ -458,9 +921,39 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
     );
   }
 }
-// --- 5. INFORMES ---
-class PantallaInformes extends StatelessWidget {
+
+// --- 5. INFORMES (DINÁMICO DESDE DISCO K) ---
+class PantallaInformes extends StatefulWidget {
   const PantallaInformes({super.key});
+
+  @override
+  State<PantallaInformes> createState() => _PantallaInformesState();
+}
+
+class _PantallaInformesState extends State<PantallaInformes> {
+  List<dynamic> _carpetas = [];
+  bool _cargando = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _obtenerCarpetasDiscoK();
+  }
+
+  Future<void> _obtenerCarpetasDiscoK() async {
+    try {
+      final respuesta = await http.get(Uri.parse('http://127.0.0.1:3000/api/informes/carpetas'));
+      if (respuesta.statusCode == 200) {
+        setState(() {
+          _carpetas = json.decode(respuesta.body);
+          _cargando = false;
+        });
+      }
+    } catch (e) {
+      print('Error al leer carpetas: $e');
+      setState(() => _cargando = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -469,22 +962,27 @@ class PantallaInformes extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Informes', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: simaDarkGreen)),
+          const Text('Informes (Disco K)', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: simaDarkGreen)),
           const SizedBox(height: 8),
-          const Text('PDFs organizados por empresa cliente.', style: TextStyle(color: Colors.grey, fontSize: 16)),
+          const Text('Lectura en vivo de las carpetas alojadas en el servidor.', style: TextStyle(color: Colors.grey, fontSize: 16)),
           const SizedBox(height: 32),
           Expanded(
-            child: GridView.count(
-              crossAxisCount: 5,
-              crossAxisSpacing: 20,
-              mainAxisSpacing: 20,
-              children: [
-                _carpetaEmpresa('Clínica del Sol', '12 informes'),
-                _carpetaEmpresa('Empresa Norte', '8 informes'),
-                _carpetaEmpresa('Hotel Central', '25 informes'),
-                _carpetaEmpresa('Supermercados Plus', '3 informes'),
-              ],
-            ),
+            child: _cargando
+                ? const Center(child: CircularProgressIndicator(color: simaDarkGreen))
+                : _carpetas.isEmpty
+                    ? const Center(child: Text('No se detectaron carpetas en el Disco K de la empresa.', style: TextStyle(color: Colors.grey, fontSize: 18)))
+                    : GridView.builder(
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 5,
+                          crossAxisSpacing: 20,
+                          mainAxisSpacing: 20,
+                        ),
+                        itemCount: _carpetas.length,
+                        itemBuilder: (context, index) {
+                          final carpeta = _carpetas[index];
+                          return _carpetaEmpresa(carpeta['empresa'], '${carpeta['cantidad']} informes');
+                        },
+                      ),
           )
         ],
       ),
@@ -507,12 +1005,13 @@ class PantallaInformes extends StatelessWidget {
   }
 }
 
-// --- 6. ANÁLISIS ---
+// --- 5. ANÁLISIS ---
 class PantallaAnalisis extends StatelessWidget {
   const PantallaAnalisis({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // ...
     return Padding(
       padding: const EdgeInsets.all(40.0),
       child: Column(

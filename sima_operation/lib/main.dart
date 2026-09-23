@@ -81,12 +81,61 @@ class PantallaLogin extends StatefulWidget {
 class _PantallaLoginState extends State<PantallaLogin> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _cargando = false;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _iniciarSesion() async {
+    setState(() => _cargando = true);
+
+    try {
+      // ⚠️ IMPORTANTE: Cambia esta IP por la Dirección IPv4 de tu PC (puerto 3000 del backend)
+      final url = Uri.parse('http://192.168.56.1:3000/api/tecnicos/login'); 
+      
+      final respuesta = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'email': _emailController.text.trim(),
+          'password': _passwordController.text.trim(),
+        }),
+      );
+
+      if (respuesta.statusCode == 200) {
+        final datosTecnico = json.decode(respuesta.body);
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('¡Bienvenido, ${datosTecnico['nombre']}!'), backgroundColor: simaDarkGreen)
+        );
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PantallaPrincipal(
+              tecnicoId: (datosTecnico['id'] as num).toInt(),
+              nombre: datosTecnico['nombre'] ?? 'Técnico',
+              email: datosTecnico['email'] ?? '',
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Credenciales incorrectas'), backgroundColor: Colors.red)
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error de conexión con el servidor'), backgroundColor: Colors.red)
+      );
+    } finally {
+      if (mounted) setState(() => _cargando = false);
+    }
   }
 
   @override
@@ -99,61 +148,41 @@ class _PantallaLoginState extends State<PantallaLogin> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                'assets/images/LOGO2.png',
-                height: 120,
-                errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, size: 100, color: simaDarkGreen),
-              ),
+              Image.asset('assets/images/LOGO2.png', height: 120, errorBuilder: (c, e, s) => const Icon(Icons.broken_image, size: 100, color: simaDarkGreen)),
               const SizedBox(height: 48),
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 5))],
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 5))],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Iniciar Sesión', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: simaDarkGreen)),
                     const SizedBox(height: 20),
-                    const Text('Correo electrónico', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
-                    const SizedBox(height: 8),
                     TextField(
                       controller: _emailController,
-                      decoration: InputDecoration(
-                        hintText: 'operativo@sima.com',
-                        filled: true,
-                        fillColor: simaBackground,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                      ),
+                      decoration: InputDecoration(hintText: 'Correo del técnico', filled: true, fillColor: simaBackground, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)),
+                      keyboardType: TextInputType.emailAddress,
                     ),
                     const SizedBox(height: 16),
-                    const Text('Contraseña', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
-                    const SizedBox(height: 8),
                     TextField(
                       controller: _passwordController,
                       obscureText: true,
-                      decoration: InputDecoration(
-                        hintText: '••••••••',
-                        filled: true,
-                        fillColor: simaBackground,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                      ),
+                      decoration: InputDecoration(hintText: 'Contraseña', filled: true, fillColor: simaBackground, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)),
                     ),
                     const SizedBox(height: 24),
                     SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: simaLightGreen,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                        onPressed: () {
-                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const PantallaPrincipal()));
-                        },
-                        child: const Text('Ingresar', style: TextStyle(color: simaDarkGreen, fontSize: 16, fontWeight: FontWeight.bold)),
+                        style: ElevatedButton.styleFrom(backgroundColor: simaLightGreen, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                        onPressed: _cargando ? null : _iniciarSesion,
+                        child: _cargando 
+                          ? const CircularProgressIndicator(color: simaDarkGreen)
+                          : const Text('Ingresar', style: TextStyle(color: simaDarkGreen, fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ],
@@ -171,7 +200,16 @@ class _PantallaLoginState extends State<PantallaLogin> {
 // CONTENEDOR PRINCIPAL
 // ---------------------------------------------------
 class PantallaPrincipal extends StatefulWidget {
-  const PantallaPrincipal({super.key});
+  final int tecnicoId;
+  final String nombre;
+  final String email;
+
+  const PantallaPrincipal({
+    super.key,
+    required this.tecnicoId,
+    required this.nombre,
+    required this.email,
+  });
 
   @override
   State<PantallaPrincipal> createState() => _PantallaPrincipalState();
@@ -179,12 +217,25 @@ class PantallaPrincipal extends StatefulWidget {
 
 class _PantallaPrincipalState extends State<PantallaPrincipal> {
   int _indiceActual = 0;
-  final List<Widget> _pantallas = [const TabDashboard(), const TabOrdenes(), const TabMasPlaceholder()];
 
   @override
   Widget build(BuildContext context) {
+    final pantallas = [
+      TabDashboard(
+        tecnicoId: widget.tecnicoId,
+        nombreTecnico: widget.nombre,
+        emailTecnico: widget.email,
+      ),
+      TabOrdenes(
+        tecnicoId: widget.tecnicoId,
+        nombreTecnico: widget.nombre,
+        emailTecnico: widget.email,
+      ),
+      TabMasPlaceholder(nombre: widget.nombre, email: widget.email),
+    ];
+
     return Scaffold(
-      body: _pantallas[_indiceActual],
+      body: pantallas[_indiceActual],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _indiceActual,
         onTap: (index) => setState(() => _indiceActual = index),
@@ -207,7 +258,16 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
 // 1. TAB DASHBOARD
 // ---------------------------------------------------
 class TabDashboard extends StatelessWidget {
-  const TabDashboard({super.key});
+  final int tecnicoId;
+  final String nombreTecnico;
+  final String emailTecnico;
+
+  const TabDashboard({
+    super.key,
+    required this.tecnicoId,
+    required this.nombreTecnico,
+    required this.emailTecnico,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -236,7 +296,7 @@ class TabDashboard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Hola, Juan 👋', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: simaDarkGreen)),
+            Text('Hola, $nombreTecnico 👋', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: simaDarkGreen)),
             const Text('Resumen de tu jornada', style: TextStyle(color: Colors.grey, fontSize: 14)),
             const SizedBox(height: 20),
             GridView.count(
@@ -261,7 +321,14 @@ class TabDashboard extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => PantallaDetalle(orden: orden)),
+                    MaterialPageRoute(
+                      builder: (context) => PantallaDetalle(
+                        orden: orden,
+                        tecnicoId: tecnicoId,
+                        nombreTecnico: nombreTecnico,
+                        emailTecnico: emailTecnico,
+                      ),
+                    ),
                   );
                 },
                 child: _tarjetaOrdenMini(orden['cliente'], orden['direccion'], orden['hora'], orden['estado'], orden['fondoEstado'], orden['textoEstado']),
@@ -325,7 +392,16 @@ class TabDashboard extends StatelessWidget {
 // 2. TAB ÓRDENES
 // ---------------------------------------------------
 class TabOrdenes extends StatelessWidget {
-  const TabOrdenes({super.key});
+  final int tecnicoId;
+  final String nombreTecnico;
+  final String emailTecnico;
+
+  const TabOrdenes({
+    super.key,
+    required this.tecnicoId,
+    required this.nombreTecnico,
+    required this.emailTecnico,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -384,7 +460,17 @@ class TabOrdenes extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         if (orden['estado'] != 'Completada') {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => PantallaDetalle(orden: orden)));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PantallaDetalle(
+                orden: orden,
+                tecnicoId: tecnicoId,
+                nombreTecnico: nombreTecnico,
+                emailTecnico: emailTecnico,
+              ),
+            ),
+          );
         }
       },
       child: _tarjetaOrdenMiniDetalle(orden['cliente'], orden['direccion'], orden['hora'], orden['estado'], orden['fondoEstado'], orden['textoEstado']),
@@ -427,8 +513,17 @@ class TabOrdenes extends StatelessWidget {
 // ---------------------------------------------------
 class PantallaDetalle extends StatelessWidget {
   final Map orden;
+  final int tecnicoId;
+  final String nombreTecnico;
+  final String emailTecnico;
 
-  const PantallaDetalle({super.key, required this.orden});
+  const PantallaDetalle({
+    super.key,
+    required this.orden,
+    required this.tecnicoId,
+    required this.nombreTecnico,
+    required this.emailTecnico,
+  });
 
   Future<void> registrarCheckIn(BuildContext context) async {
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Obteniendo ubicación GPS...')));
@@ -449,7 +544,18 @@ class PantallaDetalle extends StatelessWidget {
         SnackBar(content: Text('Check-in exitoso.\nLat: ${posicion.latitude} | Lng: ${posicion.longitude}'), backgroundColor: simaDarkGreen),
       );
 
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => PantallaTrabajoProgreso(orden: orden, posicion: posicion)));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PantallaTrabajoProgreso(
+            orden: orden,
+            posicion: posicion,
+            tecnicoId: tecnicoId,
+            nombreTecnico: nombreTecnico,
+            emailTecnico: emailTecnico,
+          ),
+        ),
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString()), backgroundColor: Colors.red));
     }
@@ -510,8 +616,18 @@ class PantallaDetalle extends StatelessWidget {
 class PantallaTrabajoProgreso extends StatefulWidget {
   final Map orden;
   final Position posicion;
+  final int tecnicoId;
+  final String nombreTecnico;
+  final String emailTecnico;
 
-  const PantallaTrabajoProgreso({super.key, required this.orden, required this.posicion});
+  const PantallaTrabajoProgreso({
+    super.key,
+    required this.orden,
+    required this.posicion,
+    required this.tecnicoId,
+    required this.nombreTecnico,
+    required this.emailTecnico,
+  });
 
   @override
   State<PantallaTrabajoProgreso> createState() => _PantallaTrabajoProgresoState();
@@ -710,7 +826,13 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
                       // 2. Regresar a la pantalla principal limpiando el historial
                       Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+                        MaterialPageRoute(
+                          builder: (context) => PantallaPrincipal(
+                            tecnicoId: widget.tecnicoId,
+                            nombre: widget.nombreTecnico,
+                            email: widget.emailTecnico,
+                          ),
+                        ),
                         (route) => false,
                       );
                     }
@@ -732,7 +854,11 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
 // 5. TAB MÁS
 // ---------------------------------------------------
 class TabMasPlaceholder extends StatelessWidget {
-  const TabMasPlaceholder({super.key});
+  final String nombre;
+  final String email;
+
+  const TabMasPlaceholder({super.key, required this.nombre, required this.email});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -748,7 +874,7 @@ class TabMasPlaceholder extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.person, color: simaDarkGreen),
             title: const Text('Perfil del Técnico'),
-            subtitle: const Text('Juan Pérez (juan@sima.com)'),
+            subtitle: Text('$nombre ($email)'),
             onTap: () {},
           ),
           const Divider(),

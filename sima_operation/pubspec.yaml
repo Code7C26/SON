@@ -59,14 +59,16 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # Si metiste los logos en la carpeta images, la ruta es así:
   assets:
     - assets/images/LOGO1.png
     - assets/images/LOGO2.png
-    # (Si los dejaste sueltos en assets, déjalos como assets/LOGO1.png)
 
-  # Aquí está la corrección clave para la ruta de tu fuente:
   fonts:
     - family: TuFuente
       fonts:
         - asset: assets/fonts/BwGradualDEMO-Regular.otf
+          weight: 400
+        - asset: assets/fonts/BwGradualDEMO-Medium.otf
+          weight: 500
+        - asset: assets/fonts/BwGradualDEMO-Bold.otf
+          weight: 700
