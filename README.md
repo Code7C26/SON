@@ -27,7 +27,6 @@ La solución articula tres pilares desacoplados que garantizan alta disponibilid
 * **Panel de Control Central (Administración):** Implementado en **Flutter Web**, optimizado para supervisión global, despacho de servicios y visualización geoespacial.
 * **Backend y Servicios Core:** API REST desarrollada en **Node.js con Express**, con persistencia relacional en **PostgreSQL**, transaccionalidad segura y servicios dedicados de generación de documentos formales mediante **PDFKit**.
 
-El servidor expone la API, sirve el panel y la aplicación web del técnico, y entrega los comprobantes al repositorio documental de la organización. En producción, el perímetro HTTPS queda a cargo de **Caddy**, orquestado junto con la base de datos mediante **Docker Compose**.
 
 ---
 
