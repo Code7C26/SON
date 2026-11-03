@@ -1,0 +1,478 @@
+{
+  "descripcion": "Honorarios referenciales del CIEC de enero de 2026 y módulos del Colegio de Geólogos, tomados de la planilla de la empresa. Las filas sin valor son las que la planilla todavía no tiene completas.",
+  "mes_base": "2026-01",
+  "valor_modulo_geologos": 44000,
+  "notas": {
+    "Protocolo I - Cond. de Seguridad (R2-R3-R4)": "Esta tabla se usa para el EPI: Estudio de Protección contra incendio. El presupuesto se hace tomando la columna verde (honorarios referenciales). Los aranceles y tasas se cobran por separado, se informan pero no se presupuestan. Los aranceles los paga el comitente o el profesional, quienes les pagan al colegio.",
+    "Protocolo I - Cond. de Seguridad (R5-R6)": "Esta tabla se usa para el EPI: Estudio de Protección contra incendio. El presupuesto se hace tomando la columna verde (honorarios referenciales). Los aranceles y tasas se cobran por separado, se informan pero no se presupuestan. Los aranceles los paga el comitente o el profesional, quienes les pagan al colegio. Ver la tabla de riesgos y sus significados R2 a R6 y por superficie.",
+    "Protocolo II - VISADO Cond. de Seguridad (R2-R3-R4)": "Este cuadro es para la renovación (idem anterior pero para renovar todos los años)",
+    "Protocolo III - Manual de Emergencias (R2 a R6)": "Plan de evacuación y manual de emergencias es lo mismo. Cuando se hace el EPI y se pide el manual de emergencia, adicionalmente se cobra este concepto",
+    "Protocolo IV - Proyecto Seguridad Contra Incendio (R2-R3-R4)": "Esta tabla se utiliza cuando se pide para una obra en construcción para ser incluidos en el diseño de construcción",
+    "Protocolo VI - Protocolos de Ergonomía": "Esta tabla se utiliza para el estudio de la ergonomía de cada puesto de trabajo",
+    "Honorarios Servicios HyS - Excepto Construcción": "La cantidad de personas se toma con los operativos + 50 % de los administrativos."
+  },
+  "tarifas": [
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo I - Cond. de Seguridad (R2-R3-R4)",
+      "tramo": "0-250 m²",
+      "detalle": "1 DTT+ 1 DTG",
+      "valor_base": 280000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo I - Cond. de Seguridad (R2-R3-R4)",
+      "tramo": "251-500 m²",
+      "detalle": "(DTT+DTG)*1,8",
+      "valor_base": 504000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo I - Cond. de Seguridad (R2-R3-R4)",
+      "tramo": "501-1.500 m²",
+      "detalle": "(DTT+DTG)*2,8",
+      "valor_base": 784000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo I - Cond. de Seguridad (R2-R3-R4)",
+      "tramo": "1.501-3.000 m²",
+      "detalle": "(DTT+DTG)*4",
+      "valor_base": 1120000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo I - Cond. de Seguridad (R2-R3-R4)",
+      "tramo": "3.001-5.000 m²",
+      "detalle": "(DTT+DTG)*5",
+      "valor_base": 1400000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo I - Cond. de Seguridad (R2-R3-R4)",
+      "tramo": "5.001-10.000 m²",
+      "detalle": "(DTT+DTG)*6",
+      "valor_base": 1680000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo I - Cond. de Seguridad (R2-R3-R4)",
+      "tramo": "10.001-20.000 m²",
+      "detalle": "(DTT+DTG)*7",
+      "valor_base": 1960000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo I - Cond. de Seguridad (R2-R3-R4)",
+      "tramo": "Más de 10.000 m²",
+      "detalle": "(DTT+DTG)*(7+n)",
+      "valor_base": null
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo I - Cond. de Seguridad (R5-R6)",
+      "tramo": "0-250 m²",
+      "detalle": null,
+      "valor_base": 224000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo I - Cond. de Seguridad (R5-R6)",
+      "tramo": "251-500 m²",
+      "detalle": null,
+      "valor_base": 403200
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo I - Cond. de Seguridad (R5-R6)",
+      "tramo": "501-1.500 m²",
+      "detalle": "90% de honorarios R2-R3-R4",
+      "valor_base": 627200
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo I - Cond. de Seguridad (R5-R6)",
+      "tramo": "1.501-3.000 m²",
+      "detalle": "90% de honorarios R2-R3-R4",
+      "valor_base": 896000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo I - Cond. de Seguridad (R5-R6)",
+      "tramo": "3.001-5.000 m²",
+      "detalle": "90% de honorarios R2-R3-R4",
+      "valor_base": 1120000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo I - Cond. de Seguridad (R5-R6)",
+      "tramo": "5.001-10.000 m²",
+      "detalle": "90% de honorarios R2-R3-R4",
+      "valor_base": 1344000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo I - Cond. de Seguridad (R5-R6)",
+      "tramo": "10.001-20.000 m²",
+      "detalle": "90% de honorarios R2-R3-R4",
+      "valor_base": 1568000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo I - Cond. de Seguridad (R5-R6)",
+      "tramo": "Más de 10.000 m²",
+      "detalle": "(DTT+DTG)*(7+n)*0,90",
+      "valor_base": null
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo II - VISADO Cond. de Seguridad (R2-R3-R4)",
+      "tramo": "0-250 m²",
+      "detalle": null,
+      "valor_base": 98000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo II - VISADO Cond. de Seguridad (R2-R3-R4)",
+      "tramo": "251-500 m²",
+      "detalle": null,
+      "valor_base": 176400
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo II - VISADO Cond. de Seguridad (R2-R3-R4)",
+      "tramo": "501-1.500 m²",
+      "detalle": "35% de honorarios Protocolo I",
+      "valor_base": 274400
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo II - VISADO Cond. de Seguridad (R2-R3-R4)",
+      "tramo": "1.501-3.000 m²",
+      "detalle": "35% de honorarios Protocolo I",
+      "valor_base": 392000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo II - VISADO Cond. de Seguridad (R2-R3-R4)",
+      "tramo": "3.001-5.000 m²",
+      "detalle": "35% de honorarios Protocolo I",
+      "valor_base": 490000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo II - VISADO Cond. de Seguridad (R2-R3-R4)",
+      "tramo": "5.001-10.000 m²",
+      "detalle": null,
+      "valor_base": 588000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo II - VISADO Cond. de Seguridad (R2-R3-R4)",
+      "tramo": "10.001-20.000 m²",
+      "detalle": null,
+      "valor_base": 686000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo III - Manual de Emergencias (R2 a R6)",
+      "tramo": "0-250 m²",
+      "detalle": null,
+      "valor_base": 112000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo III - Manual de Emergencias (R2 a R6)",
+      "tramo": "251-500 m²",
+      "detalle": null,
+      "valor_base": 201600
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo III - Manual de Emergencias (R2 a R6)",
+      "tramo": "501-1.500 m²",
+      "detalle": "40% honorarios Protocolo I",
+      "valor_base": 313600
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo III - Manual de Emergencias (R2 a R6)",
+      "tramo": "1.501-3.000 m²",
+      "detalle": "40% honorarios Protocolo I",
+      "valor_base": 448000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo III - Manual de Emergencias (R2 a R6)",
+      "tramo": "3.001-5.000 m²",
+      "detalle": "40% honorarios Protocolo I",
+      "valor_base": 560000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo III - Manual de Emergencias (R2 a R6)",
+      "tramo": "5.001-10.000 m²",
+      "detalle": null,
+      "valor_base": 672000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo III - Manual de Emergencias (R2 a R6)",
+      "tramo": "10.001-20.000 m²",
+      "detalle": null,
+      "valor_base": 784000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo IV - Proyecto Seguridad Contra Incendio (R2-R3-R4)",
+      "tramo": "Hasta 1.000 m²",
+      "detalle": "(DTT+DTG)*4",
+      "valor_base": 1120000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo IV - Proyecto Seguridad Contra Incendio (R2-R3-R4)",
+      "tramo": "1.001-5.000 m²",
+      "detalle": "(DTT+DTG)*8",
+      "valor_base": 2240000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo IV - Proyecto Seguridad Contra Incendio (R2-R3-R4)",
+      "tramo": "5.001-10.000 m²",
+      "detalle": "(DTT+DTG)*12",
+      "valor_base": 3360000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo IV - Proyecto Seguridad Contra Incendio (R2-R3-R4)",
+      "tramo": "Más de 10.000 m²",
+      "detalle": "(DTT+DTG)*(12+1,5*n)",
+      "valor_base": null
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo VI - Protocolos de Ergonomía",
+      "tramo": "1-5 puestos de trabajo",
+      "detalle": "2DTT+2DTG",
+      "valor_base": 560000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo VI - Protocolos de Ergonomía",
+      "tramo": "6-15 puestos de trabajo",
+      "detalle": "2DTT+6DTG",
+      "valor_base": 1080000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo VI - Protocolos de Ergonomía",
+      "tramo": "16-30 puestos de trabajo",
+      "detalle": "2DTT+8DTG",
+      "valor_base": 1340000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo VI - Protocolos de Ergonomía",
+      "tramo": "31-60 puestos de trabajo",
+      "detalle": "3DTT+10DTG",
+      "valor_base": 1750000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo VI - Protocolos de Ergonomía",
+      "tramo": "60-100 puestos de trabajo",
+      "detalle": "3DTT+15DTG",
+      "valor_base": 2400000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Protocolo VI - Protocolos de Ergonomía",
+      "tramo": "Más de 100 puestos de trabajo",
+      "detalle": "se agrega 35% acumulado",
+      "valor_base": null
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Honorarios Servicios HyS - Excepto Construcción",
+      "tramo": "1 a 15 trabajadores",
+      "detalle": "4 horas profesionales por mes - 2 DTT + 1 DTG",
+      "valor_base": 430000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Honorarios Servicios HyS - Excepto Construcción",
+      "tramo": "16 a 30 trabajadores",
+      "detalle": "8 horas profesionales por mes - 2 DTT + 2 DTG",
+      "valor_base": 560000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Honorarios Servicios HyS - Excepto Construcción",
+      "tramo": "31 a 60 trabajadores",
+      "detalle": "16 horas profesionales por mes - 3 DTT + 3 DTG",
+      "valor_base": 840000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Honorarios Servicios HyS - Excepto Construcción",
+      "tramo": "61 a 100 trabajadores",
+      "detalle": "28 horas profesionales por mes - 3 DTT + 4 DTG",
+      "valor_base": 970000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Honorarios Servicios HyS - Excepto Construcción",
+      "tramo": "101 a 150 trabajadores",
+      "detalle": "44 horas profesionales por mes - 4 DTT + 4 DTG",
+      "valor_base": 1120000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Honorarios Servicios HyS - Excepto Construcción",
+      "tramo": "151 a 250 trabajadores",
+      "detalle": "60 horas profesionales por mes - 5 DTT + 6 DTG",
+      "valor_base": 1530000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Honorarios Servicios HyS - Excepto Construcción",
+      "tramo": "251 a 350 trabajadores",
+      "detalle": "78 horas profesionales por mes - 6 DTT + 6 DTG",
+      "valor_base": 1680000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Honorarios Servicios HyS - Excepto Construcción",
+      "tramo": "351 a 500 trabajadores",
+      "detalle": "96 horas profesionales por mes - 7 DTT + 7 DTG",
+      "valor_base": 1960000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Honorarios Servicios HyS - Construcción",
+      "tramo": "1 a 15 operarios",
+      "detalle": "de 3 a 5 horas profesionales por semana - 2 DTT + 2 DTG",
+      "valor_base": 560000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Honorarios Servicios HyS - Construcción",
+      "tramo": "16 a 50 operarios",
+      "detalle": "de 5 a 10 horas profesionales por semana - 3 DTT + 3 DTG",
+      "valor_base": 840000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Honorarios Servicios HyS - Construcción",
+      "tramo": "51 a 100 operarios",
+      "detalle": "de 10 a 15 horas profesionales por semana - 4 DTT + 4 DTG",
+      "valor_base": 1120000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Honorarios Servicios HyS - Construcción",
+      "tramo": "101 a 150 operarios",
+      "detalle": "de 15 a 20 horas profesionales por semana - 6 DTT + 6 DTG",
+      "valor_base": 1680000
+    },
+    {
+      "familia": "CIEC",
+      "servicio": "Honorarios Servicios HyS - Construcción",
+      "tramo": "151 o más operarios",
+      "detalle": "30 o más horas profesionales por semana - 8 DTT + 8 DTG",
+      "valor_base": 2240000
+    },
+    {
+      "familia": "Colegio de Geólogos",
+      "servicio": "Aviso de Proyecto (Anexo II, Ley Provincial 10.208)",
+      "tramo": "",
+      "detalle": "30 módulos (honorario mínimo del Colegio de Geólogos)",
+      "valor_base": null,
+      "modulos": 30
+    },
+    {
+      "familia": "Colegio de Geólogos",
+      "servicio": "Estudio de Impacto Ambiental (Anexo I, Ley Provincial 10.208)",
+      "tramo": "",
+      "detalle": "50 módulos (honorario mínimo del Colegio de Geólogos)",
+      "valor_base": null,
+      "modulos": 50
+    },
+    {
+      "familia": "Colegio de Geólogos",
+      "servicio": "Estudio de Impacto Ambiental para Loteos y Planes de Vivienda de hasta 25 ha (Ley Provincial 10.208)",
+      "tramo": "",
+      "detalle": "40 módulos (honorario mínimo del Colegio de Geólogos)",
+      "valor_base": null,
+      "modulos": 40
+    },
+    {
+      "familia": "Colegio de Geólogos",
+      "servicio": "Estudio de Impacto Ambiental para Loteos y Planes de Vivienda de más de 25 ha (Ley Provincial 10.208)",
+      "tramo": "",
+      "detalle": "50 módulos (honorario mínimo del Colegio de Geólogos)",
+      "valor_base": null,
+      "modulos": 50
+    },
+    {
+      "familia": "Colegio de Geólogos",
+      "servicio": "Auditoría de Cumplimiento de un proyecto que fue Aviso de Proyecto (Anexo II, Ley Provincial 10.208)",
+      "tramo": "",
+      "detalle": "30 módulos (honorario mínimo del Colegio de Geólogos)",
+      "valor_base": null,
+      "modulos": 30
+    },
+    {
+      "familia": "Colegio de Geólogos",
+      "servicio": "Auditoría de Cumplimiento de un proyecto que fue Estudio de Impacto Ambiental (Anexo I, Ley Provincial 10.208)",
+      "tramo": "",
+      "detalle": "50 módulos (honorario mínimo del Colegio de Geólogos)",
+      "valor_base": null,
+      "modulos": 50
+    },
+    {
+      "familia": "Colegio de Geólogos",
+      "servicio": "Informe de Impacto Ambiental de Minería (Ley Nacional 24.585, Resolución 025/98)",
+      "tramo": "",
+      "detalle": "30 módulos (honorario mínimo del Colegio de Geólogos)",
+      "valor_base": null,
+      "modulos": 30
+    },
+    {
+      "familia": "Colegio de Geólogos",
+      "servicio": "Actualización de Informe de Impacto Ambiental de Minería (Ley Nacional 24.585, Resolución 025/98)",
+      "tramo": "",
+      "detalle": "25 módulos (honorario mínimo del Colegio de Geólogos)",
+      "valor_base": null,
+      "modulos": 25
+    }
+  ],
+  "costos": [
+    {
+      "concepto": "Hora Técnico",
+      "unidad": "hora",
+      "indexa": true
+    },
+    {
+      "concepto": "Hora Licenciado",
+      "unidad": "hora",
+      "indexa": true
+    },
+    {
+      "concepto": "Viáticos",
+      "unidad": "día",
+      "indexa": true
+    },
+    {
+      "concepto": "Hotel",
+      "unidad": "noche",
+      "indexa": true
+    },
+    {
+      "concepto": "Kilómetro en auto",
+      "unidad": "km",
+      "indexa": false
+    }
+  ]
+}

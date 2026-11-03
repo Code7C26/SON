@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SON</title>
+  <link rel="icon" href="icono.png">
+  <style>
+    @font-face {
+      font-family: "Bw Gradual";
+      src: url("fuentes/BwGradualDEMO-Regular.otf") format("opentype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "Bw Gradual";
+      src: url("fuentes/BwGradualDEMO-Medium.otf") format("opentype");
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "Bw Gradual";
+      src: url("fuentes/BwGradualDEMO-Medium.otf") format("opentype");
+      font-weight: 600;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "Bw Gradual";
+      src: url("fuentes/BwGradualDEMO-Bold.otf") format("opentype");
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "Bw Gradual";
+      src: url("fuentes/BwGradualDEMO-Bold.otf") format("opentype");
+      font-weight: 800;
+      font-style: normal;
+      font-display: swap;
+    }
+    :root {
+      --coral: #ff6147;
+      --oro: #d99c13;
+      --tinta: #2e2e2e;
+      --claro: #f4f4f4;
+      --blanco: #ffffff;
+      --suave: #6a6a6a;
+      --linea: #e6e6e6;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Bw Gradual", system-ui, sans-serif;
+      background: var(--blanco);
+      color: var(--tinta);
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    .ancho { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255, 255, 255, 0.94);
+      border-bottom: 1px solid var(--linea);
+      backdrop-filter: blur(10px);
+    }
+    .barra {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+    .marca { height: 38px; width: auto; }
+    nav { margin-left: auto; display: flex; align-items: center; gap: 26px; }
+    nav a { color: #4a4a4a; font-weight: 600; font-size: 15px; }
+    nav a:hover { color: var(--tinta); }
+    .ingresar, .demo, .blanco {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      font-weight: 700;
+      padding: 11px 18px;
+    }
+    .ingresar { border: 1px solid #d9d9d9; background: var(--blanco); color: var(--tinta); }
+    .ingresar:hover { border-color: var(--tinta); }
+    .demo { background: var(--coral); color: var(--tinta); }
+    .demo:hover { filter: brightness(0.97); }
+    .blanco { background: var(--blanco); color: var(--tinta); }
+    .menu { display: none; }
+
+    .hero { padding: 72px 0 36px; }
+    .hero-grilla {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 48px;
+      align-items: center;
+    }
+    h1 {
+      margin: 0 0 18px;
+      font-size: 52px;
+      line-height: 1.05;
+      letter-spacing: -1.4px;
+      font-weight: 800;
+    }
+    h1 span { color: var(--coral); }
+    .baja { margin: 0; max-width: 520px; font-size: 18px; line-height: 1.55; color: #555; }
+    .acciones { margin-top: 28px; }
+
+    .laptop { width: min(100%, 520px); margin-left: auto; }
+    .pantalla {
+      background: #1c1c1c;
+      border: 10px solid #2a2a2a;
+      border-bottom-width: 12px;
+      border-radius: 16px 16px 8px 8px;
+      box-shadow: 0 24px 50px rgba(46, 46, 46, 0.16);
+      overflow: hidden;
+    }
+    .app { display: grid; grid-template-columns: 92px 1fr; min-height: 280px; background: #f7f7f7; }
+    .lado { background: var(--tinta); color: #fff; padding: 14px 10px; }
+    .lado .punto {
+      width: 22px; height: 22px; border-radius: 6px; background: var(--coral); margin-bottom: 16px;
+    }
+    .lado span {
+      display: block; height: 8px; border-radius: 8px; background: rgba(255,255,255,.16); margin: 10px 0;
+    }
+    .lado span.activa { background: var(--oro); width: 70%; }
+    .cuerpo { padding: 14px; }
+    .cuerpo h3 { margin: 0 0 10px; font-size: 13px; }
+    .fila {
+      display: grid; grid-template-columns: 1.3fr .8fr .6fr;
+      gap: 8px; background: #fff; border-radius: 8px; padding: 9px 10px; margin-bottom: 7px;
+      font-size: 11px; align-items: center;
+    }
+    .fila b { font-weight: 700; }
+    .chip { justify-self: start; border-radius: 99px; padding: 3px 7px; background: #ffe8e4; color: #9a3412; font-weight: 700; }
+    .chip.lista { background: #f4ead0; color: #7a5a08; }
+    .base {
+      height: 12px; margin: 0 18%;
+      background: linear-gradient(#d7d7d7, #bdbdbd);
+      border-radius: 0 0 10px 10px;
+    }
+
+    .rubros { background: var(--claro); padding: 72px 0 28px; }
+    h2 { margin: 0 0 28px; font-size: 36px; letter-spacing: -0.8px; line-height: 1.15; }
+    .cuatro { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .rol {
+      min-height: 280px; border-radius: 8px; padding: 18px;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      color: #fff; position: relative; overflow: hidden;
+    }
+    .rol strong { font-size: 22px; display: block; margin-bottom: 6px; }
+    .rol p { margin: 0; font-size: 14px; line-height: 1.4; color: rgba(255,255,255,.88); }
+    .rol:nth-child(1) { background: linear-gradient(160deg, #3a3a3a, #1d1d1d 55%, #ff6147); }
+    .rol:nth-child(2) { background: linear-gradient(165deg, #2e2e2e, #5a3a22 70%, #d99c13); }
+    .rol:nth-child(3) { background: linear-gradient(160deg, #243046, #2e2e2e 60%, #ff6147); }
+    .rol:nth-child(4) { background: linear-gradient(160deg, #2e2e2e, #3d3424 65%, #d99c13); }
+
+    .franja { padding: 28px 0 10px; background: var(--claro); }
+    .panel {
+      background: var(--coral);
+      color: var(--tinta);
+      border-radius: 28px;
+      padding: 48px 40px;
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 28px;
+      align-items: center;
+    }
+    .panel h2 { font-size: 40px; max-width: 520px; }
+    .panel p { margin: 0 0 14px; line-height: 1.55; max-width: 520px; }
+    .panel p b { font-weight: 800; }
+    .hojas { position: relative; height: 230px; }
+    .hoja {
+      position: absolute; right: 0; width: 230px; background: #fff; border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(46,46,46,.12); padding: 14px;
+    }
+    .hoja:nth-child(1) { top: 0; right: 70px; transform: rotate(-6deg); }
+    .hoja:nth-child(2) { top: 36px; right: 10px; }
+    .hoja:nth-child(3) { top: 78px; right: 48px; transform: rotate(4deg); }
+    .hoja i { display: block; height: 8px; border-radius: 8px; background: var(--claro); margin-bottom: 7px; }
+    .hoja i.corta { width: 60%; background: #ffd0c8; }
+    .hoja b { display: block; font-size: 13px; margin-bottom: 8px; }
+
+    .modulos { padding: 78px 0; }
+    .titulo-fila { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 28px; }
+    .titulo-fila h2 { margin: 0; }
+    .seis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    article {
+      border: 1px solid var(--linea);
+      border-radius: 16px;
+      padding: 22px;
+      min-height: 180px;
+      box-shadow: 0 8px 24px rgba(46,46,46,.04);
+    }
+    .icono {
+      width: 42px; height: 42px; border-radius: 12px;
+      display: grid; place-items: center; margin-bottom: 14px; font-size: 18px;
+    }
+    article:nth-child(odd) .icono { background: #ffe8e4; }
+    article:nth-child(even) .icono { background: #f8efd8; }
+    article h3 { margin: 0 0 8px; font-size: 22px; }
+    article p { margin: 0; color: var(--suave); line-height: 1.5; }
+
+    .cierre { background: var(--claro); padding: 28px 0 72px; }
+    .caja {
+      background: var(--blanco);
+      border-radius: 24px;
+      padding: 48px 40px;
+      text-align: center;
+    }
+    .caja h2 { margin-bottom: 12px; }
+    .caja .baja { margin: 0 auto 28px; }
+    .pasos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: left; margin-bottom: 28px; }
+    .paso { background: var(--claro); border-radius: 14px; padding: 18px; }
+    .paso span { color: var(--coral); font-weight: 800; font-size: 13px; letter-spacing: .04em; }
+    .paso strong { display: block; margin: 6px 0; font-size: 18px; }
+    .paso p { margin: 0; color: var(--suave); line-height: 1.45; }
+    .contacto { background: var(--claro); padding: 8px 0 72px; }
+    .contacto h2 { max-width: 760px; margin-left: auto; margin-right: auto; text-align: center; }
+    .tres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .via {
+      display: block;
+      background: var(--blanco);
+      border: 1px solid var(--linea);
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 8px 24px rgba(46,46,46,.04);
+    }
+    .via:hover { border-color: #ccc; }
+    .via .icono { background: #ffe8e4; }
+    .via span { display: block; color: var(--suave); font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .via strong { display: block; font-size: 16px; line-height: 1.4; }
+
+    footer { background: var(--tinta); color: #ddd; padding: 42px 0 28px; }
+    .pie { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 24px; }
+    footer h3 { margin: 0 0 12px; color: #fff; font-size: 14px; font-weight: 700; }
+    footer a, footer p { display: block; color: #cfcfcf; margin: 0 0 8px; font-size: 14px; }
+    footer a:hover { color: #fff; }
+    .legal { margin-top: 28px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.12); color: #9a9a9a; font-size: 13px; }
+
+    @media (max-width: 900px) {
+      .menu { display: inline-flex; margin-left: auto; background: none; border: 0; font: inherit; font-weight: 700; }
+      nav {
+        display: none; position: absolute; left: 0; right: 0; top: 76px;
+        background: #fff; border-bottom: 1px solid var(--linea);
+        flex-direction: column; align-items: flex-start; padding: 12px 24px 18px; gap: 14px;
+      }
+      nav.abierta { display: flex; }
+      .hero-grilla, .panel, .seis, .cuatro, .pasos, .pie, .tres { grid-template-columns: 1fr; }
+      .cuatro { grid-template-columns: 1fr 1fr; }
+      h1 { font-size: 38px; }
+      h2, .panel h2 { font-size: 30px; }
+      .laptop { margin: 12px auto 0; }
+      .panel, .caja { padding: 28px 20px; }
+      .hojas { height: 200px; }
+    }
+    @media (max-width: 560px) {
+      .cuatro, .pasos { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="ancho barra">
+      <a href="#inicio"><img class="marca" src="logo-blanco.png" alt="SON"></a>
+      <button class="menu" type="button" aria-expanded="false" aria-controls="nav">Menú</button>
+      <nav id="nav">
+        <a href="#como">Cómo funciona</a>
+        <a href="#modulos">Módulos</a>
+        <a href="#demo">Demo</a>
+        <a href="#contacto">Contacto</a>
+        <a class="ingresar" href="/panel/">Ingresar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="inicio">
+    <section class="hero">
+      <div class="ancho hero-grilla">
+        <div>
+          <h1>La gestión de tus operaciones en terreno, <span>simplificada y bajo control.</span></h1>
+          <p class="baja">SON es la plataforma integral que digitaliza, coordina y audita el trabajo de tus equipos técnicos en tiempo real. Planificá las visitas desde la administración, guiá la ejecución desde la aplicación móvil y automatizá el envío de informes y encuestas de satisfacción a tus clientes.</p>
+          <div class="acciones">
+            <a class="demo" href="#demo">Solicitar una demostración</a>
+          </div>
+        </div>
+        <div class="laptop" aria-hidden="true">
+          <div class="pantalla">
+            <div class="app">
+              <div class="lado">
+                <div class="punto"></div>
+                <span class="activa"></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <div class="cuerpo">
+                <h3>Órdenes de la semana</h3>
+                <div class="fila"><b>Planta norte</b><span>09:00</span><span class="chip">En curso</span></div>
+                <div class="fila"><b>Depósito sur</b><span>11:30</span><span class="chip lista">Pendiente</span></div>
+                <div class="fila"><b>Oficinas centro</b><span>15:00</span><span class="chip lista">Pendiente</span></div>
+                <div class="fila"><b>Galpón 4</b><span>Ayer</span><span class="chip">Cerrada</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="base"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="rubros" id="como">
+      <div class="ancho">
+        <h2>Toda tu operación conectada en un único ecosistema.</h2>
+        <div class="cuatro">
+          <div class="rol">
+            <strong>Administración</strong>
+            <p>Gestioná tu cartera de clientes, planificá órdenes de trabajo recurrentes y supervisá la agenda semanal del equipo desde un panel web centralizado.</p>
+          </div>
+          <div class="rol">
+            <strong>Equipos en Terreno</strong>
+            <p>Ejecutan sus asignaciones desde la app móvil con validación GPS, completan protocolos de revisión, capturan evidencias fotográficas y registran firmas en el sitio.</p>
+          </div>
+          <div class="rol">
+            <strong>Clientes</strong>
+            <p>Reciben notificaciones automáticas de arribo, el informe técnico en PDF al instante y una encuesta de calidad para calificar el servicio.</p>
+          </div>
+          <div class="rol">
+            <strong>Dirección</strong>
+            <p>Centralizá la gestión comercial, cotizaciones, presupuestos y métricas de rendimiento operativo para tomar decisiones respaldadas por datos.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="franja">
+      <div class="ancho">
+        <div class="panel">
+          <div>
+            <h2>Sincronización total entre la administración y el campo.</h2>
+            <p>Cada orden de trabajo se asigna con cliente, cronograma y profesional responsable. <b>Antes del arribo</b>, el sistema notifica automáticamente al cliente que el técnico se encuentra en camino.</p>
+            <p>Al finalizar la intervención y recolectar las firmas digitales, el reporte se genera de forma instantánea. El cliente recibe la constancia en PDF y evalúa la atención recibida en una escala del 1 al 5.</p>
+            <a class="blanco" href="#demo">Solicitar una demostración</a>
+          </div>
+          <div class="hojas" aria-hidden="true">
+            <div class="hoja"><b>Orden</b><i></i><i class="corta"></i><i></i></div>
+            <div class="hoja"><b>En camino</b><i class="corta"></i><i></i><i></i></div>
+            <div class="hoja"><b>Informe</b><i></i><i></i><i class="corta"></i></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="modulos" id="modulos">
+      <div class="ancho">
+        <div class="titulo-fila">
+          <h2>Módulos diseñados para cada etapa del flujo operativo.</h2>
+          <a class="demo" href="#demo">Solicitar una demostración</a>
+        </div>
+        <div class="seis">
+          <article>
+            <div class="icono">▣</div>
+            <h3>Gestión de Órdenes</h3>
+            <p>Asignación detallada por cliente, fecha, horario y profesional, integrando listas de verificación (checklists) personalizadas según el protocolo de cada visita.</p>
+          </article>
+          <article>
+            <div class="icono">▦</div>
+            <h3>Agenda y Planificación</h3>
+            <p>Visualización dinámica del cronograma semanal y mensual del equipo para monitorear servicios pendientes, en curso y finalizados en tiempo real.</p>
+          </article>
+          <article>
+            <div class="icono">▢</div>
+            <h3>App Móvil para Técnicos</h3>
+            <p>Herramienta intuitiva en terreno con geolocalización en mapa, cronómetro de gestión, listado de microtareas, captura de fotos y firma digital en pantalla.</p>
+          </article>
+          <article>
+            <div class="icono">✉</div>
+            <h3>Notificaciones Automáticas</h3>
+            <p>Envío automatizado de alertas por correo electrónico informando al cliente el arribo inminente del profesional asignado.</p>
+          </article>
+          <article>
+            <div class="icono">▤</div>
+            <h3>Reportes y Calidad</h3>
+            <p>Generación y envío instantáneo del informe formal en PDF con las evidencias recolectadas, acompañado de una encuesta de satisfacción.</p>
+          </article>
+          <article>
+            <div class="icono">▧</div>
+            <h3>Analítica y Métricas</h3>
+            <p>Tablero de control con indicadores clave (KPIs): volumen de órdenes ejecutadas, tiempos promedio de respuesta y calificaciones de los clientes por período.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="cierre" id="demo">
+      <div class="ancho">
+        <div class="caja">
+          <h2>Solicite una demostración personalizada</h2>
+          <p class="baja">Descubra cómo SON se adapta al flujo de trabajo de su empresa: desde la planificación de una orden y la ejecución en terreno, hasta la entrega del reporte final a su cliente.</p>
+          <div class="pasos">
+            <div class="paso">
+              <span>01</span>
+              <strong>Planificación</strong>
+              <p>Configuración del calendario, asignación del cliente y designación del técnico con su protocolo de trabajo.</p>
+            </div>
+            <div class="paso">
+              <span>02</span>
+              <strong>Ejecución en Terreno</strong>
+              <p>Trazabilidad del recorrido por GPS, completado de checklists, registro fotográfico y cierre con firma digital.</p>
+            </div>
+            <div class="paso">
+              <span>03</span>
+              <strong>Experiencia del Cliente</strong>
+              <p>Recepción del aviso de arribo, descarga del informe técnico en PDF y calificación del servicio del 1 al 5.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  <section class="contacto" id="contacto">
+    <div class="ancho">
+      <h2>Comuníquese con nuestro equipo comercial para coordinar una demostración en vivo o recibir asesoramiento personalizado.</h2>
+      <div class="tres">
+        <a class="via" href="mailto:sonoperationn@gmail.com">
+          <div class="icono">✉</div>
+          <span>Atención Comercial</span>
+          <strong>sonoperationn@gmail.com</strong>
+        </a>
+        <a class="via" href="https://wa.me/5493547506225" target="_blank" rel="noopener noreferrer">
+          <div class="icono">☎</div>
+          <span>Línea Directa &amp; WhatsApp</span>
+          <strong>+54 9 3547 50-6225</strong>
+        </a>
+        <a class="via" href="https://www.instagram.com/SONoperation/" target="_blank" rel="noopener noreferrer">
+          <div class="icono">@</div>
+          <span>Redes Oficiales</span>
+          <strong>@SONoperation</strong>
+        </a>
+      </div>
+    </div>
+  </section>
+  </main>
+
+  <footer>
+    <div class="ancho pie">
+      <div>
+        <img class="marca" src="logo-blanco.png" alt="SON">
+      </div>
+      <div>
+        <h3>Navegación</h3>
+        <a href="#como">Cómo funciona</a>
+        <a href="#modulos">Módulos</a>
+        <a href="#demo">Demo</a>
+        <a href="#contacto">Contacto</a>
+      </div>
+      <div>
+        <h3>Contacto</h3>
+        <a href="mailto:sonoperationn@gmail.com">sonoperationn@gmail.com</a>
+        <a href="https://wa.me/5493547506225" target="_blank" rel="noopener noreferrer">3547 506225</a>
+        <a href="https://www.instagram.com/SONoperation/" target="_blank" rel="noopener noreferrer">@SONoperation</a>
+      </div>
+    </div>
+    <div class="ancho legal">© 2026 SON - Sistema de Gestión Operativa. Todos los derechos reservados.</div>
+  </footer>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (regs) {
+        regs.forEach(function (reg) {
+          if (reg.scope.indexOf('/panel/') === -1 && reg.scope.indexOf('/tecnico/') === -1) reg.unregister();
+        });
+      });
+    }
+    var boton = document.querySelector('.menu');
+    var nav = document.querySelector('#nav');
+    boton.addEventListener('click', function () {
+      var abierto = nav.classList.toggle('abierta');
+      boton.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+    });
+    nav.querySelectorAll('a').forEach(function (enlace) {
+      enlace.addEventListener('click', function () {
+        nav.classList.remove('abierta');
+        boton.setAttribute('aria-expanded', 'false');
+      });
+    });
+  </script>
+</body>
+</html>

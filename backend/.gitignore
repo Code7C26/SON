@@ -1,0 +1,5 @@
+node_modules/
+.env
+storage/
+descargas/
+test/muestra-*.pdf

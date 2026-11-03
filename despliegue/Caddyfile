@@ -1,0 +1,17 @@
+# Caddy consigue y renueva solo el certificado HTTPS (candadito) para el dominio.
+www.{$DOMINIO} {
+	redir https://{$DOMINIO}{uri} permanent
+}
+
+{$DOMINIO} {
+	encode gzip
+	# Los informes con fotos pueden pesar bastante.
+	request_body {
+		max_size 60MB
+	}
+	reverse_proxy app:3000 {
+		# SON usa este encabezado para limitar los intentos de login por IP.
+		# Se pisa acá con la IP real para que nadie pueda falsificarlo.
+		header_up Cf-Connecting-Ip {remote_host}
+	}
+}

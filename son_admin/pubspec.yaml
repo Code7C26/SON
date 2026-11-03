@@ -1,0 +1,43 @@
+name: son_admin
+description: Panel de administracion web para SON.
+publish_to: 'none'
+version: 1.0.0+1
+
+
+environment:
+  sdk: '^3.13.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  http: ^1.6.0
+  url_launcher: ^6.3.2
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/COLOR4.png
+    - assets/images/3.png
+    - assets/images/logo_son_claro.png
+    - assets/images/logo_son_icono.png
+
+  fonts:
+    - family: TuFuente
+      fonts:
+        - asset: assets/fonts/BwGradualDEMO-Regular.otf
+          weight: 400
+        - asset: assets/fonts/BwGradualDEMO-Medium.otf
+          weight: 500
+        - asset: assets/fonts/BwGradualDEMO-Bold.otf
+          weight: 700

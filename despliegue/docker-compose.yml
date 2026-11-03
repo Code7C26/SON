@@ -1,0 +1,63 @@
+# SON en un servidor propio (Hetzner u otro): base de datos + aplicación + HTTPS automático.
+# Vive en /opt/son del servidor. Los secretos están en el archivo .env (nunca se sube a git).
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sima_db
+      POSTGRES_USER: sima
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./datos/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sima -d sima_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: ./app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT: "3000"
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_USER: sima
+      DB_NAME: sima_db
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_NOMBRE: ${ADMIN_NOMBRE:-Administrador}
+      PUBLIC_URL: ${PUBLIC_URL:-https://sonoperation.com}
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-0}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      ENTREGA_MODO: agente
+      STORAGE_DIR: /datos/storage
+      PANEL_DIR: /app/panel
+      TECNICO_DIR: /app/tecnico
+      DESCARGAS_DIR: /app/descargas
+    volumes:
+      - ./datos/storage:/datos/storage
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMINIO: ${DOMINIO}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./datos/caddy:/data
