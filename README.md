@@ -73,8 +73,6 @@ Los originales de marca se encuentran en `DESINGS/`.
 
 ## ⚙️ Requisitos de Despliegue y Configuración
 
-### Prerrequisitos
-
 * Flutter SDK (`^3.x`)
 * Node.js (`^18.x` o superior)
 * PostgreSQL (`^14.x`; la imagen de producción es PostgreSQL 17)
@@ -91,77 +89,6 @@ Los originales de marca se encuentran en `DESINGS/`.
 | `despliegue/` | Contenedores, proxy HTTPS y procedimiento de publicación |
 | `DESINGS/` | Sistema de identidad visual |
 
-### Configuración del Entorno Backend
 
-1. Clonar el repositorio y navegar a la carpeta de servicios:
 
-   ```bash
-   cd backend
-   npm install
-   ```
 
-2. Crear el archivo de entorno a partir de la plantilla y completar las credenciales. No versionar el archivo resultante.
-
-   ```bash
-   copy .env.example .env
-   ```
-
-   Variables operativas:
-
-   | Variable | Función |
-   | --- | --- |
-   | `PORT` | Puerto de la API (referencia: `3000`) |
-   | `DB_USER`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_PASSWORD` | Conexión a PostgreSQL |
-   | `JWT_SECRET` | Firma de sesiones |
-   | `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NOMBRE` | Cuenta inicial de administración, creada solo si la base no posee una |
-   | `INFORMES_DIR` | Carpeta de red donde se archivan los comprobantes por cliente |
-   | `PUBLIC_URL` | Dirección pública que abre el cliente al responder la encuesta |
-   | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` | Canal de notificaciones. En Gmail se requiere una clave de aplicación |
-
-3. Crear la base indicada en `DB_NAME` (el entorno de referencia utiliza `sima_db`). Al primer arranque, el servicio aplica `backend/sql/esquema.sql` si el esquema aún no existe.
-
-4. Iniciar la API:
-
-   ```bash
-   node index.js
-   ```
-
-   El proceso escucha en `0.0.0.0`. Con el panel y la aplicación compilados, quedan publicados en `http://localhost:3000/panel/` y `http://localhost:3000/tecnico/`.
-
-### Panel de Control Central
-
-```bash
-cd son_admin
-flutter pub get
-flutter run -d chrome
-```
-
-Compilación para el servidor:
-
-```bash
-flutter build web --dart-define=API_URL=https://su-dominio
-```
-
-Si no se define `API_URL`, el panel publicado utiliza el mismo origen desde el que se abre.
-
-### Aplicación Móvil
-
-```bash
-cd son_tecnico
-flutter pub get
-flutter run
-```
-
-Paquete de distribución Android, apuntando a la API de producción:
-
-```bash
-flutter build apk --release --dart-define=API_URL=https://su-dominio
-```
-
-El artefacto queda en `son_tecnico/build/app/outputs/flutter-apk/app-release.apk`. Sin `API_URL`, la compilación de campo resuelve `https://sonoperation.com`.
-
-### Despliegue productivo
-
-El directorio `despliegue/` describe la topología de producción: PostgreSQL, la aplicación Node.js y Caddy, con los secretos fuera del control de versiones. El procedimiento operativo —dominio, servidor, agente de oficina y publicación— está documentado en `despliegue/GUIA-PUBLICACION.md`.
-
-La entrega al disco de red puede resolverse de dos maneras: escritura directa sobre `INFORMES_DIR`, o mediante el agente de oficina, que se vincula desde el panel (**Informes → Conectar agente**) y sincroniza los comprobantes pendientes cuando el puesto de la organización está disponible.
