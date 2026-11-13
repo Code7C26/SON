@@ -3,12 +3,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:son_admin/config/api_config.dart';
 import 'package:son_admin/pantallas/armar_presupuesto.dart';
+import 'package:son_admin/pantallas/crm.dart';
 import 'package:son_admin/pantallas/piezas.dart';
 import 'package:son_admin/pantallas/por_presupuestar.dart';
 import 'package:son_admin/services/abrir_informe.dart';
 import 'package:son_admin/services/api.dart';
 import 'package:son_admin/services/sesion.dart';
 import 'package:son_admin/theme/tema.dart';
+import 'package:son_admin/ui/componentes.dart';
 
 const List<String> estadosPresupuesto = ['Borrador', 'Enviado', 'Negociando', 'Aceptado', 'Rechazado'];
 const List<String> prioridadesPresupuesto = ['baja', 'media', 'alta'];
@@ -50,7 +52,7 @@ class PantallaPresupuestos extends StatefulWidget {
 }
 
 class _PantallaPresupuestosState extends State<PantallaPresupuestos> with SingleTickerProviderStateMixin {
-  late final TabController _pestanas = TabController(length: 3, vsync: this, initialIndex: widget.abrirNotas ? 2 : 0);
+  late final TabController _pestanas = TabController(length: 6, vsync: this, initialIndex: widget.abrirNotas ? 2 : 0);
   List<Map<String, dynamic>> _lista = [];
   bool _cargando = true;
   String? _error;
@@ -176,7 +178,7 @@ class _PantallaPresupuestosState extends State<PantallaPresupuestos> with Single
   Widget _cuerpoLista() {
     if (_cargando) return const Center(child: CircularProgressIndicator());
     if (_error != null) {
-      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text(_error!, style: TextStyle(color: sonRojo)), SizedBox(height: 12), OutlinedButton.icon(onPressed: _cargar, icon: Icon(Icons.refresh), label: Text('Reintentar'))]));
+      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text(_error!, style: TextStyle(color: sonRojo)), const SizedBox(height: 12), OutlinedButton.icon(onPressed: _cargar, icon: const Icon(Icons.refresh), label: const Text('Reintentar'))]));
     }
     if (_lista.isEmpty) {
       return Center(child: Text('Todavía no hay presupuestos. Armá el primero con "Nuevo presupuesto".', style: TextStyle(color: sonTextoSuave)));
@@ -199,30 +201,37 @@ class _PantallaPresupuestosState extends State<PantallaPresupuestos> with Single
     final cerrados = aceptados + rechazados;
     final conversion = cerrados == 0 ? null : (aceptados * 100 / cerrados).round();
     final vencidos = visibles.where(_vencido).length;
-    Widget ficha(String titulo, String valor, Color color) => Expanded(
-          child: Container(
+    Widget ficha(String titulo, String valor, Color color) => Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: decoracionTarjeta(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(titulo, style: TextStyle(color: sonTextoSuave, fontSize: 12)),
+                Text(titulo, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoSuave, fontSize: 12)),
                 const SizedBox(height: 4),
                 Text(valor, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 22)),
               ],
             ),
-          ),
         );
-    return Row(children: [
+    final fichas = [
       ficha('Por contactar', '${de('Enviado')}', sonAzul),
-      const SizedBox(width: 10),
       ficha('Negociando', '${de('Negociando')}', sonAmbar),
-      const SizedBox(width: 10),
       ficha('Aceptados', '$aceptados', sonLightGreen),
-      const SizedBox(width: 10),
       ficha('Conversión', conversion == null ? '—' : '$conversion %', sonTexto),
-      if (vencidos > 0) ...[const SizedBox(width: 10), ficha('Vencidos', '$vencidos', sonRojo)],
-    ]);
+      if (vencidos > 0) ficha('Vencidos', '$vencidos', sonRojo),
+    ];
+    // Cada ficha necesita unos 140px para que la etiqueta no se corte: si no entran en
+    // una fila, pasan a dos columnas.
+    return LayoutBuilder(builder: (context, caja) {
+      const separacion = 8.0;
+      final porFila = caja.maxWidth >= fichas.length * 140 ? fichas.length : 2;
+      final ancho = (caja.maxWidth - separacion * (porFila - 1)) / porFila;
+      return Wrap(
+        spacing: separacion,
+        runSpacing: separacion,
+        children: [for (final f in fichas) SizedBox(width: ancho, child: f)],
+      );
+    });
   }
 
   Widget _columnaTablero(String estado) {
@@ -298,13 +307,13 @@ class _PantallaPresupuestosState extends State<PantallaPresupuestos> with Single
             if (mensual > 0) Text(pesos(mensual), style: const TextStyle(fontSize: 13)),
             if (unico > 0 && mensual == 0) Text(pesos(unico), style: const TextStyle(fontSize: 13)),
             if ('${p['responsable'] ?? ''}'.isNotEmpty)
-              Padding(padding: EdgeInsets.only(top: 4), child: Text('${p['responsable']}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoSuave, fontSize: 12))),
+              Padding(padding: const EdgeInsets.only(top: 4), child: Text('${p['responsable']}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoSuave, fontSize: 12))),
             if ('${p['fechaLimite'] ?? ''}'.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(vencida ? 'Venció ${fechaDia('${p['fechaLimite']}')}' : 'Hasta ${fechaDia('${p['fechaLimite']}')}', style: TextStyle(color: vencida ? sonRojo : sonTextoSuave, fontSize: 12)),
               ),
-            if (p['facturado'] == true) Padding(padding: EdgeInsets.only(top: 4), child: EtiquetaEstado(texto: 'Facturado', color: sonLightGreen)),
+            if (p['facturado'] == true) Padding(padding: const EdgeInsets.only(top: 4), child: EtiquetaEstado(texto: 'Facturado', color: sonLightGreen)),
           ],
         ),
       ),
@@ -314,7 +323,7 @@ class _PantallaPresupuestosState extends State<PantallaPresupuestos> with Single
   Widget _tablero() {
     if (_cargando) return const Center(child: CircularProgressIndicator());
     if (_error != null) {
-      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text(_error!, style: TextStyle(color: sonRojo)), SizedBox(height: 12), OutlinedButton.icon(onPressed: _cargar, icon: Icon(Icons.refresh), label: Text('Reintentar'))]));
+      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text(_error!, style: TextStyle(color: sonRojo)), const SizedBox(height: 12), OutlinedButton.icon(onPressed: _cargar, icon: const Icon(Icons.refresh), label: const Text('Reintentar'))]));
     }
     if (_lista.isEmpty) {
       return Center(child: Text('Todavía no hay presupuestos. Armá el primero con "Nuevo presupuesto".', style: TextStyle(color: sonTextoSuave)));
@@ -335,30 +344,31 @@ class _PantallaPresupuestosState extends State<PantallaPresupuestos> with Single
 
   @override
   Widget build(BuildContext context) {
-    final enNotas = _pestanas.index == 2;
+    // Notas de técnicos y las pestañas del CRM tienen sus propios filtros: no usan la búsqueda de presupuestos.
+    final enNotas = _pestanas.index >= 2;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(40, 32, 40, 24),
+      padding: AppSpacing.pagina,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
+              // El encabezado común apila título y botón cuando el ancho no alcanza.
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Presupuestos', style: estiloTituloPantalla),
-                  ],
+                child: EncabezadoPantalla(
+                  eyebrow: 'Comercial',
+                  normal: 'Embudo de',
+                  destacado: 'presupuestos',
+                  accion: enNotas
+                      ? null
+                      : ElevatedButton.icon(
+                          key: const Key('nuevo_presupuesto'),
+                          icon: const Icon(Icons.add),
+                          label: const Text('Nuevo presupuesto'),
+                          onPressed: () => _abrir(),
+                        ),
                 ),
               ),
-              if (!enNotas)
-                ElevatedButton.icon(
-                  key: const Key('nuevo_presupuesto'),
-                  style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18)),
-                  icon: Icon(Icons.add, color: sonDarkGreen),
-                  label: Text('Nuevo presupuesto', style: TextStyle(color: sonDarkGreen, fontSize: 16, fontWeight: FontWeight.bold)),
-                  onPressed: () => _abrir(),
-                ),
             ],
           ),
           const SizedBox(height: 16),
@@ -370,6 +380,9 @@ class _PantallaPresupuestosState extends State<PantallaPresupuestos> with Single
               Tab(text: 'Tablero'),
               Tab(text: 'Lista'),
               Tab(key: Key('tab_notas'), text: 'Notas de técnicos'),
+              Tab(key: Key('tab_crm_clientes'), text: 'Clientes y contactos'),
+              Tab(key: Key('tab_crm_pendientes'), text: 'Pendientes'),
+              Tab(key: Key('tab_crm_conversion'), text: 'Ganados y perdidos'),
             ],
           ),
           if (!enNotas) ...[
@@ -414,6 +427,9 @@ class _PantallaPresupuestosState extends State<PantallaPresupuestos> with Single
                 _tablero(),
                 _cuerpoLista(),
                 PantallaPorPresupuestar(embebida: true, onCambio: widget.onCambioNotas),
+                const PestanaClientesCrm(),
+                const PestanaPendientesCrm(),
+                const PestanaConversionCrm(),
               ],
             ),
           ),
@@ -443,11 +459,18 @@ class _DialogoPresupuestoState extends State<_DialogoPresupuesto> {
   late final TextEditingController _responsable = TextEditingController();
   late final TextEditingController _fechaLimite = TextEditingController();
   late final TextEditingController _nota = TextEditingController();
+  // Del CRM: qué servicio es (para medir la conversión) y, si se perdió, por qué.
+  String? _servicio;
+  String? _razonPerdida;
+  Map<String, dynamic> _configCrm = {};
 
   @override
   void initState() {
     super.initState();
     _cargar();
+    ConfigCrm.leer().then((config) {
+      if (mounted) setState(() => _configCrm = config);
+    });
   }
 
   @override
@@ -466,6 +489,8 @@ class _DialogoPresupuestoState extends State<_DialogoPresupuesto> {
     _responsable.text = '${d['responsable'] ?? ''}';
     _fechaLimite.text = '${d['fechaLimite'] ?? ''}';
     _nota.text = '${d['notaSeguimiento'] ?? ''}';
+    _servicio = d['servicio'] as String?;
+    _razonPerdida = d['razonPerdida'] as String?;
   }
 
   Future<void> _cargar() async {
@@ -517,6 +542,8 @@ class _DialogoPresupuestoState extends State<_DialogoPresupuesto> {
           'fechaLimite': _fechaLimite.text.trim(),
           'facturado': _facturado,
           'notaSeguimiento': _nota.text,
+          'servicio': _servicio ?? '',
+          'razonPerdida': _razonPerdida ?? '',
         }),
       );
       if (!mounted) return;
@@ -555,6 +582,17 @@ class _DialogoPresupuestoState extends State<_DialogoPresupuesto> {
     } catch (_) {
       if (mounted) setState(() { _error = mensajeSinConexion; _ocupado = false; });
     }
+  }
+
+  /// Lista desplegable que también muestra el valor guardado aunque ya no esté en la configuración.
+  Widget _desplegable(String titulo, String? valor, List<String> opciones, ValueChanged<String?> alCambiar) {
+    final todas = [...opciones, if (valor != null && valor.isNotEmpty && !opciones.contains(valor)) valor];
+    return DropdownButtonFormField<String?>(
+      initialValue: valor != null && valor.isNotEmpty ? valor : null,
+      decoration: InputDecoration(labelText: titulo, isDense: true),
+      items: [const DropdownMenuItem<String?>(value: null, child: Text('—')), ...todas.map((o) => DropdownMenuItem<String?>(value: o, child: Text(o)))],
+      onChanged: _ocupado ? null : alCambiar,
+    );
   }
 
   void _pdf() {
@@ -631,6 +669,12 @@ class _DialogoPresupuestoState extends State<_DialogoPresupuesto> {
                             suffixIcon: IconButton(tooltip: 'Elegir fecha', onPressed: _ocupado ? null : _elegirFecha, icon: const Icon(Icons.event_outlined)),
                           ),
                         ),
+                        const SizedBox(height: 10),
+                        _desplegable('Servicio presupuestado', _servicio, ConfigCrm.lista(_configCrm, 'servicios'), (v) => setState(() => _servicio = v)),
+                        if (d['estado'] == 'Rechazado') ...[
+                          const SizedBox(height: 10),
+                          _desplegable('Razón de pérdida', _razonPerdida, ConfigCrm.lista(_configCrm, 'razonesPerdida'), (v) => setState(() => _razonPerdida = v)),
+                        ],
                         SwitchListTile(
                           contentPadding: EdgeInsets.zero,
                           title: const Text('Ya se facturó'),
@@ -654,7 +698,7 @@ class _DialogoPresupuestoState extends State<_DialogoPresupuesto> {
                           for (final aviso in (calculo!['avisos'] as List))
                             Text('${aviso['mensaje']}', style: TextStyle(color: sonAmbar, fontSize: 13)),
                         ],
-                        if (_error != null) Padding(padding: EdgeInsets.only(top: 8), child: Text(_error!, style: TextStyle(color: sonRojo))),
+                        if (_error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_error!, style: TextStyle(color: sonRojo))),
                       ],
                     ),
                   ),

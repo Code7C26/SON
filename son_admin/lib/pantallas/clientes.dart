@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:son_admin/pantallas/operacion.dart' show abrirAccesoCliente;
 import 'package:son_admin/pantallas/piezas.dart';
 import 'package:son_admin/services/api.dart';
 import 'package:son_admin/theme/tema.dart';
+import 'package:son_admin/ui/componentes.dart';
 
 const List<String> provinciasArgentinas = [
   'Buenos Aires',
@@ -105,15 +107,31 @@ class _PantallaClientesState extends State<PantallaClientes> {
       }
       final carpetas = (json.decode(disco.body) as List).map((c) => Map<String, dynamic>.from(c as Map)).toList();
       final lista = <Map<String, dynamic>>[];
+      final ya = <String>{};
       for (final carpeta in carpetas) {
         final nombre = _texto(carpeta, 'empresa').isNotEmpty ? _texto(carpeta, 'empresa') : _texto(carpeta, 'carpeta');
         if (nombre.isEmpty) continue;
         final ficha = porNombre[_clave(nombre)] ?? porNombre[_clave(_texto(carpeta, 'carpeta'))];
         if (ficha != null) {
           lista.add(ficha);
+          final id = ficha['id'];
+          if (id != null) ya.add('id:$id');
         } else {
           lista.add({'razon_social': nombre, 'carpeta': carpeta['carpeta'], 'ordenes': 0, 'por_presupuestar': 0});
         }
+        ya.add(_clave(nombre));
+        ya.add(_clave(_texto(carpeta, 'carpeta')));
+      }
+      // Clientes cargados en el panel aunque la empresa no tenga una carpeta en un servidor.
+      for (final ficha in fichas) {
+        final id = ficha['id'];
+        if (id != null && ya.contains('id:$id')) continue;
+        final nombre = _clave(_texto(ficha, 'razon_social'));
+        final carpeta = _clave(_texto(ficha, 'carpeta_disco_k'));
+        if (nombre.isEmpty) continue;
+        if (ya.contains(nombre) || (carpeta.isNotEmpty && ya.contains(carpeta))) continue;
+        lista.add(ficha);
+        ya.add(nombre);
       }
       lista.sort((a, b) => _clave(_texto(a, 'razon_social')).compareTo(_clave(_texto(b, 'razon_social'))));
       setState(() {
@@ -235,7 +253,16 @@ class _PantallaClientesState extends State<PantallaClientes> {
       );
     }
     if (_clientes.isEmpty) {
-      return Center(child: Text('No se encontraron carpetas de clientes en el disco.', style: TextStyle(color: sonTextoSuave)));
+      return Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 460),
+          child: Text(
+            'Todavía no hay clientes. Con Nuevo cliente se carga el primero: nombre, contacto y dirección. Las visitas de ese cliente quedan archivadas en SON.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: sonTextoSuave, fontSize: 16, height: 1.45),
+          ),
+        ),
+      );
     }
     final visibles = _visibles;
     if (visibles.isEmpty) return Center(child: Text('No se encontró ningún cliente con esa búsqueda.', style: TextStyle(color: sonTextoSuave)));
@@ -250,25 +277,24 @@ class _PantallaClientesState extends State<PantallaClientes> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(40),
+      padding: AppSpacing.pagina,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Expanded(
+              const Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Clientes', style: estiloTituloPantalla),
+                    EncabezadoPantalla(eyebrow: 'Comercial', normal: 'Cartera de', destacado: 'clientes'),
                   ],
                 ),
               ),
               ElevatedButton.icon(
                 key: const Key('nuevo_cliente'),
-                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18)),
-                icon: Icon(Icons.add, color: sonDarkGreen),
-                label: Text('Nuevo cliente', style: TextStyle(color: sonDarkGreen, fontSize: 16, fontWeight: FontWeight.bold)),
+                icon: const Icon(Icons.add),
+                label: const Text('Nuevo cliente'),
                 onPressed: () => _abrir(),
               ),
             ],
@@ -501,6 +527,12 @@ class _DialogoClienteState extends State<DialogoCliente> {
         ),
       ),
       actions: [
+        if (!_esNuevo)
+          TextButton.icon(
+            onPressed: () => abrirAccesoCliente(context, (_datos['id'] as num).toInt(), '${_datos['razon_social'] ?? ''}'),
+            icon: const Icon(Icons.link),
+            label: const Text('Acceso del cliente'),
+          ),
         TextButton(onPressed: _guardando ? null : () => Navigator.pop(context, false), child: Text('Cancelar', style: TextStyle(color: sonTextoSuave))),
         ElevatedButton(key: const Key('guardar_cliente'), onPressed: _guardando ? null : _guardar, child: Text(_esNuevo ? 'Crear cliente' : 'Guardar')),
       ],

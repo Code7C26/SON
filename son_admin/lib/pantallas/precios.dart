@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:son_admin/pantallas/piezas.dart';
 import 'package:son_admin/services/api.dart';
 import 'package:son_admin/theme/tema.dart';
+import 'package:son_admin/ui/componentes.dart';
 
 /// Tarifario, costos internos, inflación y parámetros del presupuestador.
 class PantallaPrecios extends StatefulWidget {
@@ -25,11 +26,11 @@ class _PantallaPreciosState extends State<PantallaPrecios> with SingleTickerProv
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(40, 32, 40, 24),
+      padding: AppSpacing.pagina,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Precios', style: estiloTituloPantalla),
+          const EncabezadoPantalla(eyebrow: 'Comercial', normal: 'Lista de', destacado: 'precios'),
           const SizedBox(height: 20),
           TabBar(
             controller: _pestanas,
@@ -161,7 +162,7 @@ class _PestanaTarifasState extends State<_PestanaTarifas> {
   Widget build(BuildContext context) {
     if (_cargando) return const Center(child: CircularProgressIndicator());
     if (_error != null) {
-      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text(_error!, style: TextStyle(color: sonRojo)), SizedBox(height: 12), OutlinedButton.icon(onPressed: _cargar, icon: Icon(Icons.refresh), label: Text('Reintentar'))]));
+      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text(_error!, style: TextStyle(color: sonRojo)), const SizedBox(height: 12), OutlinedButton.icon(onPressed: _cargar, icon: const Icon(Icons.refresh), label: const Text('Reintentar'))]));
     }
     final visibles = _visibles;
     return Column(
@@ -202,8 +203,8 @@ class _PestanaTarifasState extends State<_PestanaTarifas> {
             ElevatedButton.icon(
               key: const Key('nueva_tarifa'),
               onPressed: () => _abrir(),
-              icon: Icon(Icons.add, color: sonDarkGreen),
-              label: Text('Nueva tarifa', style: TextStyle(color: sonDarkGreen, fontWeight: FontWeight.bold)),
+              icon: const Icon(Icons.add),
+              label: const Text('Nueva tarifa'),
             ),
           ],
         ),
@@ -240,7 +241,7 @@ class _PestanaTarifasState extends State<_PestanaTarifas> {
                               ),
                             ),
                             if (t['indexa'] == true && t['modulos'] == null)
-                              Padding(padding: EdgeInsets.only(right: 12), child: Tooltip(message: 'Se actualiza por inflación', child: Icon(Icons.trending_up, size: 18, color: sonAzul))),
+                              Padding(padding: const EdgeInsets.only(right: 12), child: Tooltip(message: 'Se actualiza por inflación', child: Icon(Icons.trending_up, size: 18, color: sonAzul))),
                             Text(
                               sinValor ? 'Sin valor' : pesos(t['valorActual'] as num?),
                               style: TextStyle(color: sinValor ? sonAmbar : sonTexto, fontWeight: FontWeight.bold, fontSize: 16),
@@ -353,7 +354,7 @@ class _DialogoTarifaState extends State<_DialogoTarifa> {
                 onChanged: (v) => setState(() => _indexa = v),
               ),
               TextField(controller: _alcance, maxLines: 4, decoration: const InputDecoration(labelText: 'Alcance (sale en el PDF, hoja aparte)')),
-              if (_error != null) Padding(padding: EdgeInsets.only(top: 10), child: Text(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600))),
+              if (_error != null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600))),
             ],
           ),
         ),
@@ -445,7 +446,7 @@ class _PestanaCostosState extends State<_PestanaCostos> {
   Widget build(BuildContext context) {
     if (_cargando) return const Center(child: CircularProgressIndicator());
     if (_error != null) {
-      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text(_error!, style: TextStyle(color: sonRojo)), SizedBox(height: 12), OutlinedButton.icon(onPressed: _cargar, icon: Icon(Icons.refresh), label: Text('Reintentar'))]));
+      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text(_error!, style: TextStyle(color: sonRojo)), const SizedBox(height: 12), OutlinedButton.icon(onPressed: _cargar, icon: const Icon(Icons.refresh), label: const Text('Reintentar'))]));
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -456,8 +457,8 @@ class _PestanaCostosState extends State<_PestanaCostos> {
             ElevatedButton.icon(
               key: const Key('nuevo_costo'),
               onPressed: () => _abrir(),
-              icon: Icon(Icons.add, color: sonDarkGreen),
-              label: Text('Nuevo costo', style: TextStyle(color: sonDarkGreen, fontWeight: FontWeight.bold)),
+              icon: const Icon(Icons.add),
+              label: const Text('Nuevo costo'),
             ),
           ],
         ),
@@ -693,7 +694,7 @@ class _PestanaInflacionState extends State<_PestanaInflacion> {
   Widget build(BuildContext context) {
     if (_cargando) return const Center(child: CircularProgressIndicator());
     if (_error != null) {
-      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text(_error!, style: TextStyle(color: sonRojo)), SizedBox(height: 12), OutlinedButton.icon(onPressed: _cargar, icon: Icon(Icons.refresh), label: Text('Reintentar'))]));
+      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text(_error!, style: TextStyle(color: sonRojo)), const SizedBox(height: 12), OutlinedButton.icon(onPressed: _cargar, icon: const Icon(Icons.refresh), label: const Text('Reintentar'))]));
     }
     final aviso = _busqueda != null && _busqueda!['ok'] == false ? '${_busqueda!['error'] ?? ''}' : '';
     return Column(
@@ -707,8 +708,8 @@ class _PestanaInflacionState extends State<_PestanaInflacion> {
             ElevatedButton.icon(
               key: const Key('buscar_indec'),
               onPressed: _buscando ? null : _sincronizar,
-              icon: _buscando ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : Icon(Icons.cloud_download_outlined, color: sonDarkGreen),
-              label: Text('Buscar en INDEC', style: TextStyle(color: sonDarkGreen, fontWeight: FontWeight.bold)),
+              icon: _buscando ? const SizedBox(width: 16, height: 16, child: const CircularProgressIndicator(strokeWidth: 2)) : Icon(Icons.cloud_download_outlined, color: sonDarkGreen),
+              label: const Text('Buscar en INDEC'),
             ),
           ],
         ),
@@ -885,12 +886,12 @@ class _PestanaParametrosState extends State<_PestanaParametros> {
                 Expanded(child: _campo('IVA (%)', _iva)),
               ]),
               Row(children: [
-                Expanded(child: _campo('Valor del módulo (Colegio de Geólogos)', _modulo)),
+                Expanded(child: _campo('Valor del módulo', _modulo)),
                 const SizedBox(width: 12),
                 Expanded(child: _campo('Próximo número de presupuesto', _proximo)),
               ]),
               const SizedBox(height: 8),
-              Text('Datos de SIMA en el PDF', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, letterSpacing: 1)),
+              Text('Datos de la empresa en el presupuesto', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, letterSpacing: 1)),
               const SizedBox(height: 10),
               _campo('Título', _titulo),
               Row(children: [Expanded(child: _campo('Razón social', _razon)), const SizedBox(width: 12), Expanded(child: _campo('CUIT', _cuit))]),

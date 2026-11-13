@@ -4,20 +4,24 @@ import 'package:son_admin/config/api_config.dart';
 import 'package:son_admin/pantallas/analisis.dart';
 import 'package:son_admin/pantallas/clientes.dart';
 import 'package:son_admin/pantallas/dashboard.dart';
+import 'package:son_admin/pantallas/formularios.dart';
 import 'package:son_admin/pantallas/precios.dart';
 import 'package:son_admin/pantallas/presupuestos.dart';
+import 'package:son_admin/pantallas/operacion.dart';
 import 'package:son_admin/services/abrir_informe.dart';
+import 'package:son_admin/services/elegir_imagen.dart';
 import 'package:son_admin/services/api.dart';
 import 'package:son_admin/services/almacen_sesion.dart';
 import 'package:son_admin/services/sesion.dart';
 import 'package:son_admin/theme/tema.dart';
+import 'package:son_admin/ui/componentes.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/services.dart';
 
 void main() {
   final guardado = leerAlmacen('son_admin_tema');
-  if (guardado == 'claro') controlTema.establecer(true, avisar: false);
+  if (guardado == 'oscuro') controlTema.establecer(false, avisar: false);
   controlTema.alGuardar = (claro) => escribirAlmacen('son_admin_tema', claro ? 'claro' : 'oscuro');
   runApp(const SonAdmin());
 }
@@ -153,98 +157,170 @@ class _PantallaLoginState extends State<PantallaLogin> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: decoracionIngreso,
-        child: Stack(
-          children: [
-            Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Container(
-              width: 420,
-              padding: const EdgeInsets.fromLTRB(36, 36, 36, 32),
-              decoration: BoxDecoration(
-                color: sonTarjeta.withValues(alpha: 0.92),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: sonBorde),
-                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.45), blurRadius: 40, offset: const Offset(0, 18))],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Center(child: Image.asset('assets/images/logo_son_icono.png', height: 62)),
-                  const SizedBox(height: 28),
-                  Text('Acceso administrativo', textAlign: TextAlign.center, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: sonTexto)),
-                  const SizedBox(height: 26),
-                  TextField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(labelText: 'Correo electrónico', prefixIcon: Icon(Icons.mail_outline)),
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
-                  ),
-                  const SizedBox(height: 14),
-                  TextField(
-                    controller: _passwordController,
-                    decoration: InputDecoration(
-                      labelText: 'Contraseña',
-                      prefixIcon: const Icon(Icons.lock_outline),
-                      suffixIcon: IconButton(
-                        tooltip: _verPassword ? 'Ocultar contraseña' : 'Mostrar contraseña',
-                        icon: Icon(_verPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined),
-                        onPressed: () => setState(() => _verPassword = !_verPassword),
-                      ),
-                    ),
-                    obscureText: !_verPassword,
-                    onSubmitted: (_) => _iniciarSesion(),
-                  ),
-                  if (_mensajeError.isNotEmpty) ...[
-                    const SizedBox(height: 14),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: sonRojo.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: sonRojo.withValues(alpha: 0.4)),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.error_outline, color: sonRojo, size: 18),
-                          const SizedBox(width: 8),
-                          Expanded(child: Text(_mensajeError, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600, fontSize: 13))),
-                        ],
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: _cargando ? null : _iniciarSesion,
-                      child: _cargando
-                          ? SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 3, color: sonDarkGreen))
-                          : const Text('Ingresar al sistema', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                  const SizedBox(height: 22),
-                  Text('Seguridad, higiene y medio ambiente', textAlign: TextAlign.center, style: TextStyle(color: sonTextoSuave, fontSize: 12)),
-                  const SizedBox(height: 8),
-                  TextButton.icon(
-                    onPressed: controlTema.alternar,
-                    icon: Icon(controlTema.claro ? Icons.dark_mode_outlined : Icons.light_mode_outlined, color: sonTextoSuave),
-                    label: Text(controlTema.claro ? 'Tema oscuro' : 'Tema claro', style: TextStyle(color: sonTextoSuave)),
-                  ),
-                ],
-              ),
+    final formulario = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Align(alignment: Alignment.centerLeft, child: Eyebrow('Panel SON')),
+        const SizedBox(height: AppSpacing.s16),
+        const TituloContraste(normal: 'Ingresá', destacado: 'a tu panel', tamano: 32),
+        const SizedBox(height: AppSpacing.s32),
+        TextField(
+          controller: _emailController,
+          decoration: const InputDecoration(labelText: 'Correo', prefixIcon: Icon(Icons.mail_outline_rounded)),
+          keyboardType: TextInputType.emailAddress,
+          textInputAction: TextInputAction.next,
+          autofillHints: const [AutofillHints.email],
+        ),
+        const SizedBox(height: AppSpacing.s16),
+        TextField(
+          controller: _passwordController,
+          decoration: InputDecoration(
+            labelText: 'Contraseña',
+            prefixIcon: const Icon(Icons.lock_outline_rounded),
+            suffixIcon: IconButton(
+              tooltip: _verPassword ? 'Ocultar' : 'Mostrar',
+              icon: Icon(_verPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+              onPressed: () => setState(() => _verPassword = !_verPassword),
             ),
           ),
-            ),
-            const Positioned(top: 4, right: 4, child: SafeArea(child: BotonTema())),
-          ],
+          obscureText: !_verPassword,
+          autofillHints: const [AutofillHints.password],
+          onSubmitted: (_) => _iniciarSesion(),
         ),
+        AnimatedSize(
+          duration: AppMotion.media,
+          curve: AppMotion.curva,
+          child: _mensajeError.isEmpty
+              ? const SizedBox(width: double.infinity)
+              : Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.s16),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(color: sonRojo.withValues(alpha: 0.10), borderRadius: AppRadius.rTarjeta),
+                    child: Row(
+                      children: [
+                        Icon(Icons.error_outline_rounded, color: sonRojo, size: 18),
+                        const SizedBox(width: 8),
+                        Expanded(child: Text(_mensajeError, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600, fontSize: 13))),
+                      ],
+                    ),
+                  ),
+                ),
+        ),
+        const SizedBox(height: AppSpacing.s24),
+        SizedBox(
+          height: 56,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(padding: const EdgeInsets.only(left: AppSpacing.s24, right: AppSpacing.s12)),
+            onPressed: _cargando ? null : _iniciarSesion,
+            child: _cargando
+                ? SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5, color: sonSobreAcento))
+                : const EtiquetaConFlecha('Ingresar'),
+          ),
+        ),
+      ],
+    );
+
+    return Scaffold(
+      body: FondoOrbes(
+        child: SafeArea(
+        child: LayoutBuilder(builder: (context, caja) {
+          final ancho = caja.maxWidth >= 900;
+          final columnaForm = Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSpacing.s24),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 400),
+                child: Aparecer(child: PanelVidrio(padding: const EdgeInsets.all(AppSpacing.s32), child: formulario)),
+              ),
+            ),
+          );
+          return Stack(
+            children: [
+              if (ancho)
+                Row(
+                  children: [
+                    const Expanded(child: Padding(padding: EdgeInsets.all(AppSpacing.s16), child: _BloqueMarcaLogin())),
+                    Expanded(child: columnaForm),
+                  ],
+                )
+              else
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: AppSpacing.s32),
+                      child: Container(
+                        width: 56,
+                        height: 56,
+                        padding: const EdgeInsets.all(12),
+                        decoration: const BoxDecoration(color: AppColors.tinta, shape: BoxShape.circle),
+                        child: Image.asset('assets/images/logo_son_icono.png'),
+                      ),
+                    ),
+                    Expanded(child: columnaForm),
+                  ],
+                ),
+              const Positioned(top: AppSpacing.s16, right: AppSpacing.s16, child: BotonTema()),
+            ],
+          );
+        }),
+        ),
+      ),
+    );
+  }
+}
+
+/// Bloque oscuro de la izquierda en el login: marca, titular y tres datos clave.
+class _BloqueMarcaLogin extends StatelessWidget {
+  const _BloqueMarcaLogin();
+
+  @override
+  Widget build(BuildContext context) {
+    const tenue = AppColors.oscuroTextoSecundario;
+    return BloqueContraste(
+      padding: const EdgeInsets.all(AppSpacing.s48),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(color: AppColors.oscuroSuperficie, shape: BoxShape.circle, border: Border.all(color: AppColors.oscuroBorde)),
+                child: Image.asset('assets/images/logo_son_icono.png'),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'SON',
+                style: TextStyle(fontFamily: AppTypography.display, fontWeight: FontWeight.w700, fontSize: 22, letterSpacing: AppTypography.trackingTitulo, color: AppColors.superficie),
+              ),
+            ],
+          ),
+          const Spacer(),
+          const Aparecer(
+            orden: 1,
+            child: TituloContraste(
+              normal: 'Toda tu operación,',
+              destacado: 'en un solo lugar',
+              destacadoEnLineaNueva: true,
+              tamano: 44,
+              color: AppColors.superficie,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.s48),
+          const Wrap(
+            spacing: AppSpacing.s48,
+            runSpacing: AppSpacing.s24,
+            children: [
+              Aparecer(orden: 3, child: KpiBloque(valor: '100%', etiqueta: 'Digital, sin papel', colorValor: AppColors.superficie, colorEtiqueta: tenue)),
+              Aparecer(orden: 4, child: KpiBloque(valor: 'GPS', etiqueta: 'Presencia validada', colorValor: AppColors.acento, colorEtiqueta: tenue)),
+              Aparecer(orden: 5, child: KpiBloque(valor: 'PDF', etiqueta: 'Informe al instante', colorValor: AppColors.superficie, colorEtiqueta: tenue)),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -276,11 +352,13 @@ class _LayoutAdministradorState extends State<LayoutAdministrador> {
   static const Set<String> _soloComercial = {'comercial'};
 
   static const List<_OpcionMenu> _opciones = [
-    _OpcionMenu('panel', Icons.dashboard_outlined, 'Panel de Control', 'Operación', _todos),
-    _OpcionMenu('ordenes', Icons.assignment_outlined, 'Órdenes de Trabajo', 'Operación', _todos),
+    _OpcionMenu('panel', Icons.dashboard_outlined, 'Inicio', 'Operación', _todos),
+    _OpcionMenu('ordenes', Icons.assignment_outlined, 'Órdenes', 'Operación', _todos),
     _OpcionMenu('tecnicos', Icons.groups_outlined, 'Técnicos', 'Operación', _todos),
     _OpcionMenu('informes', Icons.folder_outlined, 'Informes', 'Operación', _todos),
     _OpcionMenu('analisis', Icons.bar_chart_rounded, 'Análisis', 'Operación', _todos),
+    _OpcionMenu('vencimientos', Icons.event_busy_outlined, 'Vencimientos', 'Operación', _todos),
+    _OpcionMenu('gastos', Icons.local_gas_station_outlined, 'Gastos', 'Operación', _todos),
     _OpcionMenu('presupuestos', Icons.receipt_long_outlined, 'Presupuestos', 'Comercial', _soloComercial),
     _OpcionMenu('precios', Icons.sell_outlined, 'Precios', 'Comercial', _soloComercial),
     _OpcionMenu('clientes', Icons.business_center_outlined, 'Clientes', 'Comercial', _soloComercial),
@@ -428,7 +506,7 @@ class _LayoutAdministradorState extends State<LayoutAdministrador> {
   Widget _pantalla(String id) {
     switch (id) {
       case 'panel':
-        return PantallaDashboard(nombreAdmin: (_adminActual['nombre'] ?? '').toString());
+        return PantallaDashboard(nombreAdmin: (_adminActual['nombre'] ?? '').toString(), alIrA: _irA);
       case 'ordenes':
         return const PantallaOrdenes();
       case 'tecnicos':
@@ -437,6 +515,10 @@ class _LayoutAdministradorState extends State<LayoutAdministrador> {
         return const PantallaInformes();
       case 'analisis':
         return const PantallaAnalisis();
+      case 'vencimientos':
+        return const PantallaVencimientos();
+      case 'gastos':
+        return const PantallaGastos();
       case 'presupuestos':
         return PantallaPresupuestos(onCambioNotas: _cargarResumen);
       case 'precios':
@@ -450,124 +532,306 @@ class _LayoutAdministradorState extends State<LayoutAdministrador> {
     }
   }
 
+  // --- Menú ocultable y grupos plegables (se recuerdan entre visitas) ---
+  static const String _claveMenu = 'son_admin_menu';
+  static const String _claveGrupos = 'son_admin_grupos_cerrados';
+  bool _menuAbierto = leerAlmacen(_claveMenu) != 'cerrado';
+  final Set<String> _gruposCerrados = {
+    for (final g in (leerAlmacen(_claveGrupos) ?? '').split(',')) if (g.isNotEmpty) g,
+  };
+
+  void _alternarMenu() {
+    setState(() => _menuAbierto = !_menuAbierto);
+    escribirAlmacen(_claveMenu, _menuAbierto ? 'abierto' : 'cerrado');
+  }
+
+  void _alternarGrupo(String grupo) {
+    setState(() => _gruposCerrados.contains(grupo) ? _gruposCerrados.remove(grupo) : _gruposCerrados.add(grupo));
+    escribirAlmacen(_claveGrupos, _gruposCerrados.join(','));
+  }
+
+  void _irA(String id) {
+    if (!_visibles.any((o) => o.id == id)) return;
+    SesionAdmin.guardarPantalla(id);
+    setState(() => _pantallaActual = id);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: LayoutBuilder(builder: (context, caja) {
-        final compacto = caja.maxWidth < 900; // en pantallas angostas el menú muestra solo los íconos
+      body: FondoOrbes(
+        intensidad: 0.55,
+        child: LayoutBuilder(builder: (context, caja) {
+        // En pantallas angostas el menú queda siempre en íconos.
+        final angosto = caja.maxWidth < 900;
+        final compacto = angosto || !_menuAbierto;
         return Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _menuLateral(compacto),
-            Expanded(child: _pantalla(_pantallaActual)),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(AppSpacing.s16, AppSpacing.s16, 0, AppSpacing.s16),
+              child: _menuLateral(compacto, puedeAbrirse: !angosto),
+            ),
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: AppMotion.media,
+                switchInCurve: AppMotion.curva,
+                switchOutCurve: Curves.easeInCubic,
+                // Solo se ve la pantalla nueva: la anterior no se superpone mientras entra.
+                layoutBuilder: (actual, _) => actual ?? const SizedBox.shrink(),
+                transitionBuilder: (hijo, animacion) => FadeTransition(
+                  opacity: animacion,
+                  child: SlideTransition(
+                    position: Tween(begin: const Offset(0, 0.012), end: Offset.zero).animate(animacion),
+                    child: hijo,
+                  ),
+                ),
+                child: KeyedSubtree(key: ValueKey(_pantallaActual), child: _pantalla(_pantallaActual)),
+              ),
+            ),
           ],
         );
       }),
+      ),
     );
   }
 
-  /// Las opciones que puede ver este usuario, agrupadas (Operación / Comercial / Sistema).
+  /// Las opciones que puede ver este usuario, agrupadas y plegables (Operación / Comercial / Sistema).
   List<Widget> _itemsDelMenu(bool compacto) {
-    final items = <Widget>[];
-    String? grupoAnterior;
+    final grupos = <String, List<_OpcionMenu>>{};
     for (final opcion in _visibles) {
-      if (opcion.grupo != grupoAnterior) {
-        final primero = grupoAnterior == null;
-        items.add(
-          compacto
-              ? Padding(padding: EdgeInsets.symmetric(vertical: primero ? 2 : 8), child: primero ? null : const Divider(height: 1))
-              : Padding(
-                  padding: EdgeInsets.fromLTRB(14, primero ? 2 : 20, 14, 6),
-                  child: Text(
-                    opcion.grupo.toUpperCase(),
-                    style: TextStyle(color: sonTextoSuave, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2),
-                  ),
-                ),
-        );
-        grupoAnterior = opcion.grupo;
+      grupos.putIfAbsent(opcion.grupo, () => []).add(opcion);
+    }
+    final items = <Widget>[];
+    var primero = true;
+    grupos.forEach((grupo, opciones) {
+      final cerrado = _gruposCerrados.contains(grupo);
+      // Con el grupo cerrado igual se ve la pantalla en la que estás.
+      final mostradas = cerrado ? opciones.where((o) => o.id == _pantallaActual).toList() : opciones;
+      final nuevasEnGrupo = opciones.any((o) => o.id == 'presupuestos') ? _nuevas : 0;
+      if (compacto) {
+        if (!primero) {
+          items.add(const Padding(padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14), child: Divider(height: 1)));
+        }
+      } else {
+        items.add(_CabeceraGrupo(
+          texto: grupo,
+          cerrado: cerrado,
+          primero: primero,
+          insignia: cerrado ? nuevasEnGrupo : 0,
+          alTocar: () => _alternarGrupo(grupo),
+        ));
       }
+      final lista = compacto ? opciones : mostradas;
       items.add(
-        _ItemMenu(
-          icono: opcion.icono,
-          texto: opcion.texto,
-          seleccionado: opcion.id == _pantallaActual,
-          compacto: compacto,
-          insignia: opcion.id == 'presupuestos' ? _nuevas : 0,
-          alTocar: () {
-            SesionAdmin.guardarPantalla(opcion.id);
-            setState(() => _pantallaActual = opcion.id);
-          },
+        AnimatedSize(
+          duration: AppMotion.media,
+          curve: AppMotion.curva,
+          alignment: Alignment.topCenter,
+          child: Column(
+            children: [
+              for (final opcion in lista)
+                _ItemMenu(
+                  icono: opcion.icono,
+                  texto: opcion.texto,
+                  seleccionado: opcion.id == _pantallaActual,
+                  compacto: compacto,
+                  insignia: opcion.id == 'presupuestos' ? _nuevas : 0,
+                  alTocar: () => _irA(opcion.id),
+                ),
+            ],
+          ),
         ),
       );
-    }
+      primero = false;
+    });
     return items;
   }
 
-  Widget _menuLateral(bool compacto) {
+  Widget _menuLateral(bool compacto, {required bool puedeAbrirse}) {
     final nombre = (_adminActual['nombre'] ?? 'Administrador').toString();
     final email = (_adminActual['email'] ?? '').toString();
+    final inicial = nombre.isEmpty ? '?' : nombre[0].toUpperCase();
 
-    return Container(
-      width: compacto ? 78 : 262,
-      decoration: BoxDecoration(color: sonPanel, border: Border(right: BorderSide(color: sonBorde))),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 28, 12, 26),
-            child: Center(child: Image.asset('assets/images/logo_son_icono.png', height: compacto ? 42 : 50)),
-          ),
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.symmetric(horizontal: compacto ? 10 : 14),
-              children: _itemsDelMenu(compacto),
+    final botonPlegar = puedeAbrirse
+        ? Tooltip(
+            message: compacto ? 'Mostrar menú' : 'Ocultar menú',
+            child: InkResponse(
+              onTap: _alternarMenu,
+              radius: 22,
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(color: sonTarjeta, shape: BoxShape.circle, border: Border.all(color: sonBorde)),
+                child: AnimatedRotation(
+                  turns: compacto ? 0.5 : 0,
+                  duration: AppMotion.media,
+                  curve: AppMotion.curva,
+                  child: Icon(Icons.chevron_left_rounded, size: 20, color: sonTexto),
+                ),
+              ),
             ),
-          ),
-          const Divider(height: 1),
-          Padding(
-            padding: EdgeInsets.all(compacto ? 10 : 14),
-            child: compacto
-                ? Column(
-                    children: [
-                      const BotonTema(),
-                      IconButton(tooltip: 'Ver perfil', onPressed: _mostrarPerfil, icon: Icon(Icons.account_circle_outlined, color: sonLightGreen)),
-                      IconButton(tooltip: 'Cerrar sesión', onPressed: _cerrarSesion, icon: Icon(Icons.logout, color: sonTextoSuave)),
-                    ],
-                  )
-                : Row(
-                    children: [
-                      Expanded(
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(12),
-                          onTap: _mostrarPerfil,
-                          child: Padding(
-                            padding: const EdgeInsets.all(6),
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 18,
-                                  backgroundColor: sonTarjetaAlta,
-                                  child: Text(nombre.isEmpty ? '?' : nombre[0].toUpperCase(), style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold)),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(nombre, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600, fontSize: 13)),
-                                      Text(email, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoSuave, fontSize: 11)),
-                                    ],
-                                  ),
-                                ),
-                              ],
+          )
+        : const SizedBox.shrink();
+
+    final logo = Container(
+      width: 44,
+      height: 44,
+      padding: const EdgeInsets.all(9),
+      decoration: const BoxDecoration(color: AppColors.tinta, shape: BoxShape.circle),
+      child: Image.asset('assets/images/logo_son_icono.png'),
+    );
+
+    return AnimatedContainer(
+      duration: AppMotion.lenta,
+      curve: AppMotion.curva,
+      width: compacto ? 80 : 256,
+      child: PanelVidrio(
+      child: OverflowBox(
+        alignment: Alignment.topLeft,
+        minWidth: compacto ? 80 : 256,
+        maxWidth: compacto ? 80 : 256,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 20, 14, 18),
+              child: compacto
+                  ? Column(children: [logo, if (puedeAbrirse) ...[const SizedBox(height: 12), botonPlegar]])
+                  : Row(
+                      children: [
+                        logo,
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'SON',
+                            style: TextStyle(
+                              fontFamily: AppTypography.display,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 20,
+                              letterSpacing: AppTypography.trackingTitulo,
+                              color: sonTexto,
                             ),
                           ),
                         ),
+                        botonPlegar,
+                      ],
+                    ),
+            ),
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.symmetric(horizontal: compacto ? 12 : 14, vertical: 4),
+                children: _itemsDelMenu(compacto),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(compacto ? 10 : 12),
+              child: compacto
+                  ? Column(
+                      children: [
+                        Tooltip(
+                          message: 'Mi perfil',
+                          child: InkResponse(
+                            onTap: _mostrarPerfil,
+                            child: CircleAvatar(radius: 18, backgroundColor: sonAcento, child: Text(inicial, style: TextStyle(color: sonSobreAcento, fontWeight: FontWeight.w700))),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        const BotonTema(),
+                        IconButton(tooltip: 'Cerrar sesión', onPressed: _cerrarSesion, icon: Icon(Icons.logout_rounded, color: sonTextoSuave, size: 20)),
+                      ],
+                    )
+                  : Container(
+                      padding: const EdgeInsets.fromLTRB(8, 8, 4, 8),
+                      decoration: BoxDecoration(color: sonTarjeta.withValues(alpha: 0.7), borderRadius: AppRadius.rPildora, border: Border.all(color: sonBorde.withValues(alpha: 0.6))),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: InkWell(
+                              borderRadius: AppRadius.rChico,
+                              onTap: _mostrarPerfil,
+                              child: Row(
+                                children: [
+                                  CircleAvatar(radius: 17, backgroundColor: sonAcento, child: Text(inicial, style: TextStyle(color: sonSobreAcento, fontWeight: FontWeight.w700))),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(nombre, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600, fontSize: 13)),
+                                        Text(email, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoTenue, fontSize: 11)),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const BotonTema(),
+                          IconButton(tooltip: 'Cerrar sesión', onPressed: _cerrarSesion, icon: Icon(Icons.logout_rounded, color: sonTextoSuave, size: 20)),
+                        ],
                       ),
-                      const BotonTema(),
-                      IconButton(tooltip: 'Cerrar sesión', onPressed: _cerrarSesion, icon: Icon(Icons.logout, color: sonTextoSuave, size: 22)),
-                    ],
+                    ),
+            ),
+          ],
+        ),
+      ),
+      ),
+    );
+  }
+}
+
+/// Título de un grupo del menú (OPERACIÓN, COMERCIAL...). Tocándolo se pliega o despliega.
+class _CabeceraGrupo extends StatefulWidget {
+  final String texto;
+  final bool cerrado;
+  final bool primero;
+  final int insignia;
+  final VoidCallback alTocar;
+  const _CabeceraGrupo({required this.texto, required this.cerrado, required this.primero, required this.insignia, required this.alTocar});
+
+  @override
+  State<_CabeceraGrupo> createState() => _CabeceraGrupoState();
+}
+
+class _CabeceraGrupoState extends State<_CabeceraGrupo> {
+  bool _encima = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _encima ? sonTexto : sonTextoTenue;
+    return Padding(
+      padding: EdgeInsets.only(top: widget.primero ? 0 : 14, bottom: 4),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _encima = true),
+        onExit: (_) => setState(() => _encima = false),
+        child: GestureDetector(
+          onTap: widget.alTocar,
+          behavior: HitTestBehavior.opaque,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 8, 10, 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(widget.texto.toUpperCase(), style: AppTypography.eyebrow(color).copyWith(fontSize: 11)),
+                ),
+                if (widget.insignia > 0)
+                  Container(
+                    margin: const EdgeInsets.only(right: 6),
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(color: sonAmbar, shape: BoxShape.circle),
                   ),
+                AnimatedRotation(
+                  turns: widget.cerrado ? -0.25 : 0,
+                  duration: AppMotion.media,
+                  curve: AppMotion.curva,
+                  child: Icon(Icons.expand_more_rounded, size: 18, color: color),
+                ),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -594,39 +858,44 @@ class _ItemMenuState extends State<_ItemMenu> {
   @override
   Widget build(BuildContext context) {
     final activo = widget.seleccionado;
-    final color = activo ? sonLightGreen : sonTextoSuave;
+    final oscuro = !controlTema.claro;
+    // Ítem activo: píldora oscura con texto blanco (en modo oscuro, al revés).
+    final fondoActivo = oscuro ? AppColors.canvas : AppColors.tinta;
+    final textoActivo = oscuro ? AppColors.tinta : AppColors.superficie;
+    final color = activo ? textoActivo : (_encima ? sonTexto : sonTextoSuave);
     final contenido = AnimatedContainer(
-      duration: const Duration(milliseconds: 150),
-      margin: const EdgeInsets.symmetric(vertical: 3),
-      padding: EdgeInsets.symmetric(horizontal: widget.compacto ? 0 : 14, vertical: 13),
+      duration: AppMotion.rapida,
+      curve: AppMotion.curva,
+      margin: const EdgeInsets.symmetric(vertical: 2),
+      height: 44,
+      padding: EdgeInsets.symmetric(horizontal: widget.compacto ? 0 : 14),
       decoration: BoxDecoration(
-        color: activo ? sonLightGreen.withValues(alpha: 0.12) : (_encima ? sonTarjeta : Colors.transparent),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: activo ? sonLightGreen.withValues(alpha: 0.25) : Colors.transparent),
+        color: activo ? fondoActivo : (_encima ? sonTarjeta.withValues(alpha: 0.8) : Colors.transparent),
+        borderRadius: AppRadius.rPildora,
       ),
       child: Row(
         mainAxisAlignment: widget.compacto ? MainAxisAlignment.center : MainAxisAlignment.start,
         children: [
           // Con el menú angosto el número va como una chapita sobre el ícono.
           widget.compacto && widget.insignia > 0
-              ? Badge(label: Text(widget.insignia > 99 ? '99+' : '${widget.insignia}'), backgroundColor: sonAmbar, textColor: sonDarkGreen, child: Icon(widget.icono, color: color, size: 22))
-              : Icon(widget.icono, color: color, size: 22),
+              ? Badge(label: Text(widget.insignia > 99 ? '99+' : '${widget.insignia}'), backgroundColor: sonAmbar, textColor: AppColors.sobreOro, child: Icon(widget.icono, color: color, size: 20))
+              : Icon(widget.icono, color: color, size: 20),
           if (!widget.compacto) ...[
-            const SizedBox(width: 14),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
                 widget.texto,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: activo ? sonTexto : sonTextoSuave, fontWeight: activo ? FontWeight.bold : FontWeight.w500, fontSize: 14),
+                style: TextStyle(color: color, fontWeight: activo ? FontWeight.w600 : FontWeight.w500, fontSize: 14),
               ),
             ),
             if (widget.insignia > 0)
               Container(
                 key: const Key('insignia_menu'),
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(color: sonAmbar, borderRadius: BorderRadius.circular(20)),
-                child: Text(widget.insignia > 99 ? '99+' : '${widget.insignia}', style: TextStyle(color: sonDarkGreen, fontWeight: FontWeight.bold, fontSize: 12)),
+                decoration: BoxDecoration(color: sonAmbar, borderRadius: AppRadius.rPildora),
+                child: Text(widget.insignia > 99 ? '99+' : '${widget.insignia}', style: const TextStyle(color: AppColors.sobreOro, fontWeight: FontWeight.bold, fontSize: 12)),
               ),
           ],
         ],
@@ -639,7 +908,7 @@ class _ItemMenuState extends State<_ItemMenu> {
       child: GestureDetector(
         onTap: widget.alTocar,
         behavior: HitTestBehavior.opaque,
-        child: widget.compacto ? Tooltip(message: widget.texto, child: contenido) : contenido,
+        child: widget.compacto ? Tooltip(message: widget.texto, waitDuration: const Duration(milliseconds: 300), child: contenido) : contenido,
       ),
     );
   }
@@ -663,6 +932,18 @@ Color _colorEstado(dynamic estado) {
   }
 }
 
+/// "08:00 a 12:00" (rango horario) o "08:00" si la orden no tiene hora de fin.
+String _rangoHorario(dynamic orden) {
+  String corta(dynamic valor) {
+    final texto = '${valor ?? ''}'.trim();
+    return texto.length > 5 ? texto.substring(0, 5) : texto;
+  }
+  final desde = corta(orden['hora_ejecucion']);
+  final hasta = corta(orden['hora_hasta']);
+  if (desde.isEmpty) return '';
+  return hasta.isEmpty ? desde : '$desde a $hasta';
+}
+
 DateTime _lunesDe(DateTime fecha) {
   final dia = DateTime(fecha.year, fecha.month, fecha.day);
   return dia.subtract(Duration(days: dia.weekday - 1));
@@ -679,6 +960,8 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
   List<dynamic> _ordenes = [];
   List<dynamic> _tecnicos = [];
   bool _cargando = true;
+  String? _error;
+  String _busqueda = '';
 
   // Controladores principales
   final TextEditingController _clienteController = TextEditingController();
@@ -692,7 +975,15 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
   bool _esRecurrente = false;
   final TextEditingController _recurrenciaValorCtrl = TextEditingController(text: '1');
   String _recurrenciaTipo = 'día'; // día, semana, mes
-  final TextEditingController _horaCtrl = TextEditingController(text: '12:30');
+  // Las visitas son en un rango horario: el técnico maneja su horario dentro de la franja.
+  final TextEditingController _horaCtrl = TextEditingController(text: '08:00');
+  final TextEditingController _horaHastaCtrl = TextEditingController(text: '17:00');
+  // "Guardar como tareas fijas": el checklist pasa a cargarse solo en cada orden nueva de esa empresa.
+  bool _guardarTareasFijas = false;
+  // Formularios de control de la orden (los fijos de la empresa se cargan solos al elegirla).
+  List<Map<String, dynamic>> _formulariosDisponibles = [];
+  List<int> _formulariosElegidos = [];
+  StateSetter? _redibujarOrden;
   String _terminaCondicion = 'Nunca'; // Nunca, Fecha, Repeticiones
   DateTime? _terminaFecha;
   final TextEditingController _terminaRepeticionesCtrl = TextEditingController(text: '30');
@@ -714,19 +1005,59 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
     try {
       final resOrdenes = await apiGet('/api/ordenes');
       final resTecnicos = await apiGet('/api/tecnicos');
+      _actualizarFormularios();
+      if (!mounted) return;
 
       if (resOrdenes.statusCode == 200 && resTecnicos.statusCode == 200) {
         setState(() {
           _ordenes = json.decode(resOrdenes.body);
           _tecnicos = json.decode(resTecnicos.body);
           _cargando = false;
+          _error = null;
         });
         _cargarClientes();
+      } else {
+        setState(() {
+          _cargando = false;
+          _error = mensajeError(resOrdenes.statusCode == 200 ? resTecnicos : resOrdenes, 'No se pudieron cargar las órdenes.');
+        });
       }
     } catch (e) {
-      print('Error al cargar: $e');
-      setState(() => _cargando = false);
+      if (!mounted) return;
+      setState(() {
+        _cargando = false;
+        _error = mensajeSinConexion;
+      });
     }
+  }
+
+  void _reintentar() {
+    setState(() {
+      _cargando = true;
+      _error = null;
+    });
+    _obtenerDatos();
+  }
+
+  String _nombreTecnicoDe(dynamic orden) {
+    for (final t in _tecnicos) {
+      if (t['id'] == orden['tecnico_id']) return '${t['nombre']}';
+    }
+    return '';
+  }
+
+  /// Coincide con la búsqueda por cliente, dirección, tarea, técnico o número.
+  bool _coincide(dynamic orden) {
+    final q = _busqueda.trim().toLowerCase();
+    if (q.isEmpty) return true;
+    final texto = [
+      orden['id'],
+      orden['cliente'],
+      orden['direccion_trabajo'],
+      orden['descripcion_tarea'],
+      _nombreTecnicoDe(orden),
+    ].map((v) => (v ?? '').toString().toLowerCase()).join(' ');
+    return texto.contains(q);
   }
 
   /// Arma la lista de clientes para sugerir: las carpetas que ya existen en el disco de la empresa
@@ -788,7 +1119,10 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
           if (buscado.isEmpty) return _clientesConocidos;
           return _clientesConocidos.where((nombre) => _sinAcentos(nombre).contains(buscado));
         },
-        onSelected: (_) => FocusScope.of(context).nextFocus(),
+        onSelected: (nombre) {
+          FocusScope.of(context).nextFocus();
+          _cargarDatosDeEmpresa(nombre);
+        },
         fieldViewBuilder: (context, controlador, foco, alEnviar) => TextField(
           controller: controlador,
           focusNode: foco,
@@ -820,8 +1154,33 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
     );
   }
 
+  /// Al elegir el cliente: si el checklist está vacío se cargan sus tareas fijas, y si falta la
+  /// dirección o el correo se completan con los de la empresa.
+  Future<void> _cargarDatosDeEmpresa(String nombre, {bool forzarTareas = false}) async {
+    try {
+      final respuesta = await apiGet('/api/clientes/tareas?nombre=${Uri.encodeQueryComponent(nombre)}');
+      if (respuesta.statusCode != 200) return;
+      final datos = json.decode(respuesta.body) as Map;
+      final tareas = (datos['tareas'] as List? ?? []).map((t) => '$t').toList();
+      if (tareas.isNotEmpty && (forzarTareas || _puntosCtrl.text.trim().isEmpty)) _puntosCtrl.text = tareas.join('\n');
+      final fijos = (datos['formularios'] as List? ?? []).map((id) => (id as num).toInt()).toList();
+      if (fijos.isNotEmpty && (forzarTareas || _formulariosElegidos.isEmpty)) {
+        _formulariosElegidos = fijos;
+        _redibujarOrden?.call(() {});
+      }
+      if (_direccionController.text.trim().isEmpty && '${datos['direccion'] ?? ''}'.isNotEmpty) _direccionController.text = '${datos['direccion']}';
+      if (_emailClienteCtrl.text.trim().isEmpty && '${datos['email'] ?? ''}'.isNotEmpty) _emailClienteCtrl.text = '${datos['email']}';
+      if (forzarTareas && tareas.isEmpty && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Esta empresa todavía no tiene tareas fijas.')));
+      }
+    } catch (_) {}
+  }
+
   Future<void> _guardarOrden({int? idAEditar}) async {
-    if (_tecnicoSeleccionado == null || _clienteController.text.isEmpty || _direccionController.text.isEmpty) return;
+    if (_tecnicoSeleccionado == null || _clienteController.text.isEmpty || _direccionController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Completá técnico, cliente y dirección')));
+      return;
+    }
 
     try {
       final respuesta = await apiSend(
@@ -837,6 +1196,9 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
           'recurrencia_valor': int.tryParse(_recurrenciaValorCtrl.text) ?? 1,
           'recurrencia_tipo': _recurrenciaTipo,
           'hora_ejecucion': _horaCtrl.text,
+          'hora_hasta': _horaHastaCtrl.text.trim(),
+          'guardar_tareas_fijas': _guardarTareasFijas,
+          'formularios': _formulariosElegidos,
           'termina_condicion': _terminaCondicion,
           'termina_fecha': _terminaFecha?.toIso8601String().split('T')[0],
           'termina_repeticiones': int.tryParse(_terminaRepeticionesCtrl.text) ?? 30,
@@ -848,12 +1210,15 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
       );
 
       if (respuesta.statusCode == 200) {
+        if (!mounted) return;
         Navigator.of(context).pop();
         setState(() => _cargando = true);
         _obtenerDatos();
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensajeError(respuesta, 'No se pudo guardar la orden'))));
       }
     } catch (e) {
-      print('Error al guardar: $e');
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(mensajeSinConexion)));
     }
   }
 
@@ -889,12 +1254,18 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
       _horaCtrl.text = ordenAEditar['hora_ejecucion'] ?? '12:30';
       _terminaCondicion = ordenAEditar['termina_condicion'] ?? 'Nunca';
       _terminaRepeticionesCtrl.text = '${ordenAEditar['termina_repeticiones'] ?? 30}';
-      var hora = '${ordenAEditar['hora_ejecucion'] ?? '12:30'}';
+      var hora = '${ordenAEditar['hora_ejecucion'] ?? '08:00'}';
       if (hora.length > 5) hora = hora.substring(0, 5);
       _horaCtrl.text = hora;
+      var hasta = '${ordenAEditar['hora_hasta'] ?? ''}';
+      if (hasta.length > 5) hasta = hasta.substring(0, 5);
+      _horaHastaCtrl.text = hasta;
+      _guardarTareasFijas = false;
       _fechaOrden = _fechaDeOrden(ordenAEditar) ?? DateTime.now();
       final puntos = ordenAEditar['puntos'];
       _puntosCtrl.text = puntos is List ? puntos.map((punto) => '$punto').join('\n') : '';
+      final formularios = ordenAEditar['formularios'];
+      _formulariosElegidos = formularios is List ? formularios.map((f) => ((f as Map)['id'] as num).toInt()).toList() : [];
       _emailClienteCtrl.text = '${ordenAEditar['email_cliente'] ?? ''}';
       _whatsappCtrl.text = '${ordenAEditar['whatsapp_cliente'] ?? ''}';
     } else {
@@ -905,16 +1276,22 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
       _esRecurrente = false;
       _fechaOrden = DateTime.now();
       _puntosCtrl.clear();
+      _formulariosElegidos = [];
       _emailClienteCtrl.clear();
       _whatsappCtrl.clear();
-      _horaCtrl.text = '12:30';
+      _horaCtrl.text = '08:00';
+      _horaHastaCtrl.text = '17:00';
+      _guardarTareasFijas = false;
     }
 
+    // La lista de formularios se pide de nuevo (pudo cambiar) y el diálogo se redibuja cuando llega.
+    _actualizarFormularios();
     showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setStateModal) {
+            _redibujarOrden = setStateModal;
             return AlertDialog(
               title: Text(ordenAEditar == null ? 'Crear Nueva Orden' : 'Editar Orden', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
               content: SizedBox(
@@ -961,14 +1338,51 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          SizedBox(width: 110, child: TextField(controller: _horaCtrl, decoration: const InputDecoration(labelText: 'Hora'))),
+                          SizedBox(width: 90, child: TextField(controller: _horaCtrl, decoration: const InputDecoration(labelText: 'Desde'))),
+                          const SizedBox(width: 8),
+                          SizedBox(width: 90, child: TextField(controller: _horaHastaCtrl, decoration: const InputDecoration(labelText: 'Hasta', hintText: 'sin límite'))),
                         ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text('Franja horaria: el técnico va cuando le queda mejor dentro del rango.', style: TextStyle(color: sonTextoSuave, fontSize: 12)),
                       ),
                       const SizedBox(height: 12),
                       TextField(
                         controller: _puntosCtrl,
-                        decoration: const InputDecoration(labelText: 'Checklist de la visita'),
+                        decoration: const InputDecoration(
+                          labelText: 'Checklist de la visita (una tarea por renglón)',
+                          helperText: 'Al elegir el cliente se cargan solas sus tareas fijas. Se pueden cambiar.',
+                        ),
                         maxLines: 5,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CheckboxListTile(
+                              dense: true,
+                              contentPadding: EdgeInsets.zero,
+                              controlAffinity: ListTileControlAffinity.leading,
+                              value: _guardarTareasFijas,
+                              onChanged: (valor) => setStateModal(() => _guardarTareasFijas = valor ?? false),
+                              title: const Text('Guardar checklist y formularios como fijos de la empresa (todos los meses)'),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: _clienteController.text.trim().isEmpty ? null : () => _cargarDatosDeEmpresa(_clienteController.text.trim(), forzarTareas: true),
+                            child: const Text('Cargar los fijos'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      SelectorFormularios(
+                        disponibles: _formulariosDisponibles,
+                        elegidos: _formulariosElegidos,
+                        alCambiar: (lista) => setStateModal(() => _formulariosElegidos = lista),
+                        alCambiarDisponibles: (lista) {
+                          setState(() => _formulariosDisponibles = lista);
+                          setStateModal(() {});
+                        },
                       ),
                       const SizedBox(height: 12),
                       TextField(controller: _tareaController, decoration: const InputDecoration(labelText: 'Notas de la visita'), maxLines: 3),
@@ -1048,7 +1462,6 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
               actions: [
                 TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancelar', style: TextStyle(color: sonTextoSuave))),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: sonLightGreen),
                   onPressed: () => _guardarOrden(idAEditar: ordenAEditar?['id']),
                   child: Text(ordenAEditar == null ? 'Asignar Trabajo' : 'Guardar Cambios', style: TextStyle(color: sonDarkGreen, fontWeight: FontWeight.bold)),
                 ),
@@ -1057,53 +1470,72 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
           }
         );
       },
-    );
+    ).then((_) => _redibujarOrden = null); // cerrado el diálogo, ya no hay nada que redibujar
+  }
+
+  /// Pide los formularios guardados y redibuja el diálogo de la orden si está abierto.
+  Future<void> _actualizarFormularios() async {
+    final lista = await listaDeFormularios();
+    if (!mounted) return;
+    setState(() => _formulariosDisponibles = lista);
+    _redibujarOrden?.call(() {});
   }
 
   String _filtroEstado = 'Todas';
 
-  /// Botones para filtrar las órdenes por estado, con la cantidad de cada uno.
+  /// Píldoras para filtrar las órdenes por estado, con la cantidad de cada uno.
   Widget _barraFiltros() {
     const opciones = ['Todas', 'Por asignar', 'Pendiente', 'En progreso', 'Completada'];
+    final base = _ordenes.where(_coincide).toList();
     return Wrap(
-      spacing: 10,
-      runSpacing: 10,
+      spacing: AppSpacing.s8,
+      runSpacing: AppSpacing.s8,
       children: opciones.map((op) {
-        final cantidad = op == 'Todas' ? _ordenes.length : _ordenes.where((o) => o['estado'] == op).length;
-        final activo = _filtroEstado == op;
-        final color = op == 'Todas' ? sonLightGreen : _colorEstado(op);
-        return InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: () => setState(() => _filtroEstado = op),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-            decoration: BoxDecoration(
-              color: activo ? color.withValues(alpha: 0.16) : Colors.transparent,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: activo ? color : sonBorde),
-            ),
-            child: Text('$op · $cantidad', style: TextStyle(color: activo ? color : sonTextoSuave, fontWeight: FontWeight.w600)),
-          ),
+        final cantidad = op == 'Todas' ? base.length : base.where((o) => o['estado'] == op).length;
+        return PildoraContador(
+          texto: op,
+          cantidad: cantidad,
+          activa: _filtroEstado == op,
+          punto: op == 'Todas' ? null : _colorEstado(op),
+          alTocar: () => setState(() => _filtroEstado = op),
         );
       }).toList(),
     );
   }
 
   Widget _cuerpoOrdenes() {
-    if (_cargando) return const Center(child: CircularProgressIndicator());
-    if (_ordenes.isEmpty) return Center(child: Text('No hay órdenes registradas.', style: TextStyle(color: sonTextoSuave)));
-    final visibles = _filtroEstado == 'Todas' ? _ordenes : _ordenes.where((o) => o['estado'] == _filtroEstado).toList();
-    if (visibles.isEmpty) return Center(child: Text('No hay órdenes en estado "$_filtroEstado".', style: TextStyle(color: sonTextoSuave)));
+    if (_ordenes.isEmpty) {
+      return EstadoVacio(icono: Icons.assignment_outlined, mensaje: 'Todavía no hay órdenes.', accion: 'Nueva orden', alAccionar: () => _mostrarDialogoOrden());
+    }
+    final visibles = _visibles;
+    if (visibles.isEmpty) {
+      return EstadoVacio(icono: Icons.search_off_rounded, mensaje: _busqueda.isNotEmpty ? 'Sin resultados para "$_busqueda".' : 'No hay órdenes "$_filtroEstado".');
+    }
     return GridView.builder(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: AppSpacing.s8, top: 4),
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 440,
         mainAxisExtent: 240,
-        crossAxisSpacing: 18,
-        mainAxisSpacing: 18,
+        crossAxisSpacing: AppSpacing.s16,
+        mainAxisSpacing: AppSpacing.s16,
       ),
       itemCount: visibles.length,
-      itemBuilder: (_, i) => _tarjetaOrden(visibles[i]),
+      itemBuilder: (_, i) => Aparecer(orden: i < 12 ? i : 12, child: _tarjetaOrden(visibles[i])),
+    );
+  }
+
+  /// Carga: siluetas con la forma de las tarjetas.
+  Widget _esqueletoOrdenes() {
+    return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 440,
+        mainAxisExtent: 240,
+        crossAxisSpacing: AppSpacing.s16,
+        mainAxisSpacing: AppSpacing.s16,
+      ),
+      itemCount: 6,
+      itemBuilder: (_, __) => const Skeleton(alto: 240, radio: AppRadius.rTarjetaGrande),
     );
   }
 
@@ -1127,14 +1559,13 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
     for (final t in _tecnicos) {
       if (t['id'] == orden['tecnico_id']) tecnico = '${t['nombre']}';
     }
-    var hora = (orden['hora_ejecucion'] ?? '').toString();
-    if (hora.length > 5) hora = hora.substring(0, 5);
+    final hora = _rangoHorario(orden);
     final recurrente = orden['es_recurrente'] == true;
     final direccion = (orden['direccion_trabajo'] ?? '').toString().trim();
     final tarea = (orden['descripcion_tarea'] ?? '').toString().trim();
 
     return Container(
-      decoration: decoracionTarjeta(),
+      decoration: decoracionTarjeta(radio: AppRadius.tarjetaGrande, sombra: true),
       clipBehavior: Clip.antiAlias,
       child: Row(
         children: [
@@ -1186,7 +1617,7 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
                       ],
                       if (recurrente)
                         Padding(
-                          padding: EdgeInsets.only(left: 8),
+                          padding: const EdgeInsets.only(left: 8),
                           child: Tooltip(message: 'Orden recurrente', child: Icon(Icons.repeat, size: 16, color: sonTextoSuave)),
                         ),
                       if (estado == 'Pendiente' || estado == 'En progreso')
@@ -1233,7 +1664,7 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
     }
   }
 
-  List<dynamic> get _visibles => _filtroEstado == 'Todas' ? _ordenes : _ordenes.where((o) => o['estado'] == _filtroEstado).toList();
+  List<dynamic> get _visibles => _ordenes.where((o) => _coincide(o) && (_filtroEstado == 'Todas' || o['estado'] == _filtroEstado)).toList();
 
   Widget _semana() {
     const nombres = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
@@ -1300,8 +1731,7 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
 
   Widget _tarjetaDia(dynamic orden) {
     final estado = '${orden['estado']}';
-    var hora = '${orden['hora_ejecucion'] ?? ''}';
-    if (hora.length > 5) hora = hora.substring(0, 5);
+    final hora = _rangoHorario(orden);
     var tecnico = 'Sin técnico';
     for (final t in _tecnicos) {
       if (t['id'] == orden['tecnico_id']) tecnico = '${t['nombre']}';
@@ -1327,49 +1757,60 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
 
   @override
   Widget build(BuildContext context) {
+    final Widget cuerpo;
+    if (_cargando) {
+      cuerpo = _esqueletoOrdenes();
+    } else if (_error != null && _ordenes.isEmpty) {
+      cuerpo = EstadoError(mensaje: _error!, alReintentar: _reintentar);
+    } else {
+      cuerpo = _vista == 'semana' ? _semana() : _cuerpoOrdenes();
+    }
     return Padding(
-      padding: const EdgeInsets.all(40.0),
+      padding: AppSpacing.pagina,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Órdenes de Trabajo', style: estiloTituloPantalla),
-                  ],
-                ),
-              ),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(backgroundColor: sonLightGreen, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18)),
-                icon: Icon(Icons.add, color: sonDarkGreen),
-                label: Text('Crear Nueva Orden', style: TextStyle(color: sonDarkGreen, fontSize: 16, fontWeight: FontWeight.bold)),
+          Aparecer(
+            child: EncabezadoPantalla(
+              eyebrow: 'Operación',
+              normal: 'Órdenes de',
+              destacado: 'trabajo',
+              accion: ElevatedButton.icon(
+                icon: const Icon(Icons.add_rounded),
+                label: const Text('Nueva orden'),
                 onPressed: () => _mostrarDialogoOrden(),
-              )
-            ],
+              ),
+            ),
           ),
-          const SizedBox(height: 20),
-          Row(
+          const SizedBox(height: AppSpacing.s24),
+          Wrap(
+            spacing: AppSpacing.s16,
+            runSpacing: AppSpacing.s12,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              ChoiceChip(
-                label: const Text('Semana'),
-                selected: _vista == 'semana',
-                onSelected: (_) => setState(() => _vista = 'semana'),
-              ),
-              const SizedBox(width: 8),
-              ChoiceChip(
-                label: const Text('Lista'),
-                selected: _vista == 'lista',
-                onSelected: (_) => setState(() => _vista = 'lista'),
+              Buscador(pista: 'Buscar cliente, dirección, técnico...', alCambiar: (v) => setState(() => _busqueda = v), ancho: 320),
+              SegmentedButton<String>(
+                showSelectedIcon: false,
+                segments: const [
+                  ButtonSegment(value: 'semana', icon: Icon(Icons.calendar_view_week_rounded, size: 18), label: Text('Semana')),
+                  ButtonSegment(value: 'lista', icon: Icon(Icons.grid_view_rounded, size: 18), label: Text('Tarjetas')),
+                ],
+                selected: {_vista},
+                onSelectionChanged: (v) => setState(() => _vista = v.first),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.s16),
           _barraFiltros(),
-          const SizedBox(height: 16),
-          Expanded(child: _vista == 'semana' ? _semana() : _cuerpoOrdenes()),
+          const SizedBox(height: AppSpacing.s16),
+          Expanded(
+            child: AnimatedSwitcher(
+              duration: AppMotion.media,
+              switchInCurve: AppMotion.curva,
+              layoutBuilder: (actual, _) => actual ?? const SizedBox.shrink(),
+              child: KeyedSubtree(key: ValueKey('$_vista-$_cargando-${_error != null}'), child: cuerpo),
+            ),
+          ),
         ],
       ),
     );
@@ -1391,11 +1832,92 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
   final TextEditingController _nombreController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  // Perfil: desde dónde sale (ordena su recorrido), matrícula y firma con sello (va sola en cada informe).
+  final TextEditingController _salidaController = TextEditingController();
+  final TextEditingController _matriculaController = TextEditingController();
+  String? _firma; // data URL de la imagen que se ve en el diálogo
+  bool _firmaCambiada = false;
 
   @override
   void initState() {
     super.initState();
     _obtenerTecnicos();
+  }
+
+  /// Lo que se manda del perfil: la firma solo si se cambió (si no, el servidor la deja como está).
+  Map<String, dynamic> _datosDePerfil() => {
+        'salida_direccion': _salidaController.text.trim(),
+        'matricula': _matriculaController.text.trim(),
+        if (_firmaCambiada) 'firma_sello': _firma,
+      };
+
+  Future<void> _elegirFirma() async {
+    final imagen = await elegirImagen();
+    if (imagen == null) return;
+    if (!RegExp(r'^data:image/(png|jpeg);base64,').hasMatch(imagen)) {
+      _mostrarErrorDialogo('La firma tiene que ser una imagen PNG o JPG');
+      return;
+    }
+    if (imagen.length > 2000000) {
+      _mostrarErrorDialogo('La imagen es muy pesada (máximo 1,5 MB). Achicala o recortala.');
+      return;
+    }
+    _redibujarDialogo?.call(() {
+      _firma = imagen;
+      _firmaCambiada = true;
+      _errorDialogo = null;
+    });
+  }
+
+  Future<void> _leerFirma(int id) async {
+    try {
+      final respuesta = await apiGet('/api/tecnicos/$id/firma');
+      if (respuesta.statusCode != 200) return;
+      final firma = (json.decode(respuesta.body) as Map)['firma_sello'];
+      if (firma is String && !_firmaCambiada) _redibujarDialogo?.call(() => _firma = firma);
+    } catch (_) {}
+  }
+
+  Widget _vistaFirma() {
+    Widget contenido;
+    final firma = _firma;
+    if (firma == null) {
+      contenido = Text('Sin firma cargada: el técnico firma en el celular en cada visita.', textAlign: TextAlign.center, style: TextStyle(color: sonTextoSuave));
+    } else {
+      try {
+        contenido = Image.memory(base64Decode(firma.substring(firma.indexOf(',') + 1)), fit: BoxFit.contain);
+      } catch (_) {
+        contenido = Text('No se puede mostrar la imagen', style: TextStyle(color: sonRojo));
+      }
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Firma y sello (va sola en cada informe)', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
+        const SizedBox(height: 6),
+        Container(
+          height: 110,
+          width: double.infinity,
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: sonBorde)),
+          child: Center(child: contenido),
+        ),
+        Row(
+          children: [
+            TextButton.icon(onPressed: _elegirFirma, icon: const Icon(Icons.upload_file), label: Text(firma == null ? 'Subir imagen' : 'Cambiar imagen')),
+            if (firma != null)
+              TextButton.icon(
+                onPressed: () => _redibujarDialogo?.call(() {
+                  _firma = null;
+                  _firmaCambiada = true;
+                }),
+                icon: Icon(Icons.delete_outline, color: sonRojo),
+                label: Text('Quitar', style: TextStyle(color: sonRojo)),
+              ),
+          ],
+        ),
+      ],
+    );
   }
 
   Future<void> _obtenerTecnicos() async {
@@ -1434,6 +1956,7 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
           'nombre': _nombreController.text,
           'email': _emailController.text,
           'password': _passwordController.text,
+          ..._datosDePerfil(),
         }),
       );
 
@@ -1458,7 +1981,15 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
     _nombreController.text = tecnico?['nombre'] ?? '';
     _emailController.text = tecnico?['email'] ?? '';
     _passwordController.clear();
+    _salidaController.text = '${tecnico?['salida_direccion'] ?? ''}';
+    _matriculaController.text = '${tecnico?['matricula'] ?? ''}';
+    _firma = null;
+    _firmaCambiada = false;
     _errorDialogo = null;
+    if (tecnico != null && tecnico['tiene_firma'] == true) {
+      // Se pide después de abrir el diálogo, para poder mostrarla.
+      Future.microtask(() => _leerFirma((tecnico['id'] as num).toInt()));
+    }
     showDialog(
       context: context,
       builder: (context) {
@@ -1467,7 +1998,8 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
           return AlertDialog(
             title: Text(tecnico == null ? 'Registrar Nuevo Técnico' : 'Editar Técnico', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
             content: SizedBox(
-              width: 400,
+              width: 440,
+              child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -1484,12 +2016,25 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
                     decoration: InputDecoration(labelText: tecnico == null ? 'Contraseña (mínimo 6 caracteres)' : 'Nueva contraseña (vacío = no cambiar)'),
                     obscureText: true,
                   ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _salidaController,
+                    decoration: const InputDecoration(
+                      labelText: 'Sale desde (dirección o localidad)',
+                      helperText: 'Ordena sus visitas desde ahí. Ej: Villa María, Córdoba',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(controller: _matriculaController, decoration: const InputDecoration(labelText: 'Matrícula profesional')),
+                  const SizedBox(height: 16),
+                  _vistaFirma(),
                   if (_errorDialogo != null)
                     Padding(
                       padding: const EdgeInsets.only(top: 14),
                       child: Text(_errorDialogo!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600)),
                     ),
                 ],
+              ),
               ),
             ),
             actions: [
@@ -1498,9 +2043,8 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
                 child: Text('Cancelar', style: TextStyle(color: sonTextoSuave))
               ),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: sonLightGreen),
                 onPressed: () => tecnico == null ? _registrarTecnico() : _guardarTecnico(tecnico['id']),
-                child: Text('Guardar', style: TextStyle(color: sonDarkGreen, fontWeight: FontWeight.bold)),
+                child: const Text('Guardar'),
               ),
             ],
           );
@@ -1518,6 +2062,7 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
           'nombre': _nombreController.text,
           'email': _emailController.text,
           if (_passwordController.text.isNotEmpty) 'password': _passwordController.text,
+          ..._datosDePerfil(),
         }),
       );
       if (respuesta.statusCode == 200) {
@@ -1580,27 +2125,22 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(40.0),
+      padding: AppSpacing.pagina,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
+              const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Gestión de Técnicos', style: estiloTituloPantalla),
+                  EncabezadoPantalla(eyebrow: 'Operación', normal: 'Equipo', destacado: 'técnico'),
                 ],
               ),
               ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: sonLightGreen,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                icon: Icon(Icons.person_add, color: sonDarkGreen),
-                label: Text('Registrar Técnico', style: TextStyle(color: sonDarkGreen, fontSize: 16, fontWeight: FontWeight.bold)),
+                icon: const Icon(Icons.person_add),
+                label: const Text('Nuevo técnico'),
                 onPressed: _mostrarDialogoNuevoTecnico, 
               )
             ],
@@ -1613,7 +2153,7 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
               child: _cargando
                   ? const Center(child: CircularProgressIndicator())
                   : _tecnicos.isEmpty
-                      ? Center(child: Text('No hay técnicos registrados.', style: TextStyle(color: sonTextoSuave)))
+                      ? EstadoVacio(icono: Icons.groups_outlined, mensaje: 'Todavía no hay técnicos.', accion: 'Nuevo técnico', alAccionar: _mostrarDialogoNuevoTecnico)
                       : ListView.separated(
                           padding: const EdgeInsets.all(20),
                           itemCount: _tecnicos.length,
@@ -1623,7 +2163,12 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
                             return ListTile(
                               leading: CircleAvatar(backgroundColor: sonTarjetaAlta, child: Icon(Icons.person, color: sonLightGreen)),
                               title: Text(tecnico['nombre'] ?? 'Sin Nombre', style: const TextStyle(fontWeight: FontWeight.bold)),
-                              subtitle: Text(tecnico['email'] ?? 'Sin correo'),
+                              subtitle: Text([
+                                '${tecnico['email'] ?? 'Sin correo'}',
+                                if ('${tecnico['salida_direccion'] ?? ''}'.isNotEmpty) 'Sale desde ${tecnico['salida_direccion']}',
+                                if ('${tecnico['matricula'] ?? ''}'.isNotEmpty) 'Mat. ${tecnico['matricula']}',
+                                tecnico['tiene_firma'] == true ? 'Firma cargada' : 'Sin firma cargada',
+                              ].join(' · ')),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -1749,7 +2294,6 @@ class _PantallaAdministradoresState extends State<PantallaAdministradores> {
             actions: [
               TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('Cancelar', style: TextStyle(color: sonTextoSuave))),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: sonLightGreen),
                 onPressed: () async {
                   try {
                     final respuesta = await apiSend(
@@ -1770,7 +2314,7 @@ class _PantallaAdministradoresState extends State<PantallaAdministradores> {
                     setStateDialogo(() => error = mensajeSinConexion);
                   }
                 },
-                child: Text('Crear', style: TextStyle(color: sonDarkGreen, fontWeight: FontWeight.bold)),
+                child: const Text('Crear'),
               ),
             ],
           );
@@ -1835,30 +2379,25 @@ class _PantallaAdministradoresState extends State<PantallaAdministradores> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(40.0),
+      padding: AppSpacing.pagina,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Expanded(
+              const Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Usuarios', style: estiloTituloPantalla),
+                    EncabezadoPantalla(eyebrow: 'Sistema', normal: 'Usuarios', destacado: 'del panel'),
                   ],
                 ),
               ),
               const SizedBox(width: 24),
               ElevatedButton.icon(
                 key: const Key('nuevo_usuario'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: sonLightGreen,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                icon: Icon(Icons.person_add, color: sonDarkGreen),
-                label: Text('Nuevo usuario', style: TextStyle(color: sonDarkGreen, fontSize: 16, fontWeight: FontWeight.bold)),
+                icon: const Icon(Icons.person_add),
+                label: const Text('Nuevo usuario'),
                 onPressed: _dialogoNuevoAdmin,
               ),
             ],
@@ -2048,6 +2587,23 @@ class _PantallaInformesState extends State<PantallaInformes> {
     );
   }
 
+  /// El enlace con el que el cliente ve sus informes. Lo maneja también Administración desde acá.
+  Future<void> _accesoDelCliente(Map carpeta) async {
+    final nombre = '${carpeta['empresa'] ?? carpeta['carpeta'] ?? ''}';
+    try {
+      final respuesta = await apiGet('/api/clientes/portal-por-nombre?nombre=${Uri.encodeQueryComponent(nombre)}');
+      if (!mounted) return;
+      if (respuesta.statusCode != 200) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensajeError(respuesta, 'No se encontró el cliente'))));
+        return;
+      }
+      final datos = json.decode(respuesta.body) as Map;
+      await abrirAccesoCliente(context, (datos['id'] as num).toInt(), '${datos['empresa'] ?? nombre}');
+    } catch (_) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(mensajeSinConexion)));
+    }
+  }
+
   Future<void> _abrirCarpeta(Map carpeta) async {
     final respuesta = await apiGet('/api/informes/carpetas/${Uri.encodeComponent('${carpeta['carpeta']}')}');
     if (!mounted) return;
@@ -2090,6 +2646,11 @@ class _PantallaInformesState extends State<PantallaInformes> {
                   ),
           ),
           actions: [
+            TextButton.icon(
+              onPressed: () => _accesoDelCliente(carpeta),
+              icon: const Icon(Icons.link),
+              label: const Text('Acceso del cliente'),
+            ),
             TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cerrar')),
           ],
         );
@@ -2100,14 +2661,14 @@ class _PantallaInformesState extends State<PantallaInformes> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(40.0),
+      padding: AppSpacing.pagina,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Informes de clientes', style: estiloTituloPantalla),
+              const EncabezadoPantalla(eyebrow: 'Operación', normal: 'Informes de', destacado: 'clientes'),
               Row(
                 children: [
                   if (_modoAgente)
@@ -2157,14 +2718,18 @@ class _PantallaInformesState extends State<PantallaInformes> {
             child: _cargando
                 ? const Center(child: CircularProgressIndicator())
                 : _error != null
+                    ? EstadoError(mensaje: _error!, alReintentar: _obtenerCarpetasDiscoK)
+                    : _carpetas.isEmpty
                     ? Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Text(_error!, textAlign: TextAlign.center, style: TextStyle(color: sonRojo, fontSize: 16)),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 480),
+                          child: Text(
+                            'Todavía no hay carpetas de clientes. Cuando se cierre la primera visita, el informe queda guardado acá.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: sonTextoSuave, fontSize: 18, height: 1.4),
+                          ),
                         ),
                       )
-                    : _carpetas.isEmpty
-                    ? Center(child: Text('No se detectaron carpetas de clientes.', style: TextStyle(color: sonTextoSuave, fontSize: 18)))
                     : GridView.builder(
                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 5,
@@ -2174,9 +2739,24 @@ class _PantallaInformesState extends State<PantallaInformes> {
                         itemCount: _carpetas.length,
                         itemBuilder: (context, index) {
                           final carpeta = _carpetas[index];
-                          return InkWell(
-                            onTap: () => _abrirCarpeta(carpeta),
-                            child: _carpetaEmpresa(carpeta['empresa'], '${carpeta['cantidad']} informes'),
+                          return Stack(
+                            children: [
+                              Positioned.fill(
+                                child: InkWell(
+                                  onTap: () => _abrirCarpeta(carpeta),
+                                  child: _carpetaEmpresa(carpeta['empresa'], '${carpeta['cantidad']} informes'),
+                                ),
+                              ),
+                              Positioned(
+                                top: 4,
+                                right: 4,
+                                child: IconButton(
+                                  tooltip: 'Acceso del cliente (enlace para ver sus informes)',
+                                  icon: Icon(Icons.link, color: sonTextoSuave, size: 20),
+                                  onPressed: () => _accesoDelCliente(carpeta),
+                                ),
+                              ),
+                            ],
                           );
                         },
                       ),
@@ -2217,11 +2797,25 @@ class _DialogoAgenteState extends State<_DialogoAgente> {
   String? _error;
   String? _codigo;
   int _venceEnMinutos = 15;
+  final TextEditingController _carpeta = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _cargar();
+  }
+
+  @override
+  void dispose() {
+    _carpeta.dispose();
+    super.dispose();
+  }
+
+  /// Instalación como servicio en el servidor de archivos: arranca con la máquina y no hay que
+  /// volver a descargar nada (el agente se actualiza solo desde este servidor).
+  String get _comandoServidor {
+    final carpeta = _carpeta.text.trim();
+    return 'SON-Agente.exe --instalar-servidor --codigo=$_codigoDeConexion${carpeta.isEmpty ? '' : ' --carpeta="$carpeta"'}';
   }
 
   /// Lo que se pega en el programa: el código y la dirección de este servidor.
@@ -2320,7 +2914,7 @@ class _DialogoAgenteState extends State<_DialogoAgente> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(radius: 11, backgroundColor: sonTarjetaAlta, child: Text(numero, style: const TextStyle(color: Colors.white, fontSize: 12))),
+          CircleAvatar(radius: 11, backgroundColor: sonTarjetaAlta, child: Text(numero, style: TextStyle(color: sonTexto, fontSize: 12))),
           const SizedBox(width: 10),
           Expanded(child: Text(texto)),
         ],
@@ -2342,13 +2936,16 @@ class _DialogoAgenteState extends State<_DialogoAgente> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'El agente es un programa que corre en una PC de la oficina con acceso al disco de clientes. Baja los informes de este servidor y los guarda en la carpeta de cada cliente.',
+                      'El agente es un programa que conecta el disco K (la carpeta de clientes) con este servidor. '
+                      'Se instala UNA sola vez en la máquina que tiene el disco y queda prendido siempre: '
+                      'arranca solo con Windows (aunque nadie inicie sesión) y se actualiza solo. '
+                      'Desde ese momento nadie más tiene que descargar nada para usar el panel.',
                       style: TextStyle(color: sonTextoSuave),
                     ),
                     const SizedBox(height: 16),
-                    _paso('1', 'Descargá el programa e instalalo en la PC de la oficina (doble clic).'),
-                    _paso('2', 'Tocá "Generar código" y pegalo cuando el programa lo pida.'),
-                    _paso('3', 'Elegí la carpeta de clientes. Listo: arranca solo con Windows.'),
+                    _paso('1', 'En el servidor de archivos (la máquina del disco K), descargá el programa.'),
+                    _paso('2', 'Tocá "Generar código", escribí la carpeta de clientes tal como se ve EN ESE servidor y copiá el comando.'),
+                    _paso('3', 'Abrí una consola "como administrador" en la carpeta donde quedó el programa, pegá el comando y Enter. Listo para siempre.'),
                     const SizedBox(height: 12),
                     Wrap(
                       spacing: 12,
@@ -2395,6 +2992,44 @@ class _DialogoAgenteState extends State<_DialogoAgente> {
                           ],
                         ),
                       ),
+                      const SizedBox(height: 14),
+                      TextField(
+                        controller: _carpeta,
+                        onChanged: (_) => setState(() {}),
+                        decoration: const InputDecoration(
+                          labelText: 'Carpeta de clientes vista desde el servidor',
+                          hintText: r'Ej: D:\HIGIENE Y SEGURIDAD\00. CLIENTES',
+                          helperText: 'En el servidor conviene la ruta local (D:\\...), no la K: ni \\\\sa-server: el agente corre como servicio.',
+                          helperMaxLines: 2,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text('Comando para instalarlo en el servidor (una sola vez):', style: TextStyle(fontWeight: FontWeight.w600, color: sonTexto)),
+                      const SizedBox(height: 6),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(color: sonTarjetaAlta, borderRadius: BorderRadius.circular(8)),
+                        child: Row(
+                          children: [
+                            Expanded(child: SelectableText(_comandoServidor, style: TextStyle(fontFamily: 'monospace', fontSize: 12.5, color: sonTexto))),
+                            IconButton(
+                              tooltip: 'Copiar comando',
+                              icon: Icon(Icons.copy, color: sonTexto),
+                              onPressed: () {
+                                Clipboard.setData(ClipboardData(text: _comandoServidor));
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Comando copiado')));
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Si preferís instalarlo en una PC común, abrí el programa con doble clic y pegá el código: '
+                        'funciona igual, pero solo mientras esa PC esté prendida.',
+                        style: TextStyle(color: sonTextoSuave, fontSize: 12),
+                      ),
                     ],
                     if (_error != null) ...[
                       const SizedBox(height: 12),
@@ -2404,7 +3039,7 @@ class _DialogoAgenteState extends State<_DialogoAgente> {
                     Text('Agentes conectados', style: TextStyle(fontWeight: FontWeight.bold, color: sonTexto)),
                     if (_agentes.isEmpty)
                       Padding(
-                        padding: EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.only(top: 8),
                         child: Text('Todavía no hay ningún agente vinculado.', style: TextStyle(color: sonTextoSuave)),
                       ),
                     ..._agentes.map((agente) {

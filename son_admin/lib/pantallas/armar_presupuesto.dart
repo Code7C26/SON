@@ -489,7 +489,7 @@ class _PantallaArmarPresupuestoState extends State<PantallaArmarPresupuesto> {
           _filaResumen('IVA pago único', pesos(c?['ivaUnico'] as num?)),
           const SizedBox(height: 8),
           EtiquetaEstado(texto: textoDeMargen('${c?['nivelMargen']}'), color: colorDeMargen('${c?['nivelMargen']}')),
-          if (c?['margen'] != null) Padding(padding: EdgeInsets.only(top: 6), child: Text('Margen ${c!['margen']} %', style: TextStyle(color: sonTextoSuave, fontSize: 13))),
+          if (c?['margen'] != null) Padding(padding: const EdgeInsets.only(top: 6), child: Text('Margen ${c!['margen']} %', style: TextStyle(color: sonTextoSuave, fontSize: 13))),
           if (avisos.isNotEmpty) ...[
             const SizedBox(height: 16),
             for (final aviso in avisos)
@@ -505,7 +505,7 @@ class _PantallaArmarPresupuestoState extends State<PantallaArmarPresupuesto> {
 
   Widget _filaResumen(String rotulo, String valor) => Padding(
         padding: const EdgeInsets.only(bottom: 8),
-        child: Row(children: [Expanded(child: Text(rotulo, style: TextStyle(color: sonTextoSuave))), Text(valor, style: TextStyle(fontWeight: FontWeight.w600))]),
+        child: Row(children: [Expanded(child: Text(rotulo, style: TextStyle(color: sonTextoSuave))), Text(valor, style: const TextStyle(fontWeight: FontWeight.w600))]),
       );
 
   @override
@@ -544,7 +544,7 @@ class _PantallaArmarPresupuestoState extends State<PantallaArmarPresupuesto> {
                   Expanded(
                     child: ListView(
                       children: [
-                        if (_error != null) Padding(padding: EdgeInsets.only(bottom: 12), child: Text(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600))),
+                        if (_error != null) Padding(padding: const EdgeInsets.only(bottom: 12), child: Text(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600))),
                         if (!_editable) Padding(padding: const EdgeInsets.only(bottom: 12), child: EtiquetaEstado(texto: 'Estado: $_estado. Para cambiarlo, creá una versión actualizada ("act") desde la lista.', color: sonAzul)),
                         Wrap(
                           spacing: 12,

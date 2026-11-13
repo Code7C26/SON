@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid slice">
+  <title>Técnico de seguridad en una planta industrial</title>
+  <defs>
+    <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3F3F3F"/>
+      <stop offset="1" stop-color="#2E2E2E"/>
+    </linearGradient>
+    <radialGradient id="sol" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#FF6147" stop-opacity="0.9"/>
+      <stop offset="0.55" stop-color="#FF6147" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#FF6147" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="tanque" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#353535"/>
+      <stop offset="0.6" stop-color="#4C4C4C"/>
+      <stop offset="1" stop-color="#353535"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1000" height="800" fill="url(#cielo)"/>
+  <circle cx="760" cy="230" r="320" fill="url(#sol)"/>
+  <circle cx="760" cy="230" r="92" fill="#FF6147" opacity="0.85"/>
+
+  <!-- Planta al fondo -->
+  <g opacity="0.9">
+    <rect x="40" y="300" width="120" height="330" rx="10" fill="url(#tanque)"/>
+    <ellipse cx="100" cy="300" rx="60" ry="16" fill="#4C4C4C"/>
+    <rect x="180" y="360" width="90" height="270" rx="8" fill="url(#tanque)"/>
+    <ellipse cx="225" cy="360" rx="45" ry="12" fill="#4C4C4C"/>
+    <rect x="300" y="170" width="38" height="460" fill="#353535"/>
+    <rect x="300" y="210" width="38" height="14" fill="#B3B3B3"/>
+    <rect x="300" y="250" width="38" height="14" fill="#B3B3B3"/>
+    <rect x="880" y="260" width="34" height="370" fill="#353535"/>
+    <rect x="880" y="300" width="34" height="12" fill="#B3B3B3"/>
+    <path d="M160 420 H300 M270 470 H420 M914 380 H1000" stroke="#4C4C4C" stroke-width="14" fill="none"/>
+    <path d="M60 520 H980" stroke="#4C4C4C" stroke-width="4" fill="none"/>
+    <path d="M60 520 V600 M140 520 V600 M220 520 V600 M300 520 V600 M380 520 V600 M820 520 V600 M900 520 V600 M980 520 V600" stroke="#4C4C4C" stroke-width="3"/>
+    <rect x="720" y="420" width="180" height="210" rx="6" fill="#353535"/>
+    <rect x="740" y="445" width="40" height="30" fill="#D99C13" opacity="0.55"/>
+    <rect x="800" y="445" width="40" height="30" fill="#D99C13" opacity="0.3"/>
+    <rect x="860" y="445" width="24" height="30" fill="#D99C13" opacity="0.55"/>
+  </g>
+
+  <!-- Piso -->
+  <rect y="630" width="1000" height="170" fill="#262626"/>
+  <path d="M0 630 H1000" stroke="#4C4C4C" stroke-width="2"/>
+  <path d="M120 700 H260 M420 740 H600 M760 690 H900" stroke="#353535" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Matafuego en la pared -->
+  <g transform="translate(150 470)">
+    <rect x="-8" y="-14" width="76" height="12" rx="3" fill="#6E6E6E"/>
+    <rect x="0" y="0" width="60" height="150" rx="26" fill="#FF6147"/>
+    <rect x="0" y="52" width="60" height="38" fill="#F4F4F4"/>
+    <rect x="12" y="62" width="36" height="6" rx="3" fill="#9A9A9A"/>
+    <rect x="12" y="74" width="24" height="6" rx="3" fill="#9A9A9A"/>
+    <rect x="18" y="-30" width="24" height="30" rx="4" fill="#262626"/>
+    <path d="M42 -20 C90 -20 92 40 70 70" stroke="#262626" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <circle cx="68" cy="138" r="18" fill="#D99C13"/>
+    <path d="M60 138 l6 6 l11 -12" stroke="#2E2E2E" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Técnico -->
+  <g transform="translate(430 230)">
+    <!-- sombra -->
+    <ellipse cx="110" cy="404" rx="120" ry="16" fill="#262626" opacity="0.9"/>
+    <!-- piernas -->
+    <path d="M62 250 L52 392 H92 L108 262 Z" fill="#4C4C4C"/>
+    <path d="M118 262 L132 392 H172 L160 250 Z" fill="#3F3F3F"/>
+    <rect x="40" y="384" width="62" height="20" rx="8" fill="#262626"/>
+    <rect x="126" y="384" width="62" height="20" rx="8" fill="#262626"/>
+    <!-- torso / camisa -->
+    <path d="M48 112 Q110 86 172 112 L178 268 H42 Z" fill="#E7E7E7"/>
+    <!-- chaleco -->
+    <path d="M52 116 Q78 102 96 100 L100 268 H46 Z" fill="#D99C13"/>
+    <path d="M168 116 Q142 102 124 100 L120 268 H174 Z" fill="#D99C13"/>
+    <rect x="46" y="196" width="54" height="12" fill="#F4F4F4"/>
+    <rect x="120" y="196" width="54" height="12" fill="#F4F4F4"/>
+    <rect x="46" y="226" width="54" height="10" fill="#F4F4F4" opacity="0.8"/>
+    <rect x="120" y="226" width="54" height="10" fill="#F4F4F4" opacity="0.8"/>
+    <!-- brazo atrás -->
+    <path d="M168 120 Q206 160 196 214 L176 214 Q180 172 156 140 Z" fill="#E7E7E7"/>
+    <!-- cuello y cabeza -->
+    <rect x="96" y="70" width="28" height="32" rx="10" fill="#D5D5D5"/>
+    <circle cx="110" cy="52" r="38" fill="#D5D5D5"/>
+    <!-- casco -->
+    <path d="M66 44 Q66 -4 110 -6 Q154 -4 154 44 Z" fill="#F4F4F4"/>
+    <rect x="58" y="38" width="104" height="12" rx="6" fill="#F4F4F4"/>
+    <rect x="104" y="-6" width="12" height="44" rx="5" fill="#E7E7E7"/>
+    <!-- brazo adelante con tablet -->
+    <path d="M52 120 Q20 170 44 214 L96 196 L92 180 L62 186 Q56 160 74 132 Z" fill="#E7E7E7"/>
+    <g transform="translate(70 128) rotate(-8)">
+      <rect x="0" y="0" width="118" height="84" rx="10" fill="#262626"/>
+      <rect x="7" y="7" width="104" height="70" rx="5" fill="#F4F4F4"/>
+      <rect x="7" y="7" width="104" height="14" rx="5" fill="#FF6147"/>
+      <circle cx="18" cy="32" r="4.5" fill="#FF6147"/>
+      <rect x="28" y="29" width="60" height="6" rx="3" fill="#9A9A9A"/>
+      <circle cx="18" cy="47" r="4.5" fill="#FF6147"/>
+      <rect x="28" y="44" width="46" height="6" rx="3" fill="#9A9A9A"/>
+      <circle cx="18" cy="62" r="4.5" fill="none" stroke="#9A9A9A" stroke-width="2"/>
+      <rect x="28" y="59" width="54" height="6" rx="3" fill="#D5D5D5"/>
+    </g>
+    <path d="M150 196 Q168 210 176 214 L190 214 Q194 204 186 198 L168 186 Z" fill="#D5D5D5"/>
+  </g>
+
+  <!-- Pin de GPS -->
+  <g transform="translate(700 300)">
+    <circle cx="0" cy="40" r="56" fill="none" stroke="#D99C13" stroke-width="2" stroke-dasharray="6 8" opacity="0.8"/>
+    <circle cx="0" cy="40" r="30" fill="none" stroke="#D99C13" stroke-width="2" opacity="0.6"/>
+    <path d="M0 -40 C30 -40 46 -18 46 6 C46 38 0 76 0 76 C0 76 -46 38 -46 6 C-46 -18 -30 -40 0 -40 Z" fill="#FF6147"/>
+    <circle cx="0" cy="4" r="16" fill="#F4F4F4"/>
+  </g>
+</svg>

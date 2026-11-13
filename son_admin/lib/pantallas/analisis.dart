@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:son_admin/services/api.dart';
 import 'package:son_admin/theme/tema.dart';
+import 'package:son_admin/ui/componentes.dart';
 
 /// Análisis operativo: órdenes, tiempos, clientes y encuestas.
 class PantallaAnalisis extends StatefulWidget {
@@ -155,19 +156,17 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
       runSpacing: 12,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        Text('Análisis y Estadísticas', style: estiloTituloPantalla),
-        if (datos != null)
-          Text('${_fechaTexto(datos['desde'])} – ${_fechaTexto(datos['hasta'])}', style: estiloSubtitulo),
+        SizedBox(
+          width: double.infinity,
+          child: EncabezadoPantalla(
+            eyebrow: datos != null ? '${_fechaTexto(datos['desde'])} – ${_fechaTexto(datos['hasta'])}' : 'Operación',
+            normal: 'Análisis y',
+            destacado: 'estadísticas',
+          ),
+        ),
         SegmentedButton<String>(
           key: const Key('analisis_periodo'),
           showSelectedIcon: false,
-          style: SegmentedButton.styleFrom(
-            backgroundColor: sonTarjeta,
-            foregroundColor: sonTexto,
-            selectedBackgroundColor: sonLightGreen,
-            selectedForegroundColor: sonDarkGreen,
-            side: BorderSide(color: sonBorde),
-          ),
           segments: [
             for (final periodo in _periodos)
               ButtonSegment(value: periodo.$1, label: Text(periodo.$1 == 'custom' ? etiquetaCustom : periodo.$2)),

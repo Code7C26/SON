@@ -37,7 +37,7 @@ void main() {
         onAnotar: () {},
       )));
       expect(find.text('Para presupuestar'), findsOneWidget);
-      expect(find.text('Todavía no anotaste nada.'), findsOneWidget);
+      expect(find.text('Anotar para presupuestar'), findsOneWidget);
       expect(find.byKey(const Key('anotar_presupuesto')), findsOneWidget);
     });
 

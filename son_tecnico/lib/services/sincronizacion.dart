@@ -69,6 +69,27 @@ class Sincronizador {
     return _encolar('solicitud', solicitud);
   }
 
+  /// Un gasto (combustible, peaje...) o el kilometraje del auto. Lleva `idCliente` como las notas.
+  static Future<void> encolarGasto(Map<String, dynamic> gasto) {
+    return _encolar('gasto', gasto);
+  }
+
+  /// Algo que vence (extintores, mediciones...). Lleva `idCliente` como las notas.
+  static Future<void> encolarVencimiento(Map<String, dynamic> vencimiento) {
+    return _encolar('vencimiento', vencimiento);
+  }
+
+  /// Identificadores de lo que todavía está en el celular esperando señal, del tipo pedido.
+  static Future<Set<String>> pendientesDeTipo(String tipo) async {
+    final ids = <String>{};
+    for (final (_, item) in await _leerCola()) {
+      if (item['tipo'] != tipo) continue;
+      final datos = item['datos'];
+      if (datos is Map && datos['idCliente'] != null) ids.add('${datos['idCliente']}');
+    }
+    return ids;
+  }
+
   /// Identificadores de las notas para presupuestar que todavía no llegaron al servidor.
   static Future<Set<String>> solicitudesPendientes() async {
     final ids = <String>{};
@@ -189,6 +210,10 @@ class Sincronizador {
           );
         case 'solicitud':
           respuesta = await apiPost('/api/solicitudes-presupuesto', json.encode(datos), espera: const Duration(minutes: 1));
+        case 'gasto':
+          respuesta = await apiPost('/api/gastos', json.encode(datos), espera: const Duration(minutes: 1));
+        case 'vencimiento':
+          respuesta = await apiPost('/api/vencimientos', json.encode(datos));
         default:
           return _Resultado.fallido;
       }

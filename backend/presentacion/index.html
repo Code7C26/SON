@@ -3,492 +3,821 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SON</title>
-  <link rel="icon" href="icono.png">
+  <title>SON — Operation Platform</title>
+  <meta name="description" content="Plataforma de gestión operativa para equipos en terreno: órdenes, app de campo con GPS, informes en PDF y seguimiento en vivo.">
+  <meta name="theme-color" content="#f4f4f4">
+  <link rel="icon" href="isotipo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    @font-face {
-      font-family: "Bw Gradual";
-      src: url("fuentes/BwGradualDEMO-Regular.otf") format("opentype");
-      font-weight: 400;
-      font-style: normal;
-      font-display: swap;
-    }
-    @font-face {
-      font-family: "Bw Gradual";
-      src: url("fuentes/BwGradualDEMO-Medium.otf") format("opentype");
-      font-weight: 500;
-      font-style: normal;
-      font-display: swap;
-    }
-    @font-face {
-      font-family: "Bw Gradual";
-      src: url("fuentes/BwGradualDEMO-Medium.otf") format("opentype");
-      font-weight: 600;
-      font-style: normal;
-      font-display: swap;
-    }
-    @font-face {
-      font-family: "Bw Gradual";
-      src: url("fuentes/BwGradualDEMO-Bold.otf") format("opentype");
-      font-weight: 700;
-      font-style: normal;
-      font-display: swap;
-    }
-    @font-face {
-      font-family: "Bw Gradual";
-      src: url("fuentes/BwGradualDEMO-Bold.otf") format("opentype");
-      font-weight: 800;
-      font-style: normal;
-      font-display: swap;
-    }
+    /* Paleta original de SON: solo estos colores. */
     :root {
       --coral: #ff6147;
+      --coral-suave: rgba(255, 97, 71, 0.12);
       --oro: #d99c13;
       --tinta: #2e2e2e;
-      --claro: #f4f4f4;
+      --tinta-2: #353535;
+      --tinta-3: #3f3f3f;
+      --tinta-linea: #4c4c4c;
+      --fondo: #f4f4f4;
       --blanco: #ffffff;
-      --suave: #6a6a6a;
-      --linea: #e6e6e6;
+      --relleno: #e7e7e7;
+      --linea: #d5d5d5;
+      --texto-2: #6e6e6e;
+      --texto-3: #9a9a9a;
+      --texto-osc-2: #b3b3b3;
+      --sombra: 0 4px 20px rgba(0, 0, 0, 0.04);
+      --sombra-alta: 0 12px 32px rgba(0, 0, 0, 0.08);
+      --vidrio: rgba(255, 255, 255, 0.72);
+      --vidrio-borde: rgba(255, 255, 255, 0.8);
+      --vidrio-sombra: 0 8px 32px rgba(0, 0, 0, 0.06);
+      --desenfoque: blur(24px) saturate(140%);
+      --r-contenedor: 24px;
+      --r-contenedor-grande: 32px;
+      --curva: cubic-bezier(0.33, 1, 0.68, 1); /* easeOutCubic */
+      --display: "Plus Jakarta Sans", system-ui, sans-serif;
+      --ui: "Inter", system-ui, sans-serif;
     }
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      font-family: "Bw Gradual", system-ui, sans-serif;
-      background: var(--blanco);
+      background: var(--fondo);
       color: var(--tinta);
+      font-family: var(--ui);
+      font-size: 16px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
     a { color: inherit; text-decoration: none; }
-    img { max-width: 100%; display: block; }
-    .ancho { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+    /* Foco visible con teclado en todo lo interactivo */
+    :focus-visible { outline: 2px solid var(--coral); outline-offset: 3px; border-radius: 999px; }
+    .tarjeta:focus-visible, details summary:focus-visible { border-radius: var(--r-contenedor); }
+    input:focus-visible, select:focus-visible, textarea:focus-visible { outline: none; }
+    img, video { display: block; max-width: 100%; }
+    .ancho { width: min(1200px, calc(100% - 32px)); margin: 0 auto; }
 
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      background: rgba(255, 255, 255, 0.94);
-      border-bottom: 1px solid var(--linea);
-      backdrop-filter: blur(10px);
+    /* Titulares: contraste Regular + Bold, tracking cerrado */
+    h1, h2, h3 { font-family: var(--display); letter-spacing: -0.5px; margin: 0; color: var(--tinta); }
+    h1, h2 { font-weight: 400; }
+    h1 b, h2 b { font-weight: 700; }
+    h1 { font-size: clamp(36px, 4.4vw, 58px); line-height: 1.05; }
+    h2 { font-size: clamp(30px, 3.8vw, 46px); line-height: 1.1; }
+    h3 { font-size: 18px; font-weight: 700; line-height: 1.3; }
+    p { margin: 0; color: var(--texto-2); }
+
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 12px; border-radius: 999px;
+      background: var(--coral-suave); color: var(--coral);
+      font: 600 11px/1 var(--ui); letter-spacing: 1.2px; text-transform: uppercase;
     }
+    .eyebrow .punto { width: 6px; height: 6px; border-radius: 50%; background: var(--coral); animation: latido 2s infinite; }
+
+    .boton {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      min-height: 48px; padding: 0 24px; border-radius: 999px; border: 0; cursor: pointer; white-space: nowrap;
+      font: 600 15px/1 var(--ui);
+      transition: transform 250ms var(--curva), box-shadow 250ms var(--curva), background 250ms var(--curva);
+    }
+    .boton:hover { transform: translateY(-2px); }
+    .boton.cta { background: var(--coral); color: var(--tinta); }
+    .boton.cta:hover { box-shadow: 0 10px 24px rgba(255, 97, 71, 0.28); }
+    .boton.oscuro { background: var(--tinta); color: var(--blanco); }
+    .boton.claro { background: var(--blanco); color: var(--tinta); border: 1px solid var(--linea); }
+    .boton svg { width: 18px; height: 18px; }
+    .boton.con-flecha { padding: 0 6px 0 24px; gap: 12px; }
+    .boton .circulo {
+      width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; flex: none;
+      background: rgba(255, 255, 255, 0.2); transition: transform 300ms var(--curva);
+    }
+    .boton.claro .circulo { background: var(--tinta); color: var(--blanco); }
+    .boton.cta .circulo { background: rgba(46, 46, 46, 0.12); }
+    .boton:hover .circulo { transform: rotate(-45deg); }
+    .boton .circulo svg { width: 16px; height: 16px; }
+
+    /* --- Navegación flotante en píldora --- */
+    header { position: sticky; top: 16px; z-index: 20; }
     .barra {
-      min-height: 76px;
-      display: flex;
-      align-items: center;
-      gap: 28px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 8px 8px 8px 8px; border-radius: 999px;
+      background: var(--vidrio); backdrop-filter: var(--desenfoque); -webkit-backdrop-filter: var(--desenfoque);
+      border: 1px solid var(--vidrio-borde); box-shadow: var(--vidrio-sombra);
     }
-    .marca { height: 38px; width: auto; }
-    nav { margin-left: auto; display: flex; align-items: center; gap: 26px; }
-    nav a { color: #4a4a4a; font-weight: 600; font-size: 15px; }
-    nav a:hover { color: var(--tinta); }
-    .ingresar, .demo, .blanco {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 8px;
-      font-weight: 700;
-      padding: 11px 18px;
-    }
-    .ingresar { border: 1px solid #d9d9d9; background: var(--blanco); color: var(--tinta); }
-    .ingresar:hover { border-color: var(--tinta); }
-    .demo { background: var(--coral); color: var(--tinta); }
-    .demo:hover { filter: brightness(0.97); }
-    .blanco { background: var(--blanco); color: var(--tinta); }
-    .menu { display: none; }
+    .marca { display: flex; align-items: center; gap: 10px; font: 700 18px/1 var(--display); letter-spacing: -0.5px; padding-right: 8px; }
+    .logo { width: 44px; height: 44px; border-radius: 50%; background: var(--tinta); display: grid; place-items: center; flex: none; }
+    .logo img { width: 24px; height: 24px; }
+    nav { display: flex; align-items: center; gap: 4px; }
+    nav a.enlace { padding: 10px 16px; border-radius: 999px; font: 500 14px/1 var(--ui); color: var(--texto-2); transition: background 250ms var(--curva), color 250ms var(--curva); }
+    nav a.enlace:hover { background: rgba(255, 255, 255, 0.8); color: var(--tinta); }
+    .acciones-nav { display: flex; align-items: center; gap: 8px; }
+    .ingresar { padding: 10px 14px; font: 600 14px/1 var(--ui); color: var(--tinta); border-radius: 999px; }
+    .ingresar:hover { background: var(--fondo); }
+    .solo-movil { display: none; }
+    .menu { display: none; background: var(--fondo); border: 0; border-radius: 999px; width: 44px; height: 44px; cursor: pointer; color: var(--tinta); }
+    .menu svg { width: 20px; height: 20px; }
 
-    .hero { padding: 72px 0 36px; }
-    .hero-grilla {
-      display: grid;
-      grid-template-columns: 1.05fr 0.95fr;
-      gap: 48px;
-      align-items: center;
-    }
-    h1 {
-      margin: 0 0 18px;
-      font-size: 52px;
-      line-height: 1.05;
-      letter-spacing: -1.4px;
-      font-weight: 800;
-    }
-    h1 span { color: var(--coral); }
-    .baja { margin: 0; max-width: 520px; font-size: 18px; line-height: 1.55; color: #555; }
-    .acciones { margin-top: 28px; }
+    /* --- Hero --- */
+    .hero { padding: 72px 0 32px; }
+    .hero .ancho { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center; }
+    .hero h1 { margin: 20px 0 20px; }
+    .frase { display: inline-block; font-weight: 700; transition: opacity 400ms var(--curva), transform 400ms var(--curva); }
+    .frase.sale { opacity: 0; transform: translateY(8px); }
+    .hero p.baja { font-size: 18px; max-width: 460px; }
+    .hero .acciones { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+    .kpis { display: flex; gap: 40px; margin-top: 48px; flex-wrap: wrap; }
+    .kpi strong { display: block; font: 700 34px/1.1 var(--display); letter-spacing: -0.5px; color: var(--tinta); }
+    .kpi span { font-size: 13px; color: var(--texto-2); }
 
-    .laptop { width: min(100%, 520px); margin-left: auto; }
-    .pantalla {
-      background: #1c1c1c;
-      border: 10px solid #2a2a2a;
-      border-bottom-width: 12px;
-      border-radius: 16px 16px 8px 8px;
-      box-shadow: 0 24px 50px rgba(46, 46, 46, 0.16);
-      overflow: hidden;
+    /* Composición con recorte tipo cápsula */
+    .composicion { position: relative; }
+    .capsula {
+      position: relative; border-radius: 32px 200px 32px 32px; overflow: hidden;
+      background: var(--tinta); aspect-ratio: 5 / 4; box-shadow: var(--sombra-alta);
     }
-    .app { display: grid; grid-template-columns: 92px 1fr; min-height: 280px; background: #f7f7f7; }
-    .lado { background: var(--tinta); color: #fff; padding: 14px 10px; }
-    .lado .punto {
-      width: 22px; height: 22px; border-radius: 6px; background: var(--coral); margin-bottom: 16px;
+    .ficha {
+      position: absolute; right: 16px; top: -20px; padding: 12px 20px 12px 12px; border-radius: 999px; z-index: 2;
+      background: var(--vidrio); backdrop-filter: var(--desenfoque); -webkit-backdrop-filter: var(--desenfoque);
+      border: 1px solid var(--vidrio-borde); box-shadow: var(--sombra-alta);
+      display: flex; align-items: center; gap: 12px; animation: flotar 7s ease-in-out infinite reverse;
     }
-    .lado span {
-      display: block; height: 8px; border-radius: 8px; background: rgba(255,255,255,.16); margin: 10px 0;
-    }
-    .lado span.activa { background: var(--oro); width: 70%; }
-    .cuerpo { padding: 14px; }
-    .cuerpo h3 { margin: 0 0 10px; font-size: 13px; }
-    .fila {
-      display: grid; grid-template-columns: 1.3fr .8fr .6fr;
-      gap: 8px; background: #fff; border-radius: 8px; padding: 9px 10px; margin-bottom: 7px;
-      font-size: 11px; align-items: center;
-    }
-    .fila b { font-weight: 700; }
-    .chip { justify-self: start; border-radius: 99px; padding: 3px 7px; background: #ffe8e4; color: #9a3412; font-weight: 700; }
-    .chip.lista { background: #f4ead0; color: #7a5a08; }
-    .base {
-      height: 12px; margin: 0 18%;
-      background: linear-gradient(#d7d7d7, #bdbdbd);
-      border-radius: 0 0 10px 10px;
-    }
+    .ficha .ic { width: 36px; height: 36px; border-radius: 50%; background: var(--coral); display: grid; place-items: center; color: var(--tinta); }
+    .ficha .ic svg { width: 18px; height: 18px; }
+    .ficha b { display: block; font: 700 14px/1.2 var(--display); }
+    .ficha small { color: var(--texto-2); font-size: 12px; }
 
-    .rubros { background: var(--claro); padding: 72px 0 28px; }
-    h2 { margin: 0 0 28px; font-size: 36px; letter-spacing: -0.8px; line-height: 1.15; }
-    .cuatro { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
-    .rol {
-      min-height: 280px; border-radius: 8px; padding: 18px;
+    /* Foto con respaldo: si el archivo no existe, queda un fondo de marca prolijo */
+    .foto-ia { position: relative; overflow: hidden; background: var(--tinta); }
+    .foto-ia::before {
+      content: ""; position: absolute; inset: 0;
+      background:
+        radial-gradient(circle at 80% 18%, rgba(255, 97, 71, 0.45) 0, rgba(255, 97, 71, 0) 45%),
+        var(--tinta);
+    }
+    .foto-ia::after {
+      content: ""; position: absolute; inset: 0; opacity: 0.18;
+      background-image: radial-gradient(var(--tinta-linea) 1px, transparent 1px); background-size: 18px 18px;
+    }
+    .foto-ia img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+
+    /* Tarjeta de orden armada en HTML (reemplaza la captura del celular) */
+    .orden-ui {
+      position: absolute; left: -24px; bottom: -28px; width: 260px; z-index: 2;
+      background: rgba(255, 255, 255, 0.72); backdrop-filter: var(--desenfoque); -webkit-backdrop-filter: var(--desenfoque);
+      border: 1px solid var(--vidrio-borde); border-radius: var(--r-contenedor); padding: 16px;
+      box-shadow: var(--sombra-alta); animation: flotar 6s ease-in-out infinite;
+    }
+    .orden-ui .cab { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .orden-ui .num { font: 600 12px/1 var(--ui); color: var(--texto-3); }
+    .orden-ui .est { font: 600 11px/1 var(--ui); padding: 6px 10px; border-radius: 999px; background: rgba(217, 156, 19, 0.16); color: var(--oro); }
+    .orden-ui b { display: block; font: 700 16px/1.25 var(--display); letter-spacing: -0.3px; }
+    .orden-ui small { display: block; color: var(--texto-2); font-size: 12px; margin-top: 4px; }
+    .orden-ui .barra-av { height: 6px; border-radius: 999px; background: var(--relleno); margin-top: 14px; overflow: hidden; }
+    .orden-ui .barra-av i { display: block; height: 100%; width: 62%; background: var(--coral); border-radius: 999px; animation: avanzar 3.2s var(--curva) infinite alternate; }
+    .orden-ui .pie-o { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--texto-2); }
+    @keyframes avanzar { from { width: 38%; } to { width: 86%; } }
+
+    /* --- Bloques --- */
+    .bloque { padding: 96px 0; }
+    .cabecera { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: end; margin-bottom: 48px; }
+    .cabecera h2 { margin-top: 16px; }
+    .cabecera p { max-width: 440px; justify-self: end; }
+    .cabecera.centro { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+    .cabecera.centro p { justify-self: center; }
+
+    /* Flujo: pasos */
+    .flujo { display: grid; grid-template-columns: 1fr; gap: 32px; }
+    .pasos { display: flex; flex-direction: column; }
+    .paso {
+      text-align: left; background: none; border: 0; border-top: 1px solid var(--linea); padding: 20px 4px;
+      cursor: pointer; font: inherit; color: inherit; display: grid; grid-template-columns: 40px 1fr 20px; gap: 12px; align-items: start;
+    }
+    .paso:last-child { border-bottom: 1px solid var(--linea); }
+    .paso .num { font: 600 12px/1 var(--ui); color: var(--texto-3); padding-top: 5px; }
+    .paso h3 { font-size: 17px; color: var(--texto-2); transition: color 250ms var(--curva); }
+    .paso p { max-height: 0; overflow: hidden; opacity: 0; transition: max-height 350ms var(--curva), opacity 350ms var(--curva), margin 350ms var(--curva); font-size: 14px; }
+    .paso .flecha { color: var(--texto-3); transition: transform 300ms var(--curva), color 300ms; }
+    .paso.activo h3 { color: var(--tinta); }
+    .paso.activo p { max-height: 80px; opacity: 1; margin-top: 8px; }
+    .paso.activo .flecha { color: var(--coral); transform: rotate(-45deg); }
+    .paso.activo .num { color: var(--coral); }
+
+    /* Tarjetas de funciones (mezcla blanca / oscura / foto) */
+    .funciones { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: minmax(200px, auto); gap: 16px; }
+    .tarjeta {
+      border-radius: var(--r-contenedor-grande); padding: 24px; background: var(--blanco); border: 1px solid var(--linea); box-shadow: var(--sombra);
+      display: flex; flex-direction: column; gap: 16px; overflow: hidden; position: relative;
+      transition: transform 300ms var(--curva), box-shadow 300ms var(--curva);
+    }
+    .tarjeta:hover { transform: translateY(-4px); box-shadow: var(--sombra-alta); }
+    .tarjeta .pie-t { margin-top: auto; }
+    .tarjeta .pie-t p { font-size: 14px; margin-top: 8px; }
+    .tarjeta.oscura {
+      background: radial-gradient(circle at 110% -10%, rgba(255, 97, 71, 0.26) 0, rgba(255, 97, 71, 0) 55%), var(--tinta);
+      border-color: var(--tinta);
+    }
+    .tarjeta.vidrio { background: var(--vidrio); backdrop-filter: var(--desenfoque); -webkit-backdrop-filter: var(--desenfoque); border-color: var(--vidrio-borde); box-shadow: var(--vidrio-sombra); }
+    .b-ancha { grid-column: span 2; }
+    .b-alta { grid-row: span 2; }
+    .tarjeta .micro {
+      position: absolute; top: 16px; right: 16px; z-index: 3; width: 40px; height: 40px; border-radius: 50%;
+      display: grid; place-items: center; background: var(--fondo); color: var(--tinta); transition: transform 300ms var(--curva), background 300ms var(--curva);
+    }
+    .tarjeta .micro svg { width: 16px; height: 16px; }
+    .tarjeta.oscura .micro, .tarjeta.foto .micro { background: rgba(255, 255, 255, 0.14); color: var(--blanco); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+    .tarjeta:hover .micro { transform: rotate(-45deg); background: var(--coral); color: var(--tinta); }
+    .tarjeta .grande { font: 700 44px/1 var(--display); letter-spacing: -1px; color: var(--tinta); }
+    .tarjeta .grande + span { font-size: 13px; color: var(--texto-2); margin-top: 8px; display: block; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chips span {
+      display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px 0 6px; border-radius: 999px;
+      background: var(--blanco); border: 1px solid var(--linea); font: 500 14px/1 var(--ui); color: var(--tinta);
+    }
+    .chips span i { width: 28px; height: 28px; border-radius: 50%; background: var(--tinta); color: var(--blanco); display: grid; place-items: center; }
+    .chips span i svg { width: 14px; height: 14px; }
+    .tarjeta.oscura h3 { color: var(--blanco); }
+    .tarjeta.oscura p { color: var(--texto-osc-2); }
+    .tarjeta.foto { padding: 0; border: 0; background: var(--tinta); }
+    .tarjeta.foto img { transition: transform 600ms var(--curva); }
+    .tarjeta.foto .velo, .tarjeta.foto .pie-t { z-index: 2; }
+    .tarjeta.foto:hover img { transform: scale(1.04); }
+    .tarjeta.foto .velo { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(46, 46, 46, 0) 30%, rgba(46, 46, 46, 0.92) 100%); }
+    .tarjeta.foto .pie-t { position: relative; padding: 24px; }
+    .tarjeta.foto h3 { color: var(--blanco); }
+    .tarjeta.foto p { color: var(--relleno); }
+    .iconos { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+    .iconos span {
+      aspect-ratio: 1; border-radius: 50%; background: var(--fondo); display: grid; place-items: center; color: var(--tinta);
+      transition: background 250ms var(--curva), color 250ms var(--curva);
+    }
+    .iconos span:hover { background: var(--coral); color: var(--tinta); }
+    .iconos svg { width: 22px; height: 22px; }
+    .lista { display: flex; flex-direction: column; gap: 8px; }
+    .lista span { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--tinta-2); color: var(--fondo); font-size: 14px; }
+    /* Lista sobre foto: píldoras de vidrio oscuro, al pie junto al título */
+    .tarjeta.campo .lista { flex-direction: row; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+    .tarjeta.campo .lista span {
+      padding: 8px 12px; border-radius: 999px; font-size: 13px; color: var(--blanco);
+      background: rgba(46, 46, 46, 0.55); border: 1px solid rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    }
+    .tarjeta.campo .lista span:nth-child(4) { opacity: 1; }
+    .lista span i { width: 8px; height: 8px; border-radius: 50%; background: var(--coral); }
+    .lista span:nth-child(2) i { background: var(--oro); }
+    .lista span:nth-child(4) { opacity: 0.45; }
+
+    /* Módulos compactos */
+
+    /* Demo */
+    .video {
+      border-radius: var(--r-contenedor-grande); overflow: hidden; background: var(--tinta); box-shadow: var(--sombra-alta); aspect-ratio: 16 / 9; position: relative;
+    }
+    .video video { width: 100%; height: 100%; object-fit: cover; }
+
+    /* FAQ */
+    .faq { display: grid; grid-template-columns: 220px 1fr; gap: 48px; }
+    .temas { display: flex; flex-direction: column; gap: 4px; position: sticky; top: 112px; align-self: start; border-left: 1px solid var(--linea); }
+    .temas button {
+      text-align: left; background: none; border: 0; border-left: 2px solid transparent; margin-left: -1px; padding: 10px 16px; cursor: pointer;
+      font: 500 14px/1.3 var(--ui); color: var(--texto-2); transition: color 250ms, border-color 250ms;
+    }
+    .temas button.activo { color: var(--tinta); border-left-color: var(--coral); font-weight: 600; }
+    .preguntas { display: flex; flex-direction: column; gap: 8px; }
+    .preguntas details { border-radius: var(--r-contenedor); background: transparent; border-bottom: 1px solid var(--linea); transition: background 300ms var(--curva); }
+    .preguntas details[hidden] { display: none; }
+    .preguntas details[open] { background: var(--vidrio); backdrop-filter: var(--desenfoque); -webkit-backdrop-filter: var(--desenfoque); border: 1px solid var(--vidrio-borde); box-shadow: var(--vidrio-sombra); }
+    .preguntas summary {
+      list-style: none; cursor: pointer; padding: 18px 20px; display: flex; justify-content: space-between; gap: 16px; align-items: center;
+      font: 600 16px/1.4 var(--ui); color: var(--tinta);
+    }
+    .preguntas summary::-webkit-details-marker { display: none; }
+    .preguntas summary i { width: 36px; height: 36px; border-radius: 50%; background: var(--fondo); display: grid; place-items: center; flex: none; font-style: normal; transition: transform 300ms var(--curva), background 300ms; }
+    .preguntas details[open] summary i { transform: rotate(45deg); background: var(--coral); color: var(--tinta); }
+    .preguntas details p { padding: 0 20px 20px; font-size: 15px; max-width: 640px; }
+
+    /* Contacto: bloque oscuro */
+    .contacto { background: radial-gradient(circle at 100% 0%, rgba(255, 97, 71, 0.3) 0, rgba(255, 97, 71, 0) 40%), var(--tinta); border-radius: var(--r-contenedor-grande); padding: 48px 24px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .contacto .lado {
+      border-radius: var(--r-contenedor); overflow: hidden; position: relative; background: transparent;
       display: flex; flex-direction: column; justify-content: flex-end;
-      color: #fff; position: relative; overflow: hidden;
     }
-    .rol strong { font-size: 22px; display: block; margin-bottom: 6px; }
-    .rol p { margin: 0; font-size: 14px; line-height: 1.4; color: rgba(255,255,255,.88); }
-    .rol:nth-child(1) { background: linear-gradient(160deg, #3a3a3a, #1d1d1d 55%, #ff6147); }
-    .rol:nth-child(2) { background: linear-gradient(165deg, #2e2e2e, #5a3a22 70%, #d99c13); }
-    .rol:nth-child(3) { background: linear-gradient(160deg, #243046, #2e2e2e 60%, #ff6147); }
-    .rol:nth-child(4) { background: linear-gradient(160deg, #2e2e2e, #3d3424 65%, #d99c13); }
+    .contacto .lado .velo { position: absolute; inset: 0; z-index: 2; background: linear-gradient(180deg, rgba(46, 46, 46, 0.1) 20%, rgba(46, 46, 46, 0.95) 100%); }
+    /* Centrado: formulario al medio y canales en fila debajo */
+    .contacto .lado { order: 2; width: 100%; max-width: 720px; }
+    .contacto .canales { position: relative; z-index: 3; padding: 0 24px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+    .contacto .canales .canal { flex: 1 1 200px; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+    .canal { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 14px 20px; border-radius: 999px; background: rgba(46, 46, 46, 0.7); border: 1px solid var(--tinta-linea); color: var(--blanco); transition: border-color 250ms, transform 250ms var(--curva); backdrop-filter: blur(6px); }
+    .canal:hover { border-color: var(--coral); transform: translateY(-2px); }
+    .canal span { font-size: 12px; color: var(--texto-osc-2); }
+    .canal strong { font: 600 14px/1.2 var(--ui); }
+    .formulario { padding: 0 24px 24px; width: 100%; max-width: 720px; text-align: center; }
+    .formulario form { text-align: left; }
+    .formulario h2 { color: var(--blanco); margin: 16px 0 24px; font-size: clamp(28px, 3vw, 38px); }
+    form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    form .completo { grid-column: 1 / -1; }
+    label { display: flex; flex-direction: column; gap: 8px; font: 600 11px/1 var(--ui); letter-spacing: 1.2px; text-transform: uppercase; color: var(--texto-osc-2); }
+    input, select, textarea {
+      font: 400 15px/1.4 var(--ui); color: var(--blanco); background: var(--tinta-3); border: 1px solid var(--tinta-linea); border-radius: 999px;
+      min-height: 52px; padding: 14px 20px; outline: none; transition: border-color 250ms, background 250ms; width: 100%;
+    }
+    input::placeholder, textarea::placeholder { color: var(--texto-3); }
+    input:focus, select:focus, textarea:focus { border-color: var(--coral); background: var(--tinta-2); }
+    select option { color: var(--tinta); }
+    textarea { min-height: 120px; resize: vertical; border-radius: var(--r-contenedor); }
+    select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b3b3b3' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 18px center; background-size: 16px; padding-right: 48px; }
+    form .boton { justify-self: center; grid-column: 1 / -1; }
+    .aviso { text-align: center; }
+    .aviso { color: var(--oro); font-size: 14px; min-height: 20px; }
 
-    .franja { padding: 28px 0 10px; background: var(--claro); }
-    .panel {
-      background: var(--coral);
-      color: var(--tinta);
-      border-radius: 28px;
-      padding: 48px 40px;
-      display: grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap: 28px;
-      align-items: center;
+    footer { padding: 16px 0 16px; }
+    .pie-bloque {
+      background: radial-gradient(circle at 0% 100%, rgba(255, 97, 71, 0.28) 0, rgba(255, 97, 71, 0) 45%), var(--tinta);
+      border-radius: var(--r-contenedor-grande); padding: 48px; color: var(--blanco);
     }
-    .panel h2 { font-size: 40px; max-width: 520px; }
-    .panel p { margin: 0 0 14px; line-height: 1.55; max-width: 520px; }
-    .panel p b { font-weight: 800; }
-    .hojas { position: relative; height: 230px; }
-    .hoja {
-      position: absolute; right: 0; width: 230px; background: #fff; border-radius: 12px;
-      box-shadow: 0 12px 30px rgba(46,46,46,.12); padding: 14px;
-    }
-    .hoja:nth-child(1) { top: 0; right: 70px; transform: rotate(-6deg); }
-    .hoja:nth-child(2) { top: 36px; right: 10px; }
-    .hoja:nth-child(3) { top: 78px; right: 48px; transform: rotate(4deg); }
-    .hoja i { display: block; height: 8px; border-radius: 8px; background: var(--claro); margin-bottom: 7px; }
-    .hoja i.corta { width: 60%; background: #ffd0c8; }
-    .hoja b { display: block; font-size: 13px; margin-bottom: 8px; }
+    .pie-titular { display: flex; justify-content: space-between; align-items: end; gap: 32px; flex-wrap: wrap; padding-bottom: 48px; border-bottom: 1px solid var(--tinta-linea); }
+    .pie-titular h2 { color: var(--blanco); font-size: clamp(32px, 4.4vw, 56px); }
+    .pie { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; padding-top: 32px; }
+    .pie .marca { color: var(--blanco); }
+    .pie .logo { background: var(--tinta-2); border: 1px solid var(--tinta-linea); }
+    .pie nav a { font-size: 14px; color: var(--texto-osc-2); padding: 10px 14px; border-radius: 999px; transition: background 250ms, color 250ms; }
+    .pie nav a:hover { color: var(--blanco); background: var(--tinta-2); }
+    .legal { font-size: 13px; color: var(--texto-3); margin-top: 24px; }
 
-    .modulos { padding: 78px 0; }
-    .titulo-fila { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 28px; }
-    .titulo-fila h2 { margin: 0; }
-    .seis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    article {
-      border: 1px solid var(--linea);
-      border-radius: 16px;
-      padding: 22px;
-      min-height: 180px;
-      box-shadow: 0 8px 24px rgba(46,46,46,.04);
-    }
-    .icono {
-      width: 42px; height: 42px; border-radius: 12px;
-      display: grid; place-items: center; margin-bottom: 14px; font-size: 18px;
-    }
-    article:nth-child(odd) .icono { background: #ffe8e4; }
-    article:nth-child(even) .icono { background: #f8efd8; }
-    article h3 { margin: 0 0 8px; font-size: 22px; }
-    article p { margin: 0; color: var(--suave); line-height: 1.5; }
+    /* Orbes coral difuminados detrás de todo (fijos, sin interacción) */
+    .orbes { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+    .orbes i { position: absolute; border-radius: 50%; filter: blur(90px); will-change: transform; }
+    .orbes i:nth-child(1) { width: 560px; height: 560px; right: -160px; top: -180px; background: rgba(255, 97, 71, 0.32); animation: deriva 22s ease-in-out infinite; }
+    .orbes i:nth-child(2) { width: 480px; height: 480px; left: -200px; top: 45%; background: rgba(255, 97, 71, 0.22); animation: deriva 28s ease-in-out infinite reverse; }
+    .orbes i:nth-child(3) { width: 360px; height: 360px; left: 45%; bottom: -160px; background: rgba(217, 156, 19, 0.14); animation: deriva 34s ease-in-out infinite; }
+    @keyframes deriva { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-40px, 32px); } }
 
-    .cierre { background: var(--claro); padding: 28px 0 72px; }
-    .caja {
-      background: var(--blanco);
-      border-radius: 24px;
-      padding: 48px 40px;
-      text-align: center;
+    /* Sin desenfoque disponible: el vidrio pasa a blanco casi opaco para no perder contraste */
+    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+      .barra, .ficha, .orden-ui, .tarjeta.vidrio, .preguntas details[open] { background: rgba(255, 255, 255, 0.95); }
     }
-    .caja h2 { margin-bottom: 12px; }
-    .caja .baja { margin: 0 auto 28px; }
-    .pasos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: left; margin-bottom: 28px; }
-    .paso { background: var(--claro); border-radius: 14px; padding: 18px; }
-    .paso span { color: var(--coral); font-weight: 800; font-size: 13px; letter-spacing: .04em; }
-    .paso strong { display: block; margin: 6px 0; font-size: 18px; }
-    .paso p { margin: 0; color: var(--suave); line-height: 1.45; }
-    .contacto { background: var(--claro); padding: 8px 0 72px; }
-    .contacto h2 { max-width: 760px; margin-left: auto; margin-right: auto; text-align: center; }
-    .tres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .via {
-      display: block;
-      background: var(--blanco);
-      border: 1px solid var(--linea);
-      border-radius: 16px;
-      padding: 22px;
-      box-shadow: 0 8px 24px rgba(46,46,46,.04);
+
+    /* Aparición al hacer scroll */
+    .revelar { opacity: 0; transform: translateY(16px); transition: opacity 600ms var(--curva), transform 600ms var(--curva); }
+    .revelar.visible { opacity: 1; transform: none; }
+
+    @keyframes latido { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+    @keyframes flotar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    @keyframes correr { to { stroke-dashoffset: -28; } }
+
+    @media (max-width: 1000px) {
+      .hero .ancho, .cabecera, .contacto, .faq { grid-template-columns: 1fr; }
+      .cabecera p { justify-self: start; }
+      .funciones { grid-template-columns: 1fr 1fr; }
+      .iconos { grid-template-columns: repeat(3, 1fr); }
+      .temas { position: static; flex-direction: row; overflow-x: auto; border-left: 0; border-bottom: 1px solid var(--linea); }
+      .temas button { border-left: 0; border-bottom: 2px solid transparent; white-space: nowrap; margin: 0 0 -1px; }
+      .temas button.activo { border-bottom-color: var(--coral); }
+      .composicion { margin: 24px 24px 32px 32px; }
     }
-    .via:hover { border-color: #ccc; }
-    .via .icono { background: #ffe8e4; }
-    .via span { display: block; color: var(--suave); font-size: 13px; font-weight: 700; margin-bottom: 6px; }
-    .via strong { display: block; font-size: 16px; line-height: 1.4; }
-
-    footer { background: var(--tinta); color: #ddd; padding: 42px 0 28px; }
-    .pie { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 24px; }
-    footer h3 { margin: 0 0 12px; color: #fff; font-size: 14px; font-weight: 700; }
-    footer a, footer p { display: block; color: #cfcfcf; margin: 0 0 8px; font-size: 14px; }
-    footer a:hover { color: #fff; }
-    .legal { margin-top: 28px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.12); color: #9a9a9a; font-size: 13px; }
-
-    @media (max-width: 900px) {
-      .menu { display: inline-flex; margin-left: auto; background: none; border: 0; font: inherit; font-weight: 700; }
-      nav {
-        display: none; position: absolute; left: 0; right: 0; top: 76px;
-        background: #fff; border-bottom: 1px solid var(--linea);
-        flex-direction: column; align-items: flex-start; padding: 12px 24px 18px; gap: 14px;
-      }
+    @media (max-width: 760px) {
+      nav { display: none; position: absolute; top: calc(100% + 8px); left: 0; right: 0; flex-direction: column; align-items: stretch; padding: 8px; border-radius: 24px; background: var(--blanco); border: 1px solid var(--linea); box-shadow: var(--sombra-alta); }
       nav.abierta { display: flex; }
-      .hero-grilla, .panel, .seis, .cuatro, .pasos, .pie, .tres { grid-template-columns: 1fr; }
-      .cuatro { grid-template-columns: 1fr 1fr; }
-      h1 { font-size: 38px; }
-      h2, .panel h2 { font-size: 30px; }
-      .laptop { margin: 12px auto 0; }
-      .panel, .caja { padding: 28px 20px; }
-      .hojas { height: 200px; }
+      nav a.solo-movil { display: block; }
+      nav a.enlace { padding: 14px 16px; }
+      .menu { display: grid; place-items: center; }
+      .ingresar { display: none; }
+      .acciones-nav .boton { padding: 0 18px; }
+      .acciones-nav .circulo { display: none; }
+      .hero { padding-top: 40px; }
+      .kpis { gap: 24px; }
+      .funciones { grid-template-columns: 1fr; }
+      .b-ancha { grid-column: auto; }
+      .b-alta { grid-row: auto; min-height: 360px; }
+      .pie-bloque { padding: 32px 24px; }
+      .orbes i { filter: blur(70px); }
+      form { grid-template-columns: 1fr; }
+      .bloque { padding: 64px 0; }
+      .ficha { right: 0; }
     }
-    @media (max-width: 560px) {
-      .cuatro, .pasos { grid-template-columns: 1fr; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .revelar { opacity: 1; transform: none; }
+      html { scroll-behavior: auto; }
     }
   </style>
+  <script>
+    // Usa la foto JPG si existe; si no, la ilustración SVG de SON; si tampoco, el fondo de marca.
+    function usarRespaldo(img) {
+      var respaldo = img.getAttribute('data-respaldo');
+      if (respaldo) { img.removeAttribute('data-respaldo'); img.src = respaldo; } else { img.remove(); }
+    }
+  </script>
 </head>
 <body>
+  <div class="orbes" aria-hidden="true"><i></i><i></i><i></i></div>
   <header>
-    <div class="ancho barra">
-      <a href="#inicio"><img class="marca" src="logo-blanco.png" alt="SON"></a>
-      <button class="menu" type="button" aria-expanded="false" aria-controls="nav">Menú</button>
-      <nav id="nav">
-        <a href="#como">Cómo funciona</a>
-        <a href="#modulos">Módulos</a>
-        <a href="#demo">Demo</a>
-        <a href="#contacto">Contacto</a>
-        <a class="ingresar" href="/panel/">Ingresar</a>
-      </nav>
+    <div class="ancho" style="position:relative">
+      <div class="barra">
+        <a class="marca" href="#inicio" aria-label="SON, inicio">
+          <span class="logo"><img src="isotipo.png" alt=""></span>
+          SON
+        </a>
+        <nav id="nav" aria-label="Principal">
+          <a class="enlace" href="#plataforma">Plataforma</a>
+          <a class="enlace" href="#funciones">Funciones</a>
+          <a class="enlace" href="#demostracion">Demo</a>
+          <a class="enlace" href="#preguntas">Preguntas</a>
+          <a class="enlace solo-movil" href="/panel/">Ingresar</a>
+        </nav>
+        <div class="acciones-nav">
+          <a class="ingresar" href="/panel/">Ingresar</a>
+          <a class="boton cta con-flecha" href="#contacto">Pedir demo<span class="circulo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+          <button class="menu" type="button" aria-expanded="false" aria-controls="nav" aria-label="Abrir menú">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+          </button>
+        </div>
+      </div>
     </div>
   </header>
 
   <main id="inicio">
+    <!-- HERO -->
     <section class="hero">
-      <div class="ancho hero-grilla">
-        <div>
-          <h1>La gestión de tus operaciones en terreno, <span>simplificada y bajo control.</span></h1>
-          <p class="baja">SON es la plataforma integral que digitaliza, coordina y audita el trabajo de tus equipos técnicos en tiempo real. Planificá las visitas desde la administración, guiá la ejecución desde la aplicación móvil y automatizá el envío de informes y encuestas de satisfacción a tus clientes.</p>
+      <div class="ancho">
+        <div class="revelar visible">
+          <span class="eyebrow"><span class="punto"></span>Gestión operativa en terreno</span>
+          <h1>Toda su operación técnica,<br><span class="frase" id="frase">sincronizada y bajo control</span></h1>
+          <p class="baja">Órdenes, app de campo con GPS e informes en PDF en una sola plataforma.</p>
           <div class="acciones">
-            <a class="demo" href="#demo">Solicitar una demostración</a>
+            <a class="boton cta con-flecha" href="#contacto">Pedir demo<span class="circulo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+            <a class="boton claro" href="#demostracion">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+              Ver demo
+            </a>
+          </div>
+          <div class="kpis">
+            <div class="kpi"><strong>100%</strong><span>Digital, sin papel</span></div>
+            <div class="kpi"><strong>GPS</strong><span>Presencia validada</span></div>
+            <div class="kpi"><strong>1 clic</strong><span>Informe en PDF</span></div>
           </div>
         </div>
-        <div class="laptop" aria-hidden="true">
-          <div class="pantalla">
-            <div class="app">
-              <div class="lado">
-                <div class="punto"></div>
-                <span class="activa"></span>
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-              <div class="cuerpo">
-                <h3>Órdenes de la semana</h3>
-                <div class="fila"><b>Planta norte</b><span>09:00</span><span class="chip">En curso</span></div>
-                <div class="fila"><b>Depósito sur</b><span>11:30</span><span class="chip lista">Pendiente</span></div>
-                <div class="fila"><b>Oficinas centro</b><span>15:00</span><span class="chip lista">Pendiente</span></div>
-                <div class="fila"><b>Galpón 4</b><span>Ayer</span><span class="chip">Cerrada</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="base"></div>
-        </div>
-      </div>
-    </section>
 
-    <section class="rubros" id="como">
-      <div class="ancho">
-        <h2>Toda tu operación conectada en un único ecosistema.</h2>
-        <div class="cuatro">
-          <div class="rol">
-            <strong>Administración</strong>
-            <p>Gestioná tu cartera de clientes, planificá órdenes de trabajo recurrentes y supervisá la agenda semanal del equipo desde un panel web centralizado.</p>
+        <div class="composicion revelar">
+          <div class="capsula foto-ia">
+            <img src="medios/ia/tecnico-campo.webp" style="object-position: 60% 55%" data-respaldo="medios/ia/tecnico-campo.svg" onerror="usarRespaldo(this)" alt="Técnico con casco revisando su celular en obra">
           </div>
-          <div class="rol">
-            <strong>Equipos en Terreno</strong>
-            <p>Ejecutan sus asignaciones desde la app móvil con validación GPS, completan protocolos de revisión, capturan evidencias fotográficas y registran firmas en el sitio.</p>
+          <div class="orden-ui" aria-hidden="true">
+            <div class="cab"><span class="num">ORDEN #128</span><span class="est">En curso</span></div>
+            <b>Relevamiento de extintores</b>
+            <small>Planta industrial · 09:30 a 12:00</small>
+            <div class="barra-av"><i></i></div>
+            <div class="pie-o"><span>Checklist</span><span>8 de 12</span></div>
           </div>
-          <div class="rol">
-            <strong>Clientes</strong>
-            <p>Reciben notificaciones automáticas de arribo, el informe técnico en PDF al instante y una encuesta de calidad para calificar el servicio.</p>
-          </div>
-          <div class="rol">
-            <strong>Dirección</strong>
-            <p>Centralizá la gestión comercial, cotizaciones, presupuestos y métricas de rendimiento operativo para tomar decisiones respaldadas por datos.</p>
+          <div class="ficha" aria-hidden="true">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span>
+            <span><b>Informe enviado</b><small>Visita completada</small></span>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="franja">
+    <!-- CÓMO FUNCIONA -->
+    <section class="bloque" id="plataforma">
       <div class="ancho">
-        <div class="panel">
+        <div class="cabecera revelar">
           <div>
-            <h2>Sincronización total entre la administración y el campo.</h2>
-            <p>Cada orden de trabajo se asigna con cliente, cronograma y profesional responsable. <b>Antes del arribo</b>, el sistema notifica automáticamente al cliente que el técnico se encuentra en camino.</p>
-            <p>Al finalizar la intervención y recolectar las firmas digitales, el reporte se genera de forma instantánea. El cliente recibe la constancia en PDF y evalúa la atención recibida en una escala del 1 al 5.</p>
-            <a class="blanco" href="#demo">Solicitar una demostración</a>
+            <span class="eyebrow">Cómo funciona</span>
+            <h2>Del campo al informe,<br><b>sin pasos manuales</b></h2>
           </div>
-          <div class="hojas" aria-hidden="true">
-            <div class="hoja"><b>Orden</b><i></i><i class="corta"></i><i></i></div>
-            <div class="hoja"><b>En camino</b><i class="corta"></i><i></i><i></i></div>
-            <div class="hoja"><b>Informe</b><i></i><i></i><i class="corta"></i></div>
+        </div>
+
+        <div class="flujo">
+          <div class="pasos revelar" id="pasos">
+            <button class="paso activo" type="button" data-fuente="0">
+              <span class="num">01</span>
+              <span><h3>Planificación</h3><p>Órdenes, recurrencias y checklist asignados desde el panel.</p></span>
+              <svg class="flecha" viewBox="0 0 24 24" width="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+            <button class="paso" type="button" data-fuente="1">
+              <span class="num">02</span>
+              <span><h3>Ejecución con GPS</h3><p>Check-in en el sitio, fotos, controles y firmas, con o sin conexión.</p></span>
+              <svg class="flecha" viewBox="0 0 24 24" width="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+            <button class="paso" type="button" data-fuente="2">
+              <span class="num">03</span>
+              <span><h3>Informe automático</h3><p>El PDF se arma solo con evidencias y se envía al cliente.</p></span>
+              <svg class="flecha" viewBox="0 0 24 24" width="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+            <button class="paso" type="button" data-fuente="3">
+              <span class="num">04</span>
+              <span><h3>Seguimiento</h3><p>Indicadores, vencimientos y encuestas de satisfacción en vivo.</p></span>
+              <svg class="flecha" viewBox="0 0 24 24" width="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="modulos" id="modulos">
+    <!-- FUNCIONES -->
+    <section class="bloque" id="funciones" style="padding-top:32px">
       <div class="ancho">
-        <div class="titulo-fila">
-          <h2>Módulos diseñados para cada etapa del flujo operativo.</h2>
-          <a class="demo" href="#demo">Solicitar una demostración</a>
+        <div class="cabecera revelar">
+          <div>
+            <span class="eyebrow">Por qué SON</span>
+            <h2>Funciones que<br><b>ordenan el trabajo</b></h2>
+          </div>
         </div>
-        <div class="seis">
-          <article>
-            <div class="icono">▣</div>
-            <h3>Gestión de Órdenes</h3>
-            <p>Asignación detallada por cliente, fecha, horario y profesional, integrando listas de verificación (checklists) personalizadas según el protocolo de cada visita.</p>
+
+        <div class="funciones">
+          <article class="tarjeta b-ancha revelar">
+            <span class="micro" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span>
+            <div class="pie-t" style="margin-top:0"><h3>Todo en un lugar</h3></div>
+            <div class="iconos" aria-hidden="true" style="margin-top:auto">
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8"/></svg></span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-6 7-12a7 7 0 0 0-14 0c0 6 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/></svg></span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></svg></span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V10M10 19V5M16 19v-7M22 19H2"/></svg></span>
+            </div>
           </article>
-          <article>
-            <div class="icono">▦</div>
-            <h3>Agenda y Planificación</h3>
-            <p>Visualización dinámica del cronograma semanal y mensual del equipo para monitorear servicios pendientes, en curso y finalizados en tiempo real.</p>
+
+          <article class="tarjeta foto foto-ia b-alta revelar">
+            <img src="medios/ia/oficina-coordinacion.webp" style="object-position: 40% 35%" data-respaldo="medios/ia/oficina-coordinacion.svg" onerror="usarRespaldo(this)" alt="Equipo de coordinación siguiendo la operación en sus monitores" loading="lazy">
+            <div class="velo"></div>
+            <span class="micro" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span>
+            <div class="pie-t"><h3>Agenda en vivo</h3></div>
           </article>
-          <article>
-            <div class="icono">▢</div>
-            <h3>App Móvil para Técnicos</h3>
-            <p>Herramienta intuitiva en terreno con geolocalización en mapa, cronómetro de gestión, listado de microtareas, captura de fotos y firma digital en pantalla.</p>
+
+          <article class="tarjeta foto foto-ia b-alta campo revelar">
+            <img src="medios/ia/app-campo.webp" style="object-position: 45% 20%" alt="Técnico con casco y chaleco trabajando en obra" loading="lazy">
+            <div class="velo"></div>
+            <span class="micro" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span>
+            <div class="pie-t">
+              <div class="lista" aria-hidden="true">
+                <span><i></i>Sin conexión</span>
+                <span><i></i>Fotos y firmas</span>
+                <span><i></i>Check-in GPS</span>
+                <span><i></i>Formularios propios</span>
+              </div>
+              <h3>App de campo</h3>
+            </div>
           </article>
-          <article>
-            <div class="icono">✉</div>
-            <h3>Notificaciones Automáticas</h3>
-            <p>Envío automatizado de alertas por correo electrónico informando al cliente el arribo inminente del profesional asignado.</p>
+
+          <article class="tarjeta vidrio revelar">
+            <div class="pie-t" style="margin-top:auto"><strong class="grande">100%</strong><span>Digital, sin papel</span></div>
           </article>
-          <article>
-            <div class="icono">▤</div>
-            <h3>Reportes y Calidad</h3>
-            <p>Generación y envío instantáneo del informe formal en PDF con las evidencias recolectadas, acompañado de una encuesta de satisfacción.</p>
+
+          <article class="tarjeta vidrio revelar">
+            <div class="pie-t" style="margin-top:auto"><strong class="grande" style="color:var(--coral)">GPS</strong><span>Presencia validada</span></div>
           </article>
-          <article>
-            <div class="icono">▧</div>
-            <h3>Analítica y Métricas</h3>
-            <p>Tablero de control con indicadores clave (KPIs): volumen de órdenes ejecutadas, tiempos promedio de respuesta y calificaciones de los clientes por período.</p>
+
+          <article class="tarjeta foto foto-ia b-ancha revelar" style="min-height:280px">
+            <img src="medios/ia/cliente-informado.webp" style="object-position: 50% 42%" data-respaldo="medios/ia/cliente-informado.svg" onerror="usarRespaldo(this)" alt="Cliente y asesor revisando el informe de la visita en la computadora" loading="lazy">
+            <div class="velo"></div>
+            <span class="micro" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span>
+            <div class="pie-t" style="margin-top:auto"><h3>Clientes informados</h3></div>
+          </article>
+
+          <article class="tarjeta vidrio b-ancha revelar">
+            <h3>Módulos</h3>
+            <div class="chips" style="margin-top:auto">
+              <span><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v6h6M20 20v-6h-6"/><path d="M20 10A8 8 0 0 0 6 6L4 10m16 4-2 4a8 8 0 0 1-14-4"/></svg></i>Recurrentes</span>
+              <span><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></i>Vencimientos</span>
+              <span><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h4"/></svg></i>Presupuestos</span>
+              <span><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg></i>Checklists</span>
+              <span><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17h2l2-6h10l2 6h2M7 17v2M17 17v2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg></i>Gastos</span>
+              <span><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V10M10 19V5M16 19v-7M22 19H2"/></svg></i>Análisis</span>
+            </div>
           </article>
         </div>
       </div>
     </section>
 
-    <section class="cierre" id="demo">
+    <!-- DEMO -->
+    <section class="bloque" id="demostracion" style="padding-top:32px">
       <div class="ancho">
-        <div class="caja">
-          <h2>Solicite una demostración personalizada</h2>
-          <p class="baja">Descubra cómo SON se adapta al flujo de trabajo de su empresa: desde la planificación de una orden y la ejecución en terreno, hasta la entrega del reporte final a su cliente.</p>
-          <div class="pasos">
-            <div class="paso">
-              <span>01</span>
-              <strong>Planificación</strong>
-              <p>Configuración del calendario, asignación del cliente y designación del técnico con su protocolo de trabajo.</p>
-            </div>
-            <div class="paso">
-              <span>02</span>
-              <strong>Ejecución en Terreno</strong>
-              <p>Trazabilidad del recorrido por GPS, completado de checklists, registro fotográfico y cierre con firma digital.</p>
-            </div>
-            <div class="paso">
-              <span>03</span>
-              <strong>Experiencia del Cliente</strong>
-              <p>Recepción del aviso de arribo, descarga del informe técnico en PDF y calificación del servicio del 1 al 5.</p>
-            </div>
+        <div class="cabecera centro revelar">
+          <span class="eyebrow">Demo</span>
+          <h2>Vea a SON<br><b>en funcionamiento</b></h2>
+        </div>
+        <div class="video revelar">
+          <video controls playsinline preload="metadata" poster="medios/ia/tecnico-campo.svg">
+            <source src="medios/demostracion.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
+    </section>
+
+    <!-- PREGUNTAS -->
+    <section class="bloque" id="preguntas">
+      <div class="ancho">
+        <div class="cabecera centro revelar">
+          <span class="eyebrow">Preguntas</span>
+          <h2>Todo sobre SON,<br><b>explicado</b></h2>
+        </div>
+        <div class="faq revelar">
+          <div class="temas" role="tablist">
+            <button class="activo" type="button" data-tema="general">General</button>
+            <button type="button" data-tema="campo">Trabajo en campo</button>
+            <button type="button" data-tema="clientes">Clientes</button>
+            <button type="button" data-tema="cuenta">Cuenta y acceso</button>
+          </div>
+          <div class="preguntas">
+            <details data-tema="general" open><summary>¿Qué es SON?<i>+</i></summary><p>Una plataforma para coordinar equipos en terreno: la oficina arma las órdenes, el técnico las ejecuta desde el celular y el sistema genera el informe para el cliente.</p></details>
+            <details data-tema="general"><summary>¿Necesito instalar algo?<i>+</i></summary><p>El panel funciona desde el navegador. Los técnicos usan la app en el celular.</p></details>
+            <details data-tema="general"><summary>¿Puedo usar mis propios formularios?<i>+</i></summary><p>Sí. Se cargan checklists y planillas propias, incluso importándolas desde Excel.</p></details>
+            <details data-tema="campo" hidden><summary>¿Funciona sin señal?<i>+</i></summary><p>Sí. La app guarda todo en el celular y lo envía cuando vuelve la conexión.</p></details>
+            <details data-tema="campo" hidden><summary>¿Cómo se valida que el técnico estuvo en el lugar?<i>+</i></summary><p>Con el check-in por GPS al iniciar el trabajo, más fotos y firmas del cliente.</p></details>
+            <details data-tema="clientes" hidden><summary>¿Cómo recibe el cliente el informe?<i>+</i></summary><p>Por correo, en PDF, apenas el técnico finaliza la visita. También puede responder una encuesta de satisfacción.</p></details>
+            <details data-tema="clientes" hidden><summary>¿El cliente sabe cuándo llega el técnico?<i>+</i></summary><p>Sí. Recibe un aviso cuando el técnico sale hacia su domicilio.</p></details>
+            <details data-tema="cuenta" hidden><summary>¿Quién puede ver cada sección?<i>+</i></summary><p>Cada usuario entra con su correo y contraseña, y ve solo las secciones de su rol.</p></details>
+            <details data-tema="cuenta" hidden><summary>¿Cómo empiezo?<i>+</i></summary><p>Pida una demo: le mostramos la plataforma con su forma de trabajo y armamos su cuenta.</p></details>
           </div>
         </div>
       </div>
     </section>
 
-  <section class="contacto" id="contacto">
-    <div class="ancho">
-      <h2>Comuníquese con nuestro equipo comercial para coordinar una demostración en vivo o recibir asesoramiento personalizado.</h2>
-      <div class="tres">
-        <a class="via" href="mailto:sonoperationn@gmail.com">
-          <div class="icono">✉</div>
-          <span>Atención Comercial</span>
-          <strong>sonoperationn@gmail.com</strong>
-        </a>
-        <a class="via" href="https://wa.me/5493547506225" target="_blank" rel="noopener noreferrer">
-          <div class="icono">☎</div>
-          <span>Línea Directa &amp; WhatsApp</span>
-          <strong>+54 9 3547 50-6225</strong>
-        </a>
-        <a class="via" href="https://www.instagram.com/SONoperation/" target="_blank" rel="noopener noreferrer">
-          <div class="icono">@</div>
-          <span>Redes Oficiales</span>
-          <strong>@SONoperation</strong>
-        </a>
+    <!-- CONTACTO -->
+    <section class="bloque" id="contacto" style="padding-top:32px">
+      <div class="ancho">
+        <div class="contacto revelar">
+          <div class="lado">
+            <div class="canales">
+              <a class="canal" href="mailto:sonoperationn@gmail.com"><span>Correo</span><strong>sonoperationn@gmail.com</strong></a>
+              <a class="canal" href="https://wa.me/5493547506225" target="_blank" rel="noopener noreferrer"><span>WhatsApp</span><strong>+54 9 3547 50-6225</strong></a>
+              <a class="canal" href="https://www.instagram.com/SONoperation/" target="_blank" rel="noopener noreferrer"><span>Instagram</span><strong>@SONoperation</strong></a>
+            </div>
+          </div>
+          <div class="formulario">
+            <span class="eyebrow">Pedir demo</span>
+            <h2>Digitalice su operación<br><b>en terreno</b></h2>
+            <form id="formulario">
+              <label>Nombre y apellido<input name="nombre" autocomplete="name" required maxlength="80" placeholder="Nombre Apellido"></label>
+              <label>Empresa<input name="empresa" autocomplete="organization" required maxlength="120" placeholder="Empresa"></label>
+              <label>Correo<input name="email" type="email" autocomplete="email" required maxlength="120" placeholder="nombre@empresa.com"></label>
+              <label>Teléfono<input name="telefono" type="tel" autocomplete="tel" required maxlength="40" placeholder="+54 9 ..."></label>
+              <label class="completo">Técnicos en campo
+                <select name="flota" required>
+                  <option value="">Elegir</option>
+                  <option>1 a 5 técnicos</option>
+                  <option>6 a 15 técnicos</option>
+                  <option>16 a 50 técnicos</option>
+                  <option>Más de 50 técnicos</option>
+                </select>
+              </label>
+              <label class="completo">Mensaje<textarea name="mensaje" maxlength="1000" placeholder="Opcional"></textarea></label>
+              <button class="boton cta con-flecha" type="submit" id="enviar"><span class="texto-boton">Pedir demo</span><span class="circulo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+              <p class="aviso completo" id="aviso" role="status"></p>
+            </form>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
   </main>
 
   <footer>
-    <div class="ancho pie">
-      <div>
-        <img class="marca" src="logo-blanco.png" alt="SON">
+    <div class="ancho">
+      <div class="pie-bloque">
+      <div class="pie-titular">
+        <h2>Su operación,<br><b>en un solo lugar</b></h2>
+        <a class="boton claro con-flecha" href="/panel/">Ingresar<span class="circulo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
       </div>
-      <div>
-        <h3>Navegación</h3>
-        <a href="#como">Cómo funciona</a>
-        <a href="#modulos">Módulos</a>
-        <a href="#demo">Demo</a>
-        <a href="#contacto">Contacto</a>
+      <div class="pie">
+        <a class="marca" href="#inicio"><span class="logo"><img src="isotipo.png" alt=""></span>SON</a>
+        <nav aria-label="Pie" style="display:flex">
+          <a href="#plataforma">Plataforma</a>
+          <a href="#funciones">Funciones</a>
+          <a href="#preguntas">Preguntas</a>
+          <a href="/panel/">Ingresar</a>
+        </nav>
       </div>
-      <div>
-        <h3>Contacto</h3>
-        <a href="mailto:sonoperationn@gmail.com">sonoperationn@gmail.com</a>
-        <a href="https://wa.me/5493547506225" target="_blank" rel="noopener noreferrer">3547 506225</a>
-        <a href="https://www.instagram.com/SONoperation/" target="_blank" rel="noopener noreferrer">@SONoperation</a>
+      <p class="legal">© 2026 SON — Sistema de Gestión Operativa.</p>
       </div>
     </div>
-    <div class="ancho legal">© 2026 SON - Sistema de Gestión Operativa. Todos los derechos reservados.</div>
   </footer>
+
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(function (regs) {
-        regs.forEach(function (reg) {
-          if (reg.scope.indexOf('/panel/') === -1 && reg.scope.indexOf('/tecnico/') === -1) reg.unregister();
+    (function () {
+      var reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Frase rotativa del titular
+      var frases = ['sincronizada y bajo control', '100% digital', 'auditada en tiempo real'];
+      var frase = document.getElementById('frase');
+      var indiceFrase = 0;
+      if (!reducido) {
+        setInterval(function () {
+          frase.classList.add('sale');
+          setTimeout(function () {
+            indiceFrase = (indiceFrase + 1) % frases.length;
+            frase.textContent = frases[indiceFrase];
+            frase.classList.remove('sale');
+          }, 400);
+        }, 3200);
+      }
+
+      // Aparición escalonada al hacer scroll
+      var revelar = document.querySelectorAll('.revelar');
+      if ('IntersectionObserver' in window && !reducido) {
+        var visto = new IntersectionObserver(function (entradas) {
+          entradas.forEach(function (entrada) {
+            if (!entrada.isIntersecting) return;
+            entrada.target.style.transitionDelay = (Number(entrada.target.dataset.orden || 0) * 60) + 'ms';
+            entrada.target.classList.add('visible');
+            visto.unobserve(entrada.target);
+          });
+        }, { threshold: 0.12 });
+        revelar.forEach(function (nodo, i) {
+          nodo.dataset.orden = i % 4;
+          visto.observe(nodo);
+        });
+      } else {
+        revelar.forEach(function (nodo) { nodo.classList.add('visible'); });
+      }
+
+      // Pasos del flujo: uno activo a la vez, rotan solos
+      var pasos = Array.prototype.slice.call(document.querySelectorAll('.paso'));
+      var actual = 0;
+      function activar(i) {
+        actual = i;
+        pasos.forEach(function (p, j) { p.classList.toggle('activo', j === i); });
+      }
+      var rotar = reducido ? null : setInterval(function () { activar((actual + 1) % pasos.length); }, 3600);
+      pasos.forEach(function (p, i) {
+        p.addEventListener('click', function () {
+          if (rotar) { clearInterval(rotar); rotar = null; }
+          activar(i);
         });
       });
-    }
-    var boton = document.querySelector('.menu');
-    var nav = document.querySelector('#nav');
-    boton.addEventListener('click', function () {
-      var abierto = nav.classList.toggle('abierta');
-      boton.setAttribute('aria-expanded', abierto ? 'true' : 'false');
-    });
-    nav.querySelectorAll('a').forEach(function (enlace) {
-      enlace.addEventListener('click', function () {
-        nav.classList.remove('abierta');
-        boton.setAttribute('aria-expanded', 'false');
+      activar(0);
+
+      // Preguntas por tema
+      var temas = document.querySelectorAll('.temas button');
+      var preguntas = document.querySelectorAll('.preguntas details');
+      temas.forEach(function (boton) {
+        boton.addEventListener('click', function () {
+          var tema = boton.dataset.tema;
+          temas.forEach(function (b) { b.classList.toggle('activo', b === boton); });
+          var primera = true;
+          preguntas.forEach(function (d) {
+            var mostrar = d.dataset.tema === tema;
+            d.hidden = !mostrar;
+            d.open = mostrar && primera;
+            if (mostrar) primera = false;
+          });
+        });
       });
-    });
+
+      // Menú móvil
+      var menu = document.querySelector('.menu');
+      var nav = document.getElementById('nav');
+      menu.addEventListener('click', function () {
+        var abierto = nav.classList.toggle('abierta');
+        menu.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+      });
+      nav.querySelectorAll('a').forEach(function (enlace) {
+        enlace.addEventListener('click', function () {
+          nav.classList.remove('abierta');
+          menu.setAttribute('aria-expanded', 'false');
+        });
+      });
+
+      // Formulario: se envía por formsubmit; si falla, abre el correo con los datos.
+      var formulario = document.getElementById('formulario');
+      var enviar = document.getElementById('enviar');
+      var textoEnviar = enviar.querySelector('.texto-boton');
+      var aviso = document.getElementById('aviso');
+      formulario.addEventListener('submit', function (evento) {
+        evento.preventDefault();
+        var datos = Object.fromEntries(new FormData(formulario).entries());
+        datos._subject = 'Nueva solicitud de demostración - SON';
+        var cuerpo = [
+          'Nombre: ' + (datos.nombre || ''),
+          'Empresa: ' + (datos.empresa || ''),
+          'Correo: ' + (datos.email || ''),
+          'Teléfono: ' + (datos.telefono || ''),
+          'Técnicos: ' + (datos.flota || ''),
+          'Comentarios: ' + (datos.mensaje || '')
+        ].join('\n');
+        enviar.disabled = true;
+        textoEnviar.textContent = 'Enviando...';
+        aviso.textContent = '';
+        fetch('https://formsubmit.co/ajax/sonoperationn@gmail.com', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(datos)
+        }).then(function (respuesta) {
+          if (!respuesta.ok) throw new Error('envio');
+          return respuesta.json();
+        }).then(function () {
+          formulario.reset();
+          aviso.textContent = '¡Listo! Le escribimos a la brevedad.';
+          enviar.disabled = false;
+          textoEnviar.textContent = 'Pedir demo';
+        }).catch(function () {
+          enviar.disabled = false;
+          textoEnviar.textContent = 'Pedir demo';
+          window.location.href = 'mailto:sonoperationn@gmail.com?subject=' + encodeURIComponent(datos._subject) + '&body=' + encodeURIComponent(cuerpo);
+        });
+      });
+    })();
   </script>
 </body>
 </html>

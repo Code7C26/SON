@@ -7,13 +7,17 @@ import 'package:son_admin/pantallas/armar_presupuesto.dart';
 import 'package:son_admin/pantallas/piezas.dart';
 import 'package:son_admin/services/api.dart';
 import 'package:son_admin/theme/tema.dart';
+import 'package:son_admin/ui/componentes.dart';
 
-const List<String> estadosSolicitud = ['Nueva', 'En presupuesto', 'Presupuestada', 'Descartada'];
+// 'Enviada' y 'Aprobada' son para lo que se presupuesta por fuera (WhatsApp, mail): el técnico ve en la app en qué quedó.
+const List<String> estadosSolicitud = ['Nueva', 'En presupuesto', 'Presupuestada', 'Enviada', 'Aprobada', 'Descartada'];
 
 Color colorEstadoSolicitud(String estado) => switch (estado) {
       'Nueva' => sonAmbar,
       'En presupuesto' => sonAzul,
       'Presupuestada' => sonLightGreen,
+      'Enviada' => sonAzul,
+      'Aprobada' => sonLightGreen,
       _ => sonTextoSuave,
     };
 
@@ -37,6 +41,8 @@ class _PantallaPorPresupuestarState extends State<PantallaPorPresupuestar> {
     ('Nueva', 'Nuevas'),
     ('En presupuesto', 'En presupuesto'),
     ('Presupuestada', 'Presupuestadas'),
+    ('Enviada', 'Enviadas'),
+    ('Aprobada', 'Aprobadas'),
     ('Descartada', 'Descartadas'),
     ('todas', 'Todas'),
   ];
@@ -403,17 +409,17 @@ class _PantallaPorPresupuestarState extends State<PantallaPorPresupuestar> {
     );
     if (widget.embebida) return filtrosYLista;
     return Padding(
-      padding: const EdgeInsets.all(40),
+      padding: AppSpacing.pagina,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Expanded(
+              const Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Por presupuestar', style: estiloTituloPantalla),
+                    EncabezadoPantalla(eyebrow: 'Comercial', normal: 'Por', destacado: 'presupuestar'),
                   ],
                 ),
               ),

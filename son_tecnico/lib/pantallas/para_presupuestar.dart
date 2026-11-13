@@ -54,26 +54,14 @@ class SeccionParaPresupuestar extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Text('Para presupuestar', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: sonTexto)),
-            ),
-            TextButton.icon(
-              key: const Key('anotar_presupuesto'),
-              onPressed: onAnotar,
-              icon: Icon(Icons.playlist_add, color: sonLightGreen),
-              label: Text('Anotar', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold)),
-            ),
-          ],
+        Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.s12),
+          child: Text('Para presupuestar', style: Theme.of(context).textTheme.titleLarge),
         ),
-        const SizedBox(height: 8),
-        if (notas.isEmpty)
-          Text('Todavía no anotaste nada.', style: TextStyle(color: sonTextoSuave))
-        else
+        if (notas.isNotEmpty)
           Container(
-            decoration: decoracionTarjeta(),
+            decoration: decoracionTarjeta(radio: AppRadius.tarjetaGrande),
+            clipBehavior: Clip.antiAlias,
             child: Column(
               children: [
                 for (var i = 0; i < notas.length; i++) ...[
@@ -88,6 +76,19 @@ class SeccionParaPresupuestar extends StatelessWidget {
               ],
             ),
           ),
+        Padding(
+          padding: const EdgeInsets.only(top: AppSpacing.s12),
+          child: SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: OutlinedButton.icon(
+              key: const Key('anotar_presupuesto'),
+              onPressed: onAnotar,
+              icon: const Icon(Icons.playlist_add_rounded),
+              label: const Text('Anotar para presupuestar'),
+            ),
+          ),
+        ),
       ],
     );
   }

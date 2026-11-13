@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200" preserveAspectRatio="xMidYMid slice">
+  <title>Coordinación de la agenda de técnicos desde la oficina</title>
+  <defs>
+    <radialGradient id="luz" cx="0.75" cy="0.15" r="0.7">
+      <stop offset="0" stop-color="#FF6147" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#FF6147" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="900" height="1200" fill="#2E2E2E"/>
+  <rect width="900" height="1200" fill="url(#luz)"/>
+
+  <!-- Ventana -->
+  <rect x="520" y="70" width="320" height="380" rx="18" fill="#353535"/>
+  <rect x="540" y="90" width="135" height="340" rx="8" fill="#3F3F3F"/>
+  <rect x="685" y="90" width="135" height="340" rx="8" fill="#3F3F3F"/>
+  <circle cx="760" cy="180" r="44" fill="#FF6147" opacity="0.8"/>
+  <path d="M540 360 L600 300 L640 330 L700 270 L760 320 L820 290 V430 H540 Z" fill="#4C4C4C"/>
+
+  <!-- Planta -->
+  <rect x="70" y="520" width="80" height="90" rx="14" fill="#4C4C4C"/>
+  <path d="M110 520 C80 470 60 440 70 400 C100 430 110 470 110 520 Z" fill="#6E6E6E"/>
+  <path d="M110 520 C130 460 160 430 175 410 C178 460 150 500 110 520 Z" fill="#9A9A9A"/>
+  <path d="M110 520 C100 450 110 400 120 370 C135 410 130 470 110 520 Z" fill="#B3B3B3"/>
+
+  <!-- Monitor -->
+  <rect x="180" y="210" width="420" height="290" rx="20" fill="#262626"/>
+  <rect x="196" y="226" width="388" height="258" rx="10" fill="#F4F4F4"/>
+  <!-- Mapa en pantalla -->
+  <rect x="196" y="226" width="250" height="258" fill="#E7E7E7"/>
+  <path d="M196 300 C260 280 300 340 360 320 S430 260 446 270" stroke="#D5D5D5" stroke-width="12" fill="none"/>
+  <path d="M250 226 V484 M340 226 V484 M196 400 H446" stroke="#D5D5D5" stroke-width="6"/>
+  <path d="M240 440 C280 380 320 400 350 340 S410 300 420 270" stroke="#FF6147" stroke-width="5" fill="none" stroke-dasharray="10 8" stroke-linecap="round"/>
+  <g fill="#FF6147"><circle cx="240" cy="440" r="11"/><circle cx="350" cy="340" r="11"/></g>
+  <circle cx="420" cy="270" r="11" fill="#D99C13"/>
+  <circle cx="240" cy="440" r="4" fill="#F4F4F4"/>
+  <circle cx="350" cy="340" r="4" fill="#F4F4F4"/>
+  <!-- Agenda en pantalla -->
+  <rect x="460" y="244" width="110" height="14" rx="7" fill="#2E2E2E"/>
+  <g>
+    <rect x="460" y="274" width="110" height="46" rx="10" fill="#FFFFFF"/>
+    <rect x="460" y="274" width="6" height="46" rx="3" fill="#FF6147"/>
+    <rect x="474" y="286" width="70" height="7" rx="3" fill="#6E6E6E"/>
+    <rect x="474" y="300" width="44" height="7" rx="3" fill="#B3B3B3"/>
+    <rect x="460" y="330" width="110" height="46" rx="10" fill="#FFFFFF"/>
+    <rect x="460" y="330" width="6" height="46" rx="3" fill="#D99C13"/>
+    <rect x="474" y="342" width="60" height="7" rx="3" fill="#6E6E6E"/>
+    <rect x="474" y="356" width="50" height="7" rx="3" fill="#B3B3B3"/>
+    <rect x="460" y="386" width="110" height="46" rx="10" fill="#FFFFFF"/>
+    <rect x="460" y="386" width="6" height="46" rx="3" fill="#C46A3A"/>
+    <rect x="474" y="398" width="74" height="7" rx="3" fill="#6E6E6E"/>
+    <rect x="474" y="412" width="36" height="7" rx="3" fill="#B3B3B3"/>
+  </g>
+  <rect x="370" y="500" width="40" height="70" fill="#353535"/>
+  <rect x="320" y="566" width="140" height="14" rx="7" fill="#353535"/>
+
+  <!-- Escritorio -->
+  <rect x="0" y="580" width="900" height="34" fill="#4C4C4C"/>
+  <rect x="0" y="614" width="900" height="586" fill="#262626"/>
+  <rect x="560" y="548" width="150" height="32" rx="6" fill="#6E6E6E"/>
+  <rect x="580" y="556" width="110" height="5" rx="2" fill="#9A9A9A"/>
+  <rect x="740" y="520" width="56" height="60" rx="10" fill="#F4F4F4"/>
+  <path d="M796 535 C820 535 820 565 796 565" stroke="#F4F4F4" stroke-width="8" fill="none"/>
+
+  <!-- Persona de espaldas con auriculares -->
+  <g transform="translate(560 400)">
+    <path d="M30 330 Q40 230 130 210 Q220 230 230 330 Z" fill="#D99C13"/>
+    <path d="M110 214 L130 250 L150 214 Z" fill="#F4F4F4" opacity="0.6"/>
+    <rect x="112" y="170" width="36" height="46" rx="14" fill="#D5D5D5"/>
+    <circle cx="130" cy="140" r="54" fill="#4C4C4C"/>
+    <path d="M78 150 Q80 90 130 86 Q180 90 182 150" fill="#3F3F3F"/>
+    <path d="M72 140 Q76 70 130 68 Q184 70 188 140" stroke="#262626" stroke-width="9" fill="none" stroke-linecap="round"/>
+    <rect x="62" y="128" width="22" height="40" rx="10" fill="#FF6147"/>
+    <rect x="176" y="128" width="22" height="40" rx="10" fill="#FF6147"/>
+    <path d="M70 166 Q74 200 112 206" stroke="#262626" stroke-width="4" fill="none"/>
+  </g>
+</svg>

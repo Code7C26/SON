@@ -247,10 +247,14 @@ void main() {
         await tester.pumpWidget(_app(const LayoutAdministrador(adminData: duena)));
         await tester.pumpAndSettle();
 
-        for (final visible in ['OPERACIÓN', 'COMERCIAL', 'SISTEMA', 'Panel de Control', 'Órdenes de Trabajo', 'Técnicos', 'Informes', 'Análisis', 'Precios', 'Clientes', 'Usuarios']) {
+        // Los grupos también pueden aparecer como etiqueta del encabezado de la pantalla abierta.
+        for (final grupo in ['OPERACIÓN', 'COMERCIAL', 'SISTEMA']) {
+          expect(find.text(grupo), findsWidgets, reason: 'falta el grupo $grupo en el menú de Comercial');
+        }
+        for (final visible in ['Inicio', 'Órdenes', 'Técnicos', 'Informes', 'Análisis', 'Precios', 'Clientes', 'Usuarios']) {
           expect(find.text(visible), findsOneWidget, reason: 'falta $visible en el menú de Comercial');
         }
-        expect(find.text('Presupuestos'), findsNWidgets(2), reason: 'una en el menú y otra de título');
+        expect(find.text('Presupuestos'), findsOneWidget, reason: 'el ítem del menú (el título de la pantalla ahora es "Embudo de presupuestos")');
         expect(find.text('Por presupuestar'), findsNothing, reason: 'ya no es un ítem aparte: vive adentro de Presupuestos');
         expect(find.byType(PantallaPresupuestos), findsOneWidget, reason: 'la pantalla guardada vieja abre Presupuestos');
         expect(find.text('Tablero'), findsOneWidget);
@@ -278,9 +282,9 @@ void main() {
       await servidor.correr(() async {
         await tester.pumpWidget(_app(const LayoutAdministrador(adminData: empleado)));
         await tester.pumpAndSettle();
-        expect(find.byType(PantallaDashboard), findsOneWidget, reason: 'sin pantalla guardada arranca en el Panel de Control');
+        expect(find.byType(PantallaDashboard), findsOneWidget, reason: 'sin pantalla guardada arranca en Inicio');
 
-        for (final visible in ['OPERACIÓN', 'Panel de Control', 'Órdenes de Trabajo', 'Técnicos', 'Informes', 'Análisis']) {
+        for (final visible in ['OPERACIÓN', 'Inicio', 'Órdenes', 'Técnicos', 'Informes', 'Análisis']) {
           expect(find.text(visible), findsWidgets, reason: 'falta $visible en el menú de Administración');
         }
         for (final oculto in ['COMERCIAL', 'SISTEMA', 'Por presupuestar', 'Presupuestos', 'Precios', 'Clientes', 'Usuarios']) {
@@ -318,7 +322,7 @@ void main() {
         // Sin "rol" en los datos: así eran las cuentas guardadas antes de los tipos de usuario.
         await tester.pumpWidget(_app(const LayoutAdministrador(adminData: {'id': 1, 'nombre': 'Admin', 'email': 'admin@son.test'})));
         await tester.pumpAndSettle();
-        expect(find.text('Panel de Control'), findsWidgets);
+        expect(find.text('Inicio'), findsWidgets);
         for (final oculto in ['COMERCIAL', 'SISTEMA', 'Por presupuestar', 'Presupuestos', 'Precios', 'Clientes', 'Usuarios']) {
           expect(find.text(oculto), findsNothing, reason: '$oculto es solo para Comercial');
         }
@@ -671,7 +675,7 @@ void main() {
         await tester.pumpWidget(_app(const Scaffold(body: PantallaAdministradores(adminActualId: 1))));
         await tester.pumpAndSettle();
 
-        expect(find.text('Usuarios'), findsOneWidget);
+        expect(find.text('Usuarios del panel'), findsOneWidget);
         expect(find.text('Comercial'), findsOneWidget);
         expect(find.text('Administración'), findsNWidgets(2));
         expect(find.text('Laura Dueña  (vos)'), findsOneWidget);
@@ -773,7 +777,7 @@ void main() {
         await tester.pumpWidget(_app(const Scaffold(body: PantallaOrdenes())));
         await tester.pumpAndSettle();
 
-        await tester.tap(find.text('Crear Nueva Orden'));
+        await tester.tap(find.text('Nueva orden'));
         await tester.pumpAndSettle();
         await tester.enterText(find.widgetWithText(TextField, 'Empresa / Cliente'), 'a');
         await tester.pumpAndSettle();
@@ -842,7 +846,7 @@ void main() {
       await servidor.correr(() async {
         await tester.pumpWidget(_app(const Scaffold(body: PantallaPresupuestos())));
         await tester.pumpAndSettle();
-        expect(find.text('Presupuestos'), findsOneWidget);
+        expect(find.text('Embudo de presupuestos'), findsOneWidget);
         expect(find.text('Tablero'), findsOneWidget);
         expect(find.text('Lista'), findsOneWidget);
         expect(find.text('Notas de técnicos'), findsOneWidget);
@@ -910,7 +914,7 @@ void main() {
       await servidor.correr(() async {
         await tester.pumpWidget(_app(const Scaffold(body: PantallaPrecios())));
         await tester.pumpAndSettle();
-        expect(find.text('Precios'), findsOneWidget);
+        expect(find.text('Lista de precios'), findsOneWidget);
         expect(find.text('Tarifario'), findsOneWidget);
         expect(find.byKey(const Key('nueva_tarifa')), findsOneWidget);
         await tester.tap(find.text('Inflación'));

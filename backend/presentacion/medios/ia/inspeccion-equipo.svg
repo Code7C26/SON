@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1400" preserveAspectRatio="xMidYMid slice">
+  <title>Dos técnicos inspeccionando un tablero eléctrico</title>
+  <defs>
+    <radialGradient id="luz" cx="0.5" cy="0.18" r="0.6">
+      <stop offset="0" stop-color="#FF6147" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#FF6147" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="1400" fill="#2E2E2E"/>
+  <rect width="1200" height="1400" fill="url(#luz)"/>
+
+  <!-- Caños en la pared -->
+  <path d="M0 150 H1200 M0 190 H1200" stroke="#3F3F3F" stroke-width="18"/>
+  <path d="M960 150 V760" stroke="#3F3F3F" stroke-width="18"/>
+  <rect x="940" y="300" width="58" height="26" rx="6" fill="#D99C13"/>
+
+  <!-- Tablero eléctrico -->
+  <rect x="380" y="230" width="440" height="560" rx="20" fill="#4C4C4C"/>
+  <rect x="404" y="254" width="392" height="512" rx="10" fill="#353535"/>
+  <g fill="#6E6E6E">
+    <rect x="436" y="300" width="44" height="90" rx="6"/><rect x="496" y="300" width="44" height="90" rx="6"/>
+    <rect x="556" y="300" width="44" height="90" rx="6"/><rect x="616" y="300" width="44" height="90" rx="6"/>
+    <rect x="676" y="300" width="44" height="90" rx="6"/><rect x="736" y="300" width="36" height="90" rx="6"/>
+    <rect x="436" y="420" width="44" height="90" rx="6"/><rect x="496" y="420" width="44" height="90" rx="6"/>
+    <rect x="556" y="420" width="44" height="90" rx="6"/><rect x="616" y="420" width="44" height="90" rx="6"/>
+  </g>
+  <g fill="#F4F4F4">
+    <rect x="450" y="320" width="16" height="26" rx="3"/><rect x="510" y="340" width="16" height="26" rx="3"/>
+    <rect x="570" y="320" width="16" height="26" rx="3"/><rect x="630" y="320" width="16" height="26" rx="3"/>
+    <rect x="690" y="340" width="16" height="26" rx="3"/><rect x="450" y="440" width="16" height="26" rx="3"/>
+    <rect x="510" y="440" width="16" height="26" rx="3"/><rect x="570" y="460" width="16" height="26" rx="3"/>
+  </g>
+  <rect x="630" y="440" width="16" height="26" rx="3" fill="#FF6147"/>
+  <path d="M436 560 H772 M436 600 H700 M436 640 H740" stroke="#4C4C4C" stroke-width="10" stroke-linecap="round"/>
+  <!-- cartel de riesgo -->
+  <g transform="translate(560 680)">
+    <path d="M40 0 L80 70 H0 Z" fill="#D99C13"/>
+    <path d="M44 22 L32 44 H44 L36 60 L52 36 H40 Z" fill="#2E2E2E"/>
+  </g>
+
+  <rect y="840" width="1200" height="560" fill="#262626"/>
+  <path d="M0 840 H1200" stroke="#4C4C4C" stroke-width="3"/>
+
+  <!-- Técnico izquierda: apunta al tablero -->
+  <g transform="translate(130 330)">
+    <path d="M40 720 L60 510 H200 L220 720 Z" fill="#4C4C4C"/>
+    <path d="M30 520 Q40 330 130 300 Q220 330 230 520 Z" fill="#E7E7E7"/>
+    <path d="M44 520 Q50 360 110 310 L120 520 Z" fill="#D99C13"/>
+    <path d="M216 520 Q210 360 150 310 L140 520 Z" fill="#D99C13"/>
+    <rect x="44" y="420" width="76" height="14" fill="#F4F4F4"/>
+    <rect x="140" y="420" width="76" height="14" fill="#F4F4F4"/>
+    <!-- brazo apuntando -->
+    <path d="M200 340 Q300 300 360 250 L372 270 Q320 330 214 386 Z" fill="#E7E7E7"/>
+    <circle cx="372" cy="256" r="16" fill="#D5D5D5"/>
+    <rect x="110" y="240" width="40" height="64" rx="14" fill="#D5D5D5"/>
+    <circle cx="130" cy="210" r="58" fill="#D5D5D5"/>
+    <path d="M70 204 Q70 140 130 136 Q190 140 190 204 Z" fill="#F4F4F4"/>
+    <rect x="60" y="196" width="140" height="14" rx="7" fill="#F4F4F4"/>
+  </g>
+
+  <!-- Técnico derecha: toma notas -->
+  <g transform="translate(820 360)">
+    <path d="M40 690 L60 490 H200 L220 690 Z" fill="#3F3F3F"/>
+    <path d="M30 500 Q40 320 130 290 Q220 320 230 500 Z" fill="#9A9A9A"/>
+    <path d="M44 500 Q50 350 110 300 L120 500 Z" fill="#FF6147"/>
+    <path d="M216 500 Q210 350 150 300 L140 500 Z" fill="#FF6147"/>
+    <rect x="44" y="410" width="76" height="14" fill="#F4F4F4"/>
+    <rect x="140" y="410" width="76" height="14" fill="#F4F4F4"/>
+    <!-- portapapeles -->
+    <g transform="translate(20 330) rotate(8)">
+      <rect width="120" height="150" rx="10" fill="#6E6E6E"/>
+      <rect x="10" y="16" width="100" height="126" rx="4" fill="#F4F4F4"/>
+      <rect x="40" y="-6" width="40" height="18" rx="5" fill="#262626"/>
+      <rect x="22" y="36" width="70" height="7" rx="3" fill="#9A9A9A"/>
+      <rect x="22" y="56" width="56" height="7" rx="3" fill="#9A9A9A"/>
+      <rect x="22" y="76" width="64" height="7" rx="3" fill="#9A9A9A"/>
+      <path d="M22 108 l8 8 l16 -18" stroke="#FF6147" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <path d="M200 340 Q250 400 150 440 L140 420 Q200 390 180 350 Z" fill="#9A9A9A"/>
+    <circle cx="146" cy="430" r="14" fill="#D5D5D5"/>
+    <rect x="110" y="230" width="40" height="64" rx="14" fill="#D5D5D5"/>
+    <circle cx="130" cy="200" r="58" fill="#D5D5D5"/>
+    <path d="M72 196 Q72 130 130 126 Q188 130 188 196 Z" fill="#D99C13"/>
+    <rect x="62" y="188" width="136" height="14" rx="7" fill="#D99C13"/>
+  </g>
+</svg>

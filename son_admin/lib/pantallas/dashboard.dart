@@ -6,6 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:son_admin/services/api.dart';
 import 'package:son_admin/theme/tema.dart';
+import 'package:son_admin/ui/componentes.dart';
 
 const LatLng _centroPorDefecto = LatLng(-31.6643, -64.4282); // Alta Gracia, la base
 
@@ -20,7 +21,10 @@ String _dos(int n) => n.toString().padLeft(2, '0');
 /// Panel de Control: resumen del día, mapa y actividad de los técnicos.
 class PantallaDashboard extends StatefulWidget {
   final String nombreAdmin;
-  const PantallaDashboard({super.key, this.nombreAdmin = ''});
+
+  /// Abre otra pantalla del panel (por ejemplo, 'ordenes' al tocar un indicador).
+  final void Function(String id)? alIrA;
+  const PantallaDashboard({super.key, this.nombreAdmin = '', this.alIrA});
 
   @override
   State<PantallaDashboard> createState() => _PantallaDashboardState();
@@ -31,7 +35,6 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
   List<Map<String, dynamic>> _tecnicos = [];
   bool _cargando = true;
   bool _sinConexion = false;
-  DateTime? _actualizado;
   Timer? _timer;
   final MapController _mapa = MapController();
 
@@ -59,7 +62,6 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
           _tecnicos = (json.decode(resultados[1].body) as List).map((e) => Map<String, dynamic>.from(e as Map)).toList();
           _cargando = false;
           _sinConexion = false;
-          _actualizado = DateTime.now();
         });
       } else if (_cargando) {
         setState(() { _cargando = false; _sinConexion = true; });
@@ -135,17 +137,26 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
   // --- Pantalla ---
   @override
   Widget build(BuildContext context) {
-    if (_cargando) return const Center(child: CircularProgressIndicator());
+    if (_cargando) return _esqueleto();
+    if (_sinConexion && _ordenes.isEmpty && _tecnicos.isEmpty) {
+      return EstadoError(
+        mensaje: 'No se pudo conectar con el servidor.',
+        alReintentar: () {
+          setState(() => _cargando = true);
+          _cargar();
+        },
+      );
+    }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(36, 30, 36, 36),
+      padding: AppSpacing.pagina,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _encabezado(),
-          const SizedBox(height: 24),
-          _indicadores(),
-          const SizedBox(height: 22),
+          Aparecer(child: _encabezado()),
+          const SizedBox(height: AppSpacing.s24),
+          Aparecer(orden: 2, child: _indicadores()),
+          const SizedBox(height: AppSpacing.s24),
           LayoutBuilder(builder: (context, caja) {
             final ancho = caja.maxWidth;
             final izquierda = Column(
@@ -174,26 +185,51 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
   }
   Widget _encabezado() {
     final ahora = DateTime.now();
-    final fecha = '${_dias[ahora.weekday - 1]}, ${ahora.day} de ${_meses[ahora.month - 1]}';
+    final fecha = '${_dias[ahora.weekday - 1]} ${ahora.day} de ${_meses[ahora.month - 1]}';
     final primerNombre = widget.nombreAdmin.trim().split(' ').first;
-    final saludo = primerNombre.isEmpty ? 'Panel de Control' : 'Hola, $primerNombre';
 
-    final estado = _sinConexion ? _pildora('Sin conexión', sonAmbar, apagado: true) : const SizedBox.shrink();
+    final estado = _sinConexion ? _pildora('Sin conexión', sonAmbar, apagado: true) : _pildora('En vivo', sonExito);
 
     return LayoutBuilder(builder: (context, caja) {
       final textos = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(saludo, style: estiloTituloPantalla),
-          const SizedBox(height: 6),
-          Text(fecha[0].toUpperCase() + fecha.substring(1), style: estiloSubtitulo),
+          Eyebrow(fecha, icono: Icons.calendar_today_rounded),
+          const SizedBox(height: AppSpacing.s16),
+          TituloContraste(
+            normal: primerNombre.isEmpty ? 'Tu operación,' : 'Hola, $primerNombre.',
+            destacado: primerNombre.isEmpty ? 'de un vistazo' : 'Así va tu operación',
+            destacadoEnLineaNueva: true,
+            tamano: caja.maxWidth < 640 ? 30 : 40,
+          ),
         ],
       );
       if (caja.maxWidth < 640) {
         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [textos, const SizedBox(height: 12), estado]);
       }
-      return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Expanded(child: textos), estado]);
+      return Row(crossAxisAlignment: CrossAxisAlignment.end, children: [Expanded(child: textos), estado]);
     });
+  }
+
+  /// Carga: siluetas grises con la forma de la pantalla.
+  Widget _esqueleto() {
+    return const SingleChildScrollView(
+      padding: AppSpacing.pagina,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Skeleton(alto: 26, ancho: 160, radio: AppRadius.rPildora),
+          SizedBox(height: AppSpacing.s16),
+          Skeleton(alto: 40, ancho: 320),
+          SizedBox(height: 10),
+          Skeleton(alto: 40, ancho: 420),
+          SizedBox(height: AppSpacing.s24),
+          Skeleton(alto: 190, radio: AppRadius.rTarjetaGrande),
+          SizedBox(height: AppSpacing.s24),
+          Skeleton(alto: 420, radio: AppRadius.rTarjetaGrande),
+        ],
+      ),
+    );
   }
 
   Widget _pildora(String texto, Color color, {bool apagado = false}) {
@@ -224,6 +260,7 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
   }
 
   // --- Indicadores ---
+  /// Bloque oscuro de alto contraste con los números grandes del día y el avance general.
   Widget _indicadores() {
     final pendientes = _contar('Pendiente');
     final enProgreso = _contar('En progreso');
@@ -231,94 +268,74 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
     final hoy = _hoy();
     final paraHoy = _ordenes.where((o) => _fechaDe(o) == hoy).toList();
     final hoyCompletadas = paraHoy.where((o) => o['estado'] == 'Completada').length;
-    final conUbicacion = _tecnicos.where((t) => _posicion(t) != null && _enLinea(t)).length;
+    final enLinea = _tecnicos.where((t) => _posicion(t) != null && _enLinea(t)).length;
     final total = _ordenes.length;
-    final porcentaje = total == 0 ? 0 : (completadas * 100 / total).round();
+    final avance = total == 0 ? 0.0 : completadas / total;
+    final irOrdenes = widget.alIrA == null ? null : () => widget.alIrA!('ordenes');
+    final irTecnicos = widget.alIrA == null ? null : () => widget.alIrA!('tecnicos');
 
-    final tarjetas = <Widget>[
-      _tarjetaIndicador(
-        icono: Icons.assignment_outlined, color: sonLightGreen,
-        titulo: 'Órdenes activas', valor: '${pendientes + enProgreso}',
-        detalle: '$pendientes pendientes · $enProgreso en curso',
-      ),
-      _tarjetaIndicador(
-        icono: Icons.directions_run, color: sonLightGreen,
-        titulo: 'En progreso', valor: '$enProgreso',
-        detalle: enProgreso == 0 ? 'Nadie trabajando en este momento' : 'Técnicos con visita abierta',
-      ),
-      _tarjetaIndicador(
-        icono: Icons.today_outlined, color: sonLightGreen,
-        titulo: 'Para hoy', valor: '${paraHoy.length}',
-        detalle: paraHoy.isEmpty ? 'Sin visitas programadas' : '$hoyCompletadas completadas hoy',
-      ),
-      _tarjetaIndicador(
-        icono: Icons.task_alt, color: sonLightGreen,
-        titulo: 'Completadas', valor: '$completadas',
-        detalle: total == 0 ? 'Todavía no hay órdenes' : '$porcentaje% del total de órdenes',
-      ),
-      _tarjetaIndicador(
-        icono: Icons.groups_outlined, color: sonLightGreen,
-        titulo: 'Técnicos', valor: '${_tecnicos.length}',
-        detalle: '$conUbicacion en línea ahora',
-      ),
+    const blanco = AppColors.superficie;
+    const tenue = AppColors.oscuroTextoSecundario;
+    const linea = AppColors.oscuroBorde;
+    final kpis = <Widget>[
+      KpiBloque(valor: '${pendientes + enProgreso}', etiqueta: 'Órdenes activas', colorValor: blanco, colorEtiqueta: tenue, tamano: 40, alTocar: irOrdenes),
+      KpiBloque(valor: '$enProgreso', etiqueta: 'En curso ahora', colorValor: AppColors.acento, colorEtiqueta: tenue, tamano: 40, alTocar: irOrdenes),
+      KpiBloque(valor: '$hoyCompletadas/${paraHoy.length}', etiqueta: 'Visitas de hoy', colorValor: blanco, colorEtiqueta: tenue, tamano: 40, alTocar: irOrdenes),
+      KpiBloque(valor: '$enLinea/${_tecnicos.length}', etiqueta: 'Técnicos en línea', colorValor: blanco, colorEtiqueta: tenue, tamano: 40, alTocar: irTecnicos),
     ];
 
-    return LayoutBuilder(builder: (context, caja) {
-      final ancho = caja.maxWidth;
-      if (ancho >= 1100) {
-        return Row(
+    return BloqueContraste(
+      child: LayoutBuilder(builder: (context, caja) {
+        final ancho = caja.maxWidth;
+        final Widget fila = ancho >= 760
+            ? Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (var i = 0; i < kpis.length; i++) ...[
+                    if (i > 0) Container(width: 1, height: 64, margin: const EdgeInsets.symmetric(horizontal: AppSpacing.s24), color: linea),
+                    Expanded(child: Aparecer(orden: 3 + i, child: kpis[i])),
+                  ],
+                ],
+              )
+            : Wrap(
+                spacing: AppSpacing.s32,
+                runSpacing: AppSpacing.s24,
+                children: [
+                  for (var i = 0; i < kpis.length; i++)
+                    SizedBox(width: (ancho - AppSpacing.s32) / 2, child: Aparecer(orden: 3 + i, child: kpis[i])),
+                ],
+              );
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            for (var i = 0; i < tarjetas.length; i++) ...[
-              if (i > 0) const SizedBox(width: 16),
-              Expanded(child: tarjetas[i]),
-            ],
-          ],
-        );
-      }
-      final columnas = ancho >= 760 ? 3 : 2;
-      final cada = (ancho - 16 * (columnas - 1)) / columnas;
-      return Wrap(spacing: 16, runSpacing: 16, children: [for (final t in tarjetas) SizedBox(width: cada, child: t)]);
-    });
-  }
-
-  Widget _tarjetaIndicador({
-    required IconData icono,
-    required Color color,
-    required String titulo,
-    required String valor,
-    required String detalle,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: decoracionTarjeta(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(color: color.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(10)),
-                child: Icon(icono, size: 19, color: color),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  titulo.toUpperCase(),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: sonTextoSuave, fontSize: 11, letterSpacing: 0.9, fontWeight: FontWeight.w600),
+            fila,
+            const SizedBox(height: AppSpacing.s32),
+            Row(
+              children: [
+                Text('Completadas', style: AppTypography.kpiEtiqueta(tenue)),
+                const Spacer(),
+                Text('$completadas de $total · ${(avance * 100).round()}%',
+                    style: AppTypography.kpiEtiqueta(blanco).copyWith(fontWeight: FontWeight.w600)),
+              ],
+            ),
+            const SizedBox(height: 10),
+            ClipRRect(
+              borderRadius: AppRadius.rPildora,
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0, end: avance),
+                duration: const Duration(milliseconds: 900),
+                curve: AppMotion.curva,
+                builder: (context, v, _) => LinearProgressIndicator(
+                  value: v,
+                  minHeight: 8,
+                  backgroundColor: linea,
+                  color: AppColors.oro,
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Text(valor, style: TextStyle(fontSize: 38, fontWeight: FontWeight.bold, color: sonTexto, height: 1)),
-          const SizedBox(height: 10),
-          Text(detalle, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoSuave, fontSize: 12)),
-        ],
-      ),
+            ),
+          ],
+        );
+      }),
     );
   }
 
@@ -505,7 +522,7 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
           _tituloTarjeta('Técnicos en campo', derecha: Text('${_tecnicos.length}', style: TextStyle(color: sonTextoSuave, fontSize: 12))),
           if (lista.isEmpty)
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: 8),
               child: Text('Todavía no hay técnicos registrados.', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
             ),
           for (final tecnico in lista.take(6)) _filaTecnico(tecnico),
@@ -592,7 +609,7 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
           _tituloTarjeta('Órdenes activas', derecha: Text('${activas.length}', style: TextStyle(color: sonTextoSuave, fontSize: 12))),
           if (activas.isEmpty)
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: 8),
               child: Text('No hay órdenes pendientes ni en curso.', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
             ),
           for (final orden in activas.take(5)) _filaOrden(orden),
