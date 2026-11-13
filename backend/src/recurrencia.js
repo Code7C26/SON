@@ -1,4 +1,5 @@
-const { ordenarRecorrido } = require('./ruta');
+const { programarRecorrido } = require('./ruta');
+const { formulariosFijosDe } = require('./formularios');
 
 function fechaISO(valor) {
     if (!valor) return null;
@@ -62,6 +63,9 @@ async function sincronizarSerie(pool, plantilla) {
         return;
     }
     const deseadas = new Set(fechasSiguientes(plantilla));
+    // Formularios de cada visita: los de la orden madre o, si no tiene, los fijos de la empresa.
+    let formularios = Array.isArray(plantilla.formularios) && plantilla.formularios.length ? plantilla.formularios : null;
+
     const hijos = await pool.query(
         `SELECT id, to_char(fecha_ocurrencia, 'YYYY-MM-DD') AS fecha, estado
          FROM ordenes WHERE orden_padre_id = $1`,
@@ -80,13 +84,16 @@ async function sincronizarSerie(pool, plantilla) {
     }
     for (const fecha of deseadas) {
         if (ya.has(fecha)) continue;
+        if (formularios === null) formularios = await formulariosFijosDe(pool, plantilla.empresa_id);
         await pool.query(
             `INSERT INTO ordenes (
                 tecnico_id, empresa_id, direccion_trabajo, descripcion_tarea, fecha_asignada, estado,
                 es_recurrente, recurrencia_valor, recurrencia_tipo, hora_ejecucion,
                 termina_condicion, termina_fecha, termina_repeticiones, orden_padre_id, fecha_ocurrencia,
-                lat, lng, formulario_id, puntos, email_cliente, whatsapp_cliente
-            ) VALUES ($1,$2,$3,$4,$5,'Pendiente', FALSE, $6,$7,$8,$9,$10,$11,$12,$5,$13,$14,$15,$16::jsonb,$17,$18)`,
+                lat, lng, formulario_id, puntos, email_cliente, whatsapp_cliente, hora_hasta, formularios
+            ) VALUES ($1,$2,$3,$4,$5,'Pendiente', FALSE, $6,$7,$8,$9,$10,$11,$12,$5,$13,$14,$15,
+                      -- Sin checklist propio, cada visita del mes arranca con las tareas fijas de la empresa.
+                      COALESCE($16::jsonb, (SELECT tareas_fijas FROM empresas WHERE id = $2)),$17,$18,$19,$20::jsonb)`,
             [
                 plantilla.tecnico_id,
                 plantilla.empresa_id,
@@ -106,17 +113,21 @@ async function sincronizarSerie(pool, plantilla) {
                 plantilla.puntos ? JSON.stringify(plantilla.puntos) : null,
                 plantilla.email_cliente,
                 plantilla.whatsapp_cliente,
+                plantilla.hora_hasta || null,
+                formularios && formularios.length ? JSON.stringify(formularios) : null,
             ]
         );
         dias.add(fecha);
     }
+    // Solo el contacto se copia siempre. El checklist y el horario de cada visita del mes se pueden
+    // cambiar a mano en esa orden, así que no se pisan.
     await pool.query(
         `UPDATE ordenes SET email_cliente = $2, whatsapp_cliente = $3
          WHERE orden_padre_id = $1 AND estado IN ('Pendiente', 'Por asignar')`,
         [plantilla.id, plantilla.email_cliente, plantilla.whatsapp_cliente]
     );
     for (const fecha of dias) {
-        await ordenarRecorrido(pool, plantilla.tecnico_id, fecha);
+        programarRecorrido(pool, plantilla.tecnico_id, fecha);
     }
 }
 

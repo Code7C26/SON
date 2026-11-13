@@ -130,6 +130,15 @@ function raizPublica(base) {
     return (process.env.PUBLIC_URL || base || 'http://localhost:3000').replace(/\/$/, '');
 }
 
+// El PDF se guarda en "pendientes" y, cuando se copia a la carpeta del cliente, pasa a "enviados".
+// La orden recuerda la primera ruta: si ya no está ahí, se busca en "enviados".
+function rutaDelInforme(ruta) {
+    if (!ruta) return null;
+    if (fs.existsSync(ruta)) return ruta;
+    const movida = ruta.replace(/([\\/])pendientes([\\/])/, '$1enviados$2');
+    return movida !== ruta && fs.existsSync(movida) ? movida : null;
+}
+
 function fechaLegible(iso) {
     const partes = String(iso || '').split('-');
     if (partes.length !== 3) return iso || '';
@@ -156,6 +165,13 @@ async function despuesDelInforme(pool, { ordenId, tecnicoId, cliente, inicio, fi
         );
 
         const datos = await leerAviso(pool, ordenId);
+        // El PDF queda enlazado a la orden siempre (lo usa el acceso del cliente), tenga o no correo.
+        if (datos && pdfPath && fs.existsSync(pdfPath)) {
+            await pool.query(
+                'UPDATE ordenes SET token_informe = COALESCE(token_informe, $1), informe_pdf = $2 WHERE id = $3',
+                [tokenNuevo(), pdfPath, ordenId]
+            );
+        }
         const email = datos && (datos.email_cliente || datos.email);
         if (!datos || !email) return { whatsapp: null };
         let encuesta = await pool.query('SELECT token FROM encuestas WHERE orden_id = $1', [ordenId]);
@@ -262,7 +278,9 @@ async function avisarLosQueEstanPorSalir(pool) {
            AND o.aviso_en IS NULL
            AND o.tecnico_id IS NOT NULL
            AND o.fecha_asignada BETWEEN $1::date AND $2::date
-           AND o.hora_ejecucion IS NOT NULL`,
+           AND o.hora_ejecucion IS NOT NULL
+           -- Con rango horario el técnico maneja su horario: el aviso sale cuando toca "Ir" en la app.
+           AND o.hora_hasta IS NULL`,
         [iso(desde), iso(hasta)]
     );
     for (const fila of filas.rows) {
@@ -279,41 +297,7 @@ async function avisarLosQueEstanPorSalir(pool) {
 }
 
 function registrarRutasCampo(app, { pool, usuarioDelPanel, soloTecnico, buscarOCrearEmpresa }) {
-    app.get('/api/formularios', usuarioDelPanel, async (req, res) => {
-        try {
-            const filas = await pool.query('SELECT id, nombre, puntos FROM formularios_visita WHERE activo = true ORDER BY nombre');
-            res.json(filas.rows);
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: 'No se pudieron leer los formularios' });
-        }
-    });
-
-    app.post('/api/formularios', usuarioDelPanel, async (req, res) => {
-        const nombre = String((req.body && req.body.nombre) || '').trim();
-        const puntos = puntosDe(req.body && req.body.puntos);
-        if (!nombre) return res.status(400).json({ error: 'Poné un nombre al formulario' });
-        if (!puntos.length) return res.status(400).json({ error: 'Agregá al menos un punto, uno por renglón' });
-        try {
-            const nuevo = await pool.query(
-                'INSERT INTO formularios_visita (nombre, puntos) VALUES ($1, $2::jsonb) RETURNING id, nombre, puntos',
-                [nombre.slice(0, 80), JSON.stringify(puntos)]
-            );
-            res.json(nuevo.rows[0]);
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: 'No se pudo guardar el formulario' });
-        }
-    });
-
-    app.delete('/api/formularios/:id', usuarioDelPanel, async (req, res) => {
-        try {
-            await pool.query('UPDATE formularios_visita SET activo = false WHERE id = $1', [req.params.id]);
-            res.json({ ok: true });
-        } catch (error) {
-            res.status(500).json({ error: 'No se pudo borrar el formulario' });
-        }
-    });
+    // Los formularios de control viven en src/formularios.js.
 
     app.post('/api/ordenes/pedir', soloTecnico, async (req, res) => {
         const nombre = String((req.body && req.body.nombre_cliente) || '').trim();
@@ -341,7 +325,7 @@ function registrarRutasCampo(app, { pool, usuarioDelPanel, soloTecnico, buscarOC
         if (!tokenValido(req.params.token)) return res.status(404).type('html').send(pagina('SON', '<h1>Este enlace no existe</h1>'));
         try {
             const fila = await pool.query('SELECT informe_pdf FROM ordenes WHERE token_informe = $1', [req.params.token]);
-            const ruta = fila.rows[0] && fila.rows[0].informe_pdf;
+            const ruta = rutaDelInforme(fila.rows[0] && fila.rows[0].informe_pdf);
             const segura = ruta && !ruta.includes('..') && path.resolve(ruta).toLowerCase().endsWith('.pdf') && fs.existsSync(ruta);
             if (!segura) return res.status(404).type('html').send(pagina('SON', '<h1>El informe todavía no está</h1>'));
             res.download(path.resolve(ruta), 'Informe.pdf');
@@ -478,4 +462,7 @@ function registrarRutasCampo(app, { pool, usuarioDelPanel, soloTecnico, buscarOC
     });
 }
 
-module.exports = { registrarRutasCampo, despuesDelInforme, diaValido, puntosDe, contactoDe, avisarInicio, avisarLosQueEstanPorSalir, esHoraDeAvisar, numeroWhatsapp, listadoTareas };
+module.exports = {
+    registrarRutasCampo, despuesDelInforme, diaValido, puntosDe, contactoDe, avisarInicio, avisarLosQueEstanPorSalir,
+    esHoraDeAvisar, numeroWhatsapp, listadoTareas, pagina, escapar, tokenNuevo, tokenValido, rutaDelInforme, raizPublica,
+};

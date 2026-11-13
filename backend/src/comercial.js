@@ -2,7 +2,9 @@
 // Las rutas viven acá aparte para que index.js no siga creciendo.
 const { emailValido } = require('./auth');
 
-const ESTADOS_SOLICITUD = ['Nueva', 'En presupuesto', 'Presupuestada', 'Descartada'];
+// "Enviada" y "Aprobada" sirven para lo que se presupuesta por fuera del presupuestador (por WhatsApp o
+// mail): así el técnico igual ve en qué quedó. Si la nota está en un presupuesto, manda el de ese presupuesto.
+const ESTADOS_SOLICITUD = ['Nueva', 'En presupuesto', 'Presupuestada', 'Enviada', 'Aprobada', 'Descartada'];
 const ESTADOS_ABIERTOS = ['Nueva', 'En presupuesto'];
 const MAX_FOTO_BYTES = 4 * 1024 * 1024;
 const MAX_DESCRIPCION = 500;

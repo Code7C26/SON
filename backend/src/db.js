@@ -45,6 +45,16 @@ async function prepararEsquema() {
             creado_en TIMESTAMPTZ NOT NULL DEFAULT now(),
             visto_en TIMESTAMPTZ
         );
+        CREATE TABLE IF NOT EXISTS solicitudes_contacto (
+            id SERIAL PRIMARY KEY,
+            nombre TEXT NOT NULL,
+            empresa TEXT NOT NULL,
+            telefono TEXT NOT NULL,
+            tecnicos INTEGER NOT NULL,
+            email TEXT,
+            creada_en TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        ALTER TABLE solicitudes_contacto ADD COLUMN IF NOT EXISTS email TEXT;
 
         -- Tipo de usuario del panel: 'comercial' es la dueña (ve todo) y 'admin' es Administración
         -- (técnicos superiores: solo el área técnica). Las cuentas anteriores quedan como 'admin' y
@@ -147,6 +157,97 @@ async function prepararEsquema() {
     `);
     await marcarEncuestasViejasComoEnviadas();
     await prepararEsquemaDelPresupuestador();
+    await prepararEsquemaDeCampo();
+}
+
+// Lo que pidieron los técnicos en la reunión de noviembre de 2026.
+async function prepararEsquemaDeCampo() {
+    await pool.query(`
+        -- Perfil del técnico: desde dónde sale (para ordenar el recorrido), matrícula y la imagen de
+        -- su firma con sello, que va sola en cada informe (el técnico ya no firma en el celular).
+        ALTER TABLE tecnicos ADD COLUMN IF NOT EXISTS salida_direccion TEXT;
+        ALTER TABLE tecnicos ADD COLUMN IF NOT EXISTS matricula TEXT;
+        ALTER TABLE tecnicos ADD COLUMN IF NOT EXISTS firma_sello TEXT;
+
+        -- Las visitas son en un rango horario (de hora_ejecucion a hora_hasta): el técnico maneja su horario.
+        ALTER TABLE ordenes ADD COLUMN IF NOT EXISTS hora_hasta TIME;
+
+        -- Tareas que cada empresa tiene que cumplir siempre: se cargan solas en cada orden nueva.
+        ALTER TABLE empresas ADD COLUMN IF NOT EXISTS tareas_fijas JSONB;
+
+        -- Acceso del cliente a sus informes (un enlace privado que se puede activar y cortar).
+        ALTER TABLE empresas ADD COLUMN IF NOT EXISTS portal_token TEXT;
+        ALTER TABLE empresas ADD COLUMN IF NOT EXISTS portal_activo BOOLEAN NOT NULL DEFAULT false;
+        CREATE UNIQUE INDEX IF NOT EXISTS empresas_portal_token_idx ON empresas (portal_token) WHERE portal_token IS NOT NULL;
+
+        -- Kilometraje y gastos que carga el técnico (combustible, peajes...) para Administración.
+        CREATE TABLE IF NOT EXISTS gastos (
+            id SERIAL PRIMARY KEY,
+            id_cliente TEXT UNIQUE,
+            orden_id INTEGER REFERENCES ordenes(id) ON DELETE SET NULL,
+            tecnico_id INTEGER REFERENCES tecnicos(id) ON DELETE SET NULL,
+            tecnico_nombre TEXT,
+            empresa_nombre TEXT,
+            vehiculo TEXT,
+            km_inicio INTEGER,
+            km_fin INTEGER,
+            tipo TEXT NOT NULL DEFAULT 'Otro',
+            monto NUMERIC(14, 2),
+            descripcion TEXT,
+            foto BYTEA,
+            foto_tipo TEXT,
+            revisado BOOLEAN NOT NULL DEFAULT false,
+            creado_en TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS gastos_creado_idx ON gastos (creado_en DESC);
+
+        -- Vencimientos (extintores, mediciones, habilitaciones...): avisan antes de que se venzan.
+        CREATE TABLE IF NOT EXISTS vencimientos (
+            id SERIAL PRIMARY KEY,
+            id_cliente TEXT UNIQUE,
+            empresa_id INTEGER REFERENCES empresas(id) ON DELETE SET NULL,
+            empresa_nombre TEXT,
+            orden_id INTEGER REFERENCES ordenes(id) ON DELETE SET NULL,
+            tecnico_id INTEGER REFERENCES tecnicos(id) ON DELETE SET NULL,
+            descripcion TEXT NOT NULL,
+            cantidad INTEGER NOT NULL DEFAULT 1,
+            vence DATE NOT NULL,
+            resuelto BOOLEAN NOT NULL DEFAULT false,
+            avisado_en TIMESTAMPTZ,
+            creado_por TEXT,
+            creado_en TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS vencimientos_vence_idx ON vencimientos (vence) WHERE resuelto = false;
+
+        -- CRM comercial: tipo de cliente (define cada cuántos días hay que contactarlo), bitácora de
+        -- contactos con pendientes, y por qué se perdió un presupuesto.
+        ALTER TABLE empresas ADD COLUMN IF NOT EXISTS tipo_cliente TEXT;
+        ALTER TABLE presupuestos ADD COLUMN IF NOT EXISTS razon_perdida TEXT;
+        ALTER TABLE presupuestos ADD COLUMN IF NOT EXISTS servicio TEXT;
+        CREATE TABLE IF NOT EXISTS crm_notas (
+            id SERIAL PRIMARY KEY,
+            empresa_id INTEGER NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,
+            fecha DATE NOT NULL DEFAULT CURRENT_DATE,
+            tipo TEXT NOT NULL DEFAULT 'Llamada',
+            texto TEXT,
+            pendiente TEXT,
+            pendiente_fecha DATE,
+            pendiente_responsable TEXT,
+            pendiente_hecho BOOLEAN NOT NULL DEFAULT false,
+            autor TEXT,
+            creada_en TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS crm_notas_empresa_idx ON crm_notas (empresa_id, fecha DESC);
+
+        -- Formularios de control digitales (convertidos desde el Excel que ya usaban).
+        ALTER TABLE formularios_visita ADD COLUMN IF NOT EXISTS definicion JSONB;
+        ALTER TABLE formularios_visita ADD COLUMN IF NOT EXISTS archivo TEXT;
+        -- Los formularios de cada orden (copia al armarla) y lo que completó el técnico.
+        ALTER TABLE ordenes ADD COLUMN IF NOT EXISTS formularios JSONB;
+        ALTER TABLE ordenes ADD COLUMN IF NOT EXISTS formularios_cierre JSONB;
+        -- Formularios que una empresa lleva siempre (se cargan solos en cada orden nueva).
+        ALTER TABLE empresas ADD COLUMN IF NOT EXISTS formularios_fijos JSONB;
+    `);
 }
 
 // Las encuestas viejas se crearon al mandar el mail, antes de guardar la hora de envío.

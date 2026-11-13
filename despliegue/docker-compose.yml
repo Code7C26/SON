@@ -48,16 +48,60 @@ services:
     volumes:
       - ./datos/storage:/datos/storage
 
+  # Crea la base de la demostración en el Postgres que ya existe (no toca sima_db).
+  preparar-demo:
+    image: postgres:17-alpine
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: ${DB_PASSWORD}
+    entrypoint: ["sh", "-c"]
+    command:
+      - "psql -h db -U sima -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname = 'son_vacia'\" | grep -q 1 || psql -h db -U sima -d postgres -c \"CREATE DATABASE son_vacia\""
+
+  # El panel que se abre desde «Solicitar una demostración». Arranca vacío.
+  demo:
+    build: ./app
+    restart: unless-stopped
+    depends_on:
+      preparar-demo:
+        condition: service_completed_successfully
+    environment:
+      PORT: "3000"
+      BASE_VACIA: "1"
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_USER: sima
+      DB_NAME: son_vacia
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${DEMO_JWT_SECRET}
+      ADMIN_EMAIL: ${DEMO_ADMIN_EMAIL:-demo@sonoperation.com}
+      ADMIN_PASSWORD: ${DEMO_ADMIN_PASSWORD:-conocer-son}
+      ADMIN_NOMBRE: ${DEMO_ADMIN_NOMBRE:-Demostración}
+      PUBLIC_URL: https://${DEMO_DOMINIO:-demo.sonoperation.com}
+      ENTREGA_MODO: carpeta
+      INFORMES_DIR: /datos/clientes
+      STORAGE_DIR: /datos/storage
+      PANEL_DIR: /app/panel
+      TECNICO_DIR: /app/tecnico
+      DESCARGAS_DIR: /app/descargas
+    volumes:
+      - ./datos/demo:/datos
+
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
     depends_on:
       - app
+      - demo
     ports:
       - "80:80"
       - "443:443"
     environment:
       DOMINIO: ${DOMINIO}
+      DEMO_DOMINIO: ${DEMO_DOMINIO:-demo.sonoperation.com}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./datos/caddy:/data

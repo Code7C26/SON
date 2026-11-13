@@ -15,3 +15,14 @@ www.{$DOMINIO} {
 		header_up Cf-Connecting-Ip {remote_host}
 	}
 }
+
+# Base vacía para mostrar el producto. Misma máquina, otra dirección, otra base.
+{$DEMO_DOMINIO} {
+	encode gzip
+	request_body {
+		max_size 60MB
+	}
+	reverse_proxy demo:3000 {
+		header_up Cf-Connecting-Ip {remote_host}
+	}
+}

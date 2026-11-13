@@ -81,11 +81,47 @@ async function guardarClave(consulta, clave, valor) {
     );
 }
 
+// Base que se entrega a otra empresa: mismos campos, sin la marca ni el tarifario de SIMA.
+// La empresa los completa desde el panel (Precios > Parámetros y Tarifario).
+const CONFIG_VACIA = {
+    margen_minimo: 0.2,
+    margen_ideal: 0.35,
+    iva: 0.21,
+    proximo_numero: 1,
+    valor_modulo: 0,
+    empresa: {
+        titulo: '',
+        razon_social: '',
+        cuit: '',
+        direccion: '',
+        telefonos: '',
+        iva: '',
+        celular: '',
+        email: '',
+        web: '',
+    },
+    firma: { nombre: '', cargo: '', empresa: '' },
+    textos: { codigo_formulario: '', forma_pago: '', plazo_entrega: '', validez: '' },
+};
+
+function baseVacia() {
+    return ['1', 'true', 'si', 'sí'].includes(String(process.env.BASE_VACIA || '').trim().toLowerCase());
+}
+
 // Al arrancar: deja los valores de partida de la configuración y, la primera vez, carga el tarifario
 // del archivo assets/tarifario/ciec_2026.json (después ya no se toca: lo que se edite en el panel queda).
+// Con BASE_VACIA no se carga ese tarifario: la empresa empieza sin precios cargados.
 async function sembrarComercial(pool) {
-    for (const [clave, valor] of Object.entries(CONFIG_POR_DEFECTO)) {
+    const config = baseVacia() ? CONFIG_VACIA : CONFIG_POR_DEFECTO;
+    for (const [clave, valor] of Object.entries(config)) {
         await pool.query('INSERT INTO configuracion_comercial (clave, valor) VALUES ($1, $2) ON CONFLICT (clave) DO NOTHING', [clave, JSON.stringify(valor)]);
+    }
+    if (baseVacia()) {
+        await pool.query(
+            'INSERT INTO configuracion_comercial (clave, valor) VALUES ($1, $2) ON CONFLICT (clave) DO NOTHING',
+            ['tarifario_sembrado', JSON.stringify(true)]
+        );
+        return;
     }
     const yaSembrado = await pool.query("SELECT 1 FROM configuracion_comercial WHERE clave = 'tarifario_sembrado'");
     if (yaSembrado.rowCount) return;

@@ -382,6 +382,8 @@ function presentarEncabezado(fila) {
         fechaLimite: fila.fecha_limite,
         facturado: fila.facturado === true,
         notaSeguimiento: fila.nota_seguimiento,
+        servicio: fila.servicio,
+        razonPerdida: fila.razon_perdida,
         creadoPor: fila.creado_por,
         creadoEn: fila.creado_en,
         actualizadoEn: fila.actualizado_en,
@@ -391,7 +393,7 @@ function presentarEncabezado(fila) {
 const COLUMNAS_PRESUPUESTO = `id, numero, version, empresa_id, cliente, to_char(fecha, 'YYYY-MM-DD') AS fecha, mes_referencia, estado,
     bonificacion, iva, forma_pago, plazo_entrega, validez, referencia, observaciones, to_char(fecha_envio, 'YYYY-MM-DD') AS fecha_envio,
     prioridad, responsable, to_char(fecha_limite, 'YYYY-MM-DD') AS fecha_limite, facturado, nota_seguimiento,
-    creado_por, creado_en, actualizado_en`;
+    servicio, razon_perdida, creado_por, creado_en, actualizado_en`;
 
 async function leerPresupuesto(consulta, id) {
     const cabecera = await consulta.query(`SELECT ${COLUMNAS_PRESUPUESTO} FROM presupuestos WHERE id = $1`, [id]);
@@ -481,7 +483,7 @@ function registrarRutasPresupuestos(app, { pool, soloComercial }) {
             const donde = condiciones.length ? `WHERE ${condiciones.join(' AND ')}` : '';
             const filas = await pool.query(
                 `SELECT p.id, p.numero, p.version, p.empresa_id, p.cliente, to_char(p.fecha, 'YYYY-MM-DD') AS fecha, p.estado, p.bonificacion, p.iva,
-                        p.prioridad, p.responsable, to_char(p.fecha_limite, 'YYYY-MM-DD') AS fecha_limite, p.facturado, p.nota_seguimiento,
+                        p.prioridad, p.responsable, to_char(p.fecha_limite, 'YYYY-MM-DD') AS fecha_limite, p.facturado, p.nota_seguimiento, p.servicio, p.razon_perdida,
                         to_char(p.fecha_envio, 'YYYY-MM-DD') AS fecha_envio, p.creado_por, p.actualizado_en,
                         (SELECT COUNT(*)::int FROM presupuestos v WHERE v.numero = p.numero) AS cantidad_versiones
                  FROM presupuestos p ${donde} ORDER BY p.numero DESC, p.version DESC`,
@@ -521,6 +523,8 @@ function registrarRutasPresupuestos(app, { pool, soloComercial }) {
                     fechaEnvio: fila.fecha_envio,
                     facturado: fila.facturado === true,
                     notaSeguimiento: fila.nota_seguimiento,
+                    servicio: fila.servicio,
+                    razonPerdida: fila.razon_perdida,
                     creadoPor: fila.creado_por,
                     actualizadoEn: fila.actualizado_en,
                 };
@@ -777,6 +781,9 @@ function registrarRutasPresupuestos(app, { pool, soloComercial }) {
             if (fechaLimite !== undefined) poner('fecha_limite', fechaLimite);
             if (cuerpo.facturado !== undefined) poner('facturado', booleano(cuerpo.facturado, false));
             if (cuerpo.notaSeguimiento !== undefined) poner('nota_seguimiento', nota.texto);
+            // Del CRM: qué servicio es (para medir la conversión) y por qué se perdió.
+            if (cuerpo.servicio !== undefined) poner('servicio', String(cuerpo.servicio ?? '').trim().slice(0, 120) || null);
+            if (cuerpo.razonPerdida !== undefined) poner('razon_perdida', String(cuerpo.razonPerdida ?? '').trim().slice(0, 120) || null);
             if (!sets.length) {
                 await cliente.query('ROLLBACK');
                 return res.status(400).json({ error: 'No hay nada para cambiar' });
@@ -844,10 +851,10 @@ function registrarRutasPresupuestos(app, { pool, soloComercial }) {
             const nuevo = await cliente.query(
                 `INSERT INTO presupuestos (numero, version, empresa_id, cliente, fecha, mes_referencia, bonificacion, iva,
                                            forma_pago, plazo_entrega, validez, referencia, observaciones, creado_por,
-                                           prioridad, responsable, fecha_limite, nota_seguimiento)
-                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) RETURNING id`,
+                                           prioridad, responsable, fecha_limite, nota_seguimiento, servicio)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19) RETURNING id`,
                 [f.numero, f.version + 1, f.empresa_id, JSON.stringify(f.cliente), hoy, mes, f.bonificacion, f.iva, f.forma_pago, f.plazo_entrega, f.validez, f.referencia, f.observaciones, quien,
-                    f.prioridad || 'media', f.responsable, f.fecha_limite, f.nota_seguimiento]
+                    f.prioridad || 'media', f.responsable, f.fecha_limite, f.nota_seguimiento, f.servicio]
             );
             const nuevoId = nuevo.rows[0].id;
             await guardarItems(cliente, nuevoId, items.map((item, i) => ({

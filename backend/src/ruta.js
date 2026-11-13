@@ -223,7 +223,24 @@ async function ordenPorCalles(puntos, salida) {
     }
 }
 
-async function ordenarRecorrido(pool, tecnicoId, fecha) {
+// Desde dónde arranca el técnico: la ubicación que mandó el celular (si se pasa), si no la dirección
+// de salida cargada en su perfil (cada uno sale de su casa: Alta Gracia, Villa María...), y si no la base.
+async function puntoDeSalida(pool, tecnicoId, desde) {
+    if (desde && Number.isFinite(Number(desde.lat)) && Number.isFinite(Number(desde.lng))) {
+        return { lat: Number(desde.lat), lng: Number(desde.lng) };
+    }
+    const perfil = await pool.query('SELECT salida_direccion FROM tecnicos WHERE id = $1', [tecnicoId]);
+    const direccion = perfil.rows[0] && String(perfil.rows[0].salida_direccion || '').trim();
+    if (direccion) {
+        const base = await ubicar(pool, BASE);
+        const propia = await ubicar(pool, direccion, base);
+        if (propia) return propia;
+    }
+    return ubicar(pool, BASE);
+}
+
+// Ordena las visitas pendientes de un día. "desde" es opcional: { lat, lng } de donde está el técnico ahora.
+async function ordenarRecorrido(pool, tecnicoId, fecha, desde = null) {
     const dia = typeof fecha === 'string' ? fecha.slice(0, 10) : null;
     const id = Number(tecnicoId);
     if (!Number.isInteger(id) || !/^\d{4}-\d{2}-\d{2}$/.test(dia || '')) return;
@@ -234,7 +251,7 @@ async function ordenarRecorrido(pool, tecnicoId, fecha) {
              ORDER BY id`,
             [id, dia]
         );
-        const salida = await ubicar(pool, BASE);
+        const salida = await puntoDeSalida(pool, id, desde);
         const ubicadas = [];
         for (const orden of ordenes.rows) {
             const punto = await ubicar(pool, orden.direccion_trabajo, salida);
@@ -254,4 +271,31 @@ async function ordenarRecorrido(pool, tecnicoId, fecha) {
     }
 }
 
-module.exports = { normalizarDireccion, mejorRecorrido, mejorDesdeSalida, elegirLugar, ordenDesdeViaje, ordenarRecorrido };
+// Ordenar un recorrido tarda unos segundos (busca las direcciones en el mapa). Para no hacer esperar
+// al que guarda la orden, se anota y se hace en segundo plano, de a uno y sin repetir el mismo día.
+const recorridosPendientes = new Map(); // "tecnico|dia" -> { pool, tecnicoId, fecha }
+let ordenandoEnFondo = false;
+
+async function vaciarCola() {
+    if (ordenandoEnFondo) return;
+    ordenandoEnFondo = true;
+    try {
+        while (recorridosPendientes.size) {
+            const [clave, tarea] = recorridosPendientes.entries().next().value;
+            recorridosPendientes.delete(clave);
+            await ordenarRecorrido(tarea.pool, tarea.tecnicoId, tarea.fecha);
+        }
+    } finally {
+        ordenandoEnFondo = false;
+    }
+}
+
+function programarRecorrido(pool, tecnicoId, fecha) {
+    const dia = typeof fecha === 'string' ? fecha.slice(0, 10) : null;
+    const id = Number(tecnicoId);
+    if (!Number.isInteger(id) || !/^\d{4}-\d{2}-\d{2}$/.test(dia || '')) return;
+    recorridosPendientes.set(`${id}|${dia}`, { pool, tecnicoId: id, fecha: dia });
+    setImmediate(() => vaciarCola().catch((error) => console.error('Recorrido en segundo plano:', error.message)));
+}
+
+module.exports = { normalizarDireccion, mejorRecorrido, mejorDesdeSalida, elegirLugar, ordenDesdeViaje, ordenarRecorrido, programarRecorrido };

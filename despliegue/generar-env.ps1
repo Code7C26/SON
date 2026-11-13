@@ -23,6 +23,11 @@ JWT_SECRET=$(Clave-Azar 64)
 ADMIN_EMAIL=$EmailAdmin
 ADMIN_PASSWORD=$passAdmin
 ADMIN_NOMBRE=$NombreAdmin
+DEMO_DOMINIO=demo.$Dominio
+DEMO_JWT_SECRET=$(Clave-Azar 64)
+DEMO_ADMIN_EMAIL=demo@sonoperation.com
+DEMO_ADMIN_PASSWORD=conocer-son
+DEMO_ADMIN_NOMBRE=Demostración
 "@
 [IO.File]::WriteAllText($destino, $contenido + "`n", (New-Object Text.UTF8Encoding $false))
 Write-Host "Listo: $destino"

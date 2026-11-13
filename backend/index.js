@@ -26,8 +26,13 @@ const { registrarRutasComercial, carpetaDeEmpresa } = require('./src/comercial')
 const { registrarRutasTarifario, sembrarComercial } = require('./src/tarifario');
 const { registrarRutasPresupuestos } = require('./src/presupuestos');
 const { programarSincronizacionIPC } = require('./src/ipc');
-const { registrarRutasCampo, despuesDelInforme, diaValido, puntosDe, contactoDe, avisarLosQueEstanPorSalir } = require('./src/campo');
-const { ordenarRecorrido } = require('./src/ruta');
+const { registrarRutasCampo, despuesDelInforme, diaValido, puntosDe, contactoDe, avisarLosQueEstanPorSalir, avisarInicio } = require('./src/campo');
+const { registrarRutasOperacion, avisarVencimientos } = require('./src/operacion');
+const { registrarRutasCrm } = require('./src/crm');
+const {
+    registrarRutasFormularios, copiaDeFormularios, formulariosFijosDe, normalizarRespuestas, vencimientosDe,
+} = require('./src/formularios');
+const { ordenarRecorrido, programarRecorrido } = require('./src/ruta');
 const { consultarAnalisis, crearPresupuestoDesdeComentario, normalizarChecklist } = require('./src/analisis');
 
 const app = express();
@@ -220,6 +225,61 @@ async function checklistDe(cuerpo) {
     return leerFormulario(cuerpo.formulario_id);
 }
 
+// Si la orden no trae checklist, se cargan solas las tareas fijas de la empresa (las que se hacen siempre).
+async function tareasFijasDe(empresaId) {
+    if (!empresaId) return null;
+    const fila = await pool.query('SELECT tareas_fijas FROM empresas WHERE id = $1', [empresaId]);
+    const tareas = fila.rows[0] && fila.rows[0].tareas_fijas;
+    return Array.isArray(tareas) && tareas.length ? JSON.stringify(puntosDe(tareas)) : null;
+}
+
+// "Guardar como fijos de la empresa": el checklist y los formularios de esta orden pasan a ser los
+// de todos los meses.
+async function guardarTareasFijas(empresaId, puntos, formularios) {
+    if (!empresaId) return;
+    const lista = puntosDe(puntos);
+    await pool.query('UPDATE empresas SET tareas_fijas = $1::jsonb WHERE id = $2', [lista.length ? JSON.stringify(lista) : null, empresaId]);
+    if (Array.isArray(formularios)) {
+        const ids = [...new Set(formularios.map(Number).filter((n) => Number.isInteger(n) && n > 0))];
+        await pool.query('UPDATE empresas SET formularios_fijos = $1::jsonb WHERE id = $2', [ids.length ? JSON.stringify(ids) : null, empresaId]);
+    }
+}
+
+// Rango horario de la visita: "08:00" a "12:00". Vacío = sin límite.
+function horaValida(valor) {
+    const texto = String(valor || '').trim();
+    const partes = texto.match(/^(\d{1,2}):(\d{2})/);
+    if (!partes) return null;
+    const horas = Number(partes[1]);
+    const minutos = Number(partes[2]);
+    if (horas > 23 || minutos > 59) return null;
+    return `${String(horas).padStart(2, '0')}:${partes[2]}`;
+}
+
+// La firma con sello del técnico: una imagen PNG o JPG chica (se guarda tal cual, como data URL).
+const MAX_FIRMA_BYTES = 1.5 * 1024 * 1024;
+function leerFirmaSello(valor) {
+    if (valor === undefined) return { sinCambio: true };
+    if (valor === null || valor === '') return { firma: null };
+    const texto = String(valor);
+    const partes = texto.match(/^data:image\/(png|jpeg);base64,([A-Za-z0-9+/=]+)$/);
+    if (!partes) return { error: 'La firma tiene que ser una imagen PNG o JPG' };
+    const bytes = Buffer.from(partes[2], 'base64');
+    if (!bytes.length || bytes.length > MAX_FIRMA_BYTES) return { error: 'La imagen de la firma es muy grande (máximo 1,5 MB)' };
+    const esPng = bytes.subarray(0, 4).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47]));
+    const esJpg = bytes[0] === 0xff && bytes[1] === 0xd8;
+    if (!esPng && !esJpg) return { error: 'La firma tiene que ser una imagen PNG o JPG' };
+    return { firma: texto };
+}
+
+function perfilTecnico(cuerpo) {
+    const salida = String(cuerpo.salida_direccion ?? '').trim().slice(0, 255) || null;
+    const matricula = String(cuerpo.matricula ?? '').trim().slice(0, 60) || null;
+    const firma = leerFirmaSello(cuerpo.firma_sello);
+    if (firma.error) return { error: firma.error };
+    return { salida, matricula, firma };
+}
+
 // Valida y normaliza los datos de una cuenta (administrador o técnico).
 function limpiarCuenta(cuerpo, { passwordObligatoria }) {
     const nombre = String(cuerpo.nombre || '').trim();
@@ -369,6 +429,12 @@ registrarRutasCampo(app, { pool, usuarioDelPanel, soloTecnico, buscarOCrearEmpre
 // Presupuestador (solo Comercial): inflación, tarifario, costos, parámetros y presupuestos.
 registrarRutasTarifario(app, { pool, soloComercial });
 registrarRutasPresupuestos(app, { pool, soloComercial });
+// Gastos de vehículo, vencimientos, estado de los presupuestos para el técnico y acceso de clientes.
+registrarRutasOperacion(app, { pool, usuarioDelPanel, soloTecnico, soloComercial });
+// CRM comercial: bitácora de contactos, pendientes y conversión.
+registrarRutasCrm(app, { pool, soloComercial });
+// Formularios de control: se importan del Excel, se eligen en la orden y los completa el técnico.
+registrarRutasFormularios(app, { pool, usuarioDelPanel });
 
 app.post('/api/tecnicos/login', limitarLogin, async (req, res) => {
     const email = (req.body.email || '').trim();
@@ -401,7 +467,9 @@ app.post('/api/tecnicos/login', limitarLogin, async (req, res) => {
 app.get('/api/tecnicos', usuarioDelPanel, async (req, res) => {
     try {
         const resultado = await pool.query(
-            'SELECT id, nombre, email, activo, lat, lng, ubicacion_en FROM tecnicos ORDER BY id ASC'
+            `SELECT id, nombre, email, activo, lat, lng, ubicacion_en, salida_direccion, matricula,
+                    (firma_sello IS NOT NULL) AS tiene_firma
+             FROM tecnicos ORDER BY id ASC`
         );
         res.json(resultado.rows);
     } catch (error) {
@@ -409,14 +477,43 @@ app.get('/api/tecnicos', usuarioDelPanel, async (req, res) => {
     }
 });
 
+// La imagen de firma y sello de un técnico (el panel la muestra al editarlo).
+app.get('/api/tecnicos/:id/firma', usuarioDelPanel, async (req, res) => {
+    try {
+        const fila = await pool.query('SELECT firma_sello FROM tecnicos WHERE id = $1', [Number(req.params.id)]);
+        res.json({ firma_sello: fila.rows[0] ? fila.rows[0].firma_sello : null });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'No se pudo leer la firma' });
+    }
+});
+
+// Lo que la app del técnico necesita saber de su propio perfil.
+app.get('/api/tecnicos/yo', soloTecnico, async (req, res) => {
+    try {
+        const fila = await pool.query(
+            'SELECT id, nombre, email, matricula, salida_direccion, (firma_sello IS NOT NULL) AS tiene_firma FROM tecnicos WHERE id = $1',
+            [req.usuario.id]
+        );
+        if (!fila.rows[0]) return res.status(404).json({ error: 'Ese técnico no existe' });
+        res.json(fila.rows[0]);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'No se pudo leer el perfil' });
+    }
+});
+
 app.post('/api/tecnicos', usuarioDelPanel, async (req, res) => {
     const cuenta = limpiarCuenta(req.body, { passwordObligatoria: true });
     if (cuenta.error) return res.status(400).json({ error: cuenta.error });
+    const perfil = perfilTecnico(req.body);
+    if (perfil.error) return res.status(400).json({ error: perfil.error });
     try {
         const hash = await bcrypt.hash(cuenta.password, 10);
         const resultado = await pool.query(
-            'INSERT INTO tecnicos (nombre, email, password) VALUES ($1, $2, $3) RETURNING id, nombre, email',
-            [cuenta.nombre, cuenta.email, hash]
+            `INSERT INTO tecnicos (nombre, email, password, salida_direccion, matricula, firma_sello)
+             VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, nombre, email`,
+            [cuenta.nombre, cuenta.email, hash, perfil.salida, perfil.matricula, perfil.firma.sinCambio ? null : perfil.firma.firma]
         );
         res.json(resultado.rows[0]);
     } catch (error) {
@@ -427,6 +524,8 @@ app.post('/api/tecnicos', usuarioDelPanel, async (req, res) => {
 app.put('/api/tecnicos/:id', usuarioDelPanel, async (req, res) => {
     const cuenta = limpiarCuenta(req.body, { passwordObligatoria: false });
     if (cuenta.error) return res.status(400).json({ error: cuenta.error });
+    const perfil = perfilTecnico(req.body);
+    if (perfil.error) return res.status(400).json({ error: perfil.error });
     try {
         if (cuenta.password) {
             const hash = await bcrypt.hash(cuenta.password, 10);
@@ -437,6 +536,10 @@ app.put('/api/tecnicos/:id', usuarioDelPanel, async (req, res) => {
         } else {
             await pool.query('UPDATE tecnicos SET nombre = $1, email = $2 WHERE id = $3', [cuenta.nombre, cuenta.email, req.params.id]);
         }
+        // Los datos del perfil solo cambian si vienen en el pedido (así un panel viejo no los borra).
+        if (req.body.salida_direccion !== undefined) await pool.query('UPDATE tecnicos SET salida_direccion = $1 WHERE id = $2', [perfil.salida, req.params.id]);
+        if (req.body.matricula !== undefined) await pool.query('UPDATE tecnicos SET matricula = $1 WHERE id = $2', [perfil.matricula, req.params.id]);
+        if (!perfil.firma.sinCambio) await pool.query('UPDATE tecnicos SET firma_sello = $1 WHERE id = $2', [perfil.firma.firma, req.params.id]);
         const actualizado = await pool.query('SELECT id, nombre, email, activo FROM tecnicos WHERE id = $1', [req.params.id]);
         if (!actualizado.rows[0]) return res.status(404).json({ error: 'Ese técnico no existe' });
         res.json(actualizado.rows[0]);
@@ -523,11 +626,14 @@ app.get('/api/ordenes/tecnico/:id', soloTecnico, async (req, res) => {
                    o.descripcion_tarea AS tarea,
                    o.estado,
                    o.puntos,
+                   o.formularios,
                    o.lat,
                    o.lng,
                    o.orden_ruta,
                    o.whatsapp_cliente AS whatsapp,
-                   o.hora_ejecucion AS hora,
+                   to_char(o.hora_ejecucion, 'HH24:MI') AS hora,
+                   to_char(o.hora_hasta, 'HH24:MI') AS hora_hasta,
+                   o.empresa_id,
                    to_char(o.fecha_asignada, 'DD/MM/YYYY') AS fecha,
                    to_char(o.fecha_asignada, 'YYYY-MM-DD') AS fecha_iso,
                    e.razon_social AS cliente
@@ -548,37 +654,109 @@ app.get('/api/ordenes/tecnico/:id', soloTecnico, async (req, res) => {
     }
 });
 
+// El técnico abre la lista de órdenes o toca "Recorrido de hoy": las visitas de hoy se ordenan por
+// cercanía desde donde está parado (no desde la oficina). Devuelve el orden nuevo.
+app.post('/api/ordenes/recorrido', soloTecnico, async (req, res) => {
+    const lat = Number(req.body && req.body.lat);
+    const lng = Number(req.body && req.body.lng);
+    const desde = Number.isFinite(lat) && Number.isFinite(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 ? { lat, lng } : null;
+    const ahora = new Date();
+    const hoy = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
+    const dia = diaValido(req.body && req.body.fecha) || hoy;
+    try {
+        await ordenarRecorrido(pool, req.usuario.id, dia, desde);
+        const orden = await pool.query(
+            `SELECT id, orden_ruta, lat, lng FROM ordenes
+             WHERE tecnico_id = $1 AND fecha_asignada = $2::date AND estado <> 'Completada'
+             ORDER BY orden_ruta ASC NULLS LAST, id`,
+            [req.usuario.id, dia]
+        );
+        res.json({ fecha: dia, desde, ordenes: orden.rows });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'No se pudo ordenar el recorrido' });
+    }
+});
+
+// El técnico sale hacia la visita (tocó "Ir"): si la orden tiene rango horario, el aviso "está en
+// camino" sale ahora y no a una hora fija. Se manda una sola vez por orden.
+app.post('/api/ordenes/:id/en-camino', soloTecnico, async (req, res) => {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) return res.status(400).json({ error: 'Orden inválida' });
+    try {
+        const orden = await pool.query('SELECT tecnico_id, aviso_en FROM ordenes WHERE id = $1', [id]);
+        if (!orden.rows[0] || orden.rows[0].tecnico_id !== req.usuario.id) return res.status(403).json({ error: 'Esta orden no es tuya' });
+        if (orden.rows[0].aviso_en) return res.json({ ok: true, yaAvisado: true });
+        const aviso = await avisarInicio(pool, id, { forzar: false });
+        res.json({ ok: true, enviado: Boolean(aviso && aviso.correo && aviso.correo.enviado) });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'No se pudo avisar al cliente' });
+    }
+});
+
+// Tareas fijas de una empresa (el formulario de órdenes las precarga al elegir el cliente).
+app.get('/api/clientes/tareas', usuarioDelPanel, async (req, res) => {
+    const nombre = String(req.query.nombre || '').trim();
+    if (!nombre) return res.json({ tareas: [] });
+    try {
+        const fila = await pool.query(
+            'SELECT tareas_fijas, formularios_fijos, direccion_principal, email FROM empresas WHERE lower(btrim(razon_social)) = lower(btrim($1)) ORDER BY id LIMIT 1',
+            [nombre]
+        );
+        const empresa = fila.rows[0];
+        res.json({
+            tareas: empresa && Array.isArray(empresa.tareas_fijas) ? empresa.tareas_fijas : [],
+            formularios: empresa && Array.isArray(empresa.formularios_fijos) ? empresa.formularios_fijos : [],
+            direccion: empresa ? empresa.direccion_principal : null,
+            email: empresa ? empresa.email : null,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'No se pudieron leer las tareas de la empresa' });
+    }
+});
+
 app.post('/api/ordenes', usuarioDelPanel, async (req, res) => {
-    const { 
-        tecnico_id, nombre_cliente, direccion_trabajo, descripcion_tarea, 
-        es_recurrente, recurrencia_valor, recurrencia_tipo, hora_ejecucion, 
+    const {
+        tecnico_id, nombre_cliente, direccion_trabajo, descripcion_tarea,
+        es_recurrente, recurrencia_valor, recurrencia_tipo, hora_ejecucion,
         termina_condicion, termina_fecha, termina_repeticiones,
     } = req.body;
     try {
         const empresaId = await buscarOCrearEmpresa(nombre_cliente, direccion_trabajo);
         const fecha = diaValido(req.body.fecha_asignada);
         const formulario = await checklistDe(req.body);
+        if (req.body.guardar_tareas_fijas === true) await guardarTareasFijas(empresaId, req.body.puntos, req.body.formularios);
+        if (!formulario.puntos) formulario.puntos = await tareasFijasDe(empresaId);
+        // Formularios de control: los elegidos, o si no se mandó nada, los fijos de la empresa.
+        const formularios = Array.isArray(req.body.formularios)
+            ? await copiaDeFormularios(pool, req.body.formularios)
+            : await formulariosFijosDe(pool, empresaId);
         const contacto = contactoDe(req.body);
         if (contacto.emailInvalido) return res.status(400).json({ error: 'El correo del cliente no es válido' });
         if (contacto.whatsappInvalido) return res.status(400).json({ error: 'El WhatsApp no parece un número' });
+        const desde = horaValida(hora_ejecucion);
+        const hasta = horaValida(req.body.hora_hasta);
+        if (desde && hasta && hasta <= desde) return res.status(400).json({ error: 'La hora "hasta" tiene que ser después de la hora "desde"' });
         const nueva = await pool.query(
             `INSERT INTO ordenes (
                 tecnico_id, empresa_id, direccion_trabajo, descripcion_tarea, fecha_asignada, estado,
                 es_recurrente, recurrencia_valor, recurrencia_tipo, hora_ejecucion,
                 termina_condicion, termina_fecha, termina_repeticiones, fecha_ocurrencia,
-                formulario_id, puntos, email_cliente, whatsapp_cliente
-            ) VALUES ($1,$2,$3,$4,COALESCE($12::date, CURRENT_DATE),'Pendiente',$5,$6,$7,$8,$9,$10,$11,COALESCE($12::date, CURRENT_DATE),$13,$14::jsonb,$15,$16) RETURNING *`,
+                formulario_id, puntos, email_cliente, whatsapp_cliente, hora_hasta, formularios
+            ) VALUES ($1,$2,$3,$4,COALESCE($12::date, CURRENT_DATE),'Pendiente',$5,$6,$7,$8,$9,$10,$11,COALESCE($12::date, CURRENT_DATE),$13,$14::jsonb,$15,$16,$17,$18::jsonb) RETURNING *`,
             [
                 tecnico_id, empresaId, direccion_trabajo, descripcion_tarea,
                 es_recurrente || false, recurrencia_valor || 1, recurrencia_tipo || 'día',
-                hora_ejecucion || '12:30', termina_condicion || 'Nunca', termina_fecha || null,
+                desde || '08:00', termina_condicion || 'Nunca', termina_fecha || null,
                 termina_repeticiones || 30, fecha, formulario.id, formulario.puntos,
-                contacto.email, contacto.whatsapp,
+                contacto.email, contacto.whatsapp, hasta, formularios.length ? JSON.stringify(formularios) : null,
             ]
         );
         const ahora = new Date();
         const diaRuta = fecha || `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
-        await ordenarRecorrido(pool, tecnico_id, diaRuta);
+        programarRecorrido(pool, tecnico_id, diaRuta); // en segundo plano: la orden se guarda al instante
         if (es_recurrente) await generarRecurrencias(pool, nueva.rows[0].id);
         const guardada = await pool.query(`SELECT o.*, to_char(o.fecha_asignada, 'YYYY-MM-DD') AS fecha_dia FROM ordenes o WHERE o.id = $1`, [nueva.rows[0].id]);
         res.json(guardada.rows[0]);
@@ -599,9 +777,18 @@ app.put('/api/ordenes/:id', usuarioDelPanel, async (req, res) => {
         if (nombre_cliente) empresaId = await buscarOCrearEmpresa(nombre_cliente, direccion_trabajo);
         const fecha = diaValido(req.body.fecha_asignada);
         const formulario = await checklistDe(req.body);
+        if (req.body.guardar_tareas_fijas === true) {
+            const empresaDeLaOrden = empresaId || (await pool.query('SELECT empresa_id FROM ordenes WHERE id = $1', [req.params.id])).rows[0]?.empresa_id;
+            await guardarTareasFijas(empresaDeLaOrden, req.body.puntos, req.body.formularios);
+        }
+        // Si no se mandan los formularios, la orden se queda con los que tenía.
+        const formularios = Array.isArray(req.body.formularios) ? await copiaDeFormularios(pool, req.body.formularios) : null;
         const contacto = contactoDe(req.body);
         if (contacto.emailInvalido) return res.status(400).json({ error: 'El correo del cliente no es válido' });
         if (contacto.whatsappInvalido) return res.status(400).json({ error: 'El WhatsApp no parece un número' });
+        const desde = horaValida(hora_ejecucion);
+        const hasta = horaValida(req.body.hora_hasta);
+        if (desde && hasta && hasta <= desde) return res.status(400).json({ error: 'La hora "hasta" tiene que ser después de la hora "desde"' });
         const antes = await pool.query(`SELECT tecnico_id, orden_padre_id, to_char(fecha_asignada, 'YYYY-MM-DD') AS fecha FROM ordenes WHERE id = $1`, [req.params.id]);
         await pool.query(
             `UPDATE ordenes SET
@@ -622,14 +809,17 @@ app.put('/api/ordenes/:id', usuarioDelPanel, async (req, res) => {
                 puntos = $15::jsonb,
                 email_cliente = $16,
                 whatsapp_cliente = $17,
+                hora_hasta = CASE WHEN $18::boolean THEN $19::time ELSE hora_hasta END,
+                formularios = CASE WHEN $20::boolean THEN $21::jsonb ELSE formularios END,
                 estado = CASE WHEN estado = 'Por asignar' AND $1::int IS NOT NULL THEN 'Pendiente' ELSE estado END
              WHERE id = $12`,
             [
                 tecnico_id || null, empresaId, direccion_trabajo, descripcion_tarea,
                 es_recurrente, recurrencia_valor || null, recurrencia_tipo || null,
-                hora_ejecucion || null, termina_condicion || null, termina_fecha || null,
+                desde, termina_condicion || null, termina_fecha || null,
                 termina_repeticiones || null, req.params.id, fecha, formulario.id, formulario.puntos,
-                contacto.email, contacto.whatsapp,
+                contacto.email, contacto.whatsapp, req.body.hora_hasta !== undefined, hasta,
+                formularios !== null, formularios && formularios.length ? JSON.stringify(formularios) : null,
             ]
         );
         const despues = await pool.query(`SELECT tecnico_id, to_char(fecha_asignada, 'YYYY-MM-DD') AS fecha FROM ordenes WHERE id = $1`, [req.params.id]);
@@ -639,7 +829,7 @@ app.put('/api/ordenes/:id', usuarioDelPanel, async (req, res) => {
         }
         for (const par of pares) {
             const [tecnico, dia] = par.split('|');
-            await ordenarRecorrido(pool, Number(tecnico), dia);
+            programarRecorrido(pool, Number(tecnico), dia);
         }
         if (antes.rows[0] && !antes.rows[0].orden_padre_id) await generarRecurrencias(pool, Number(req.params.id));
         res.json({ mensaje: 'Actualizada' });
@@ -679,6 +869,16 @@ app.delete('/api/ordenes/:id', usuarioDelPanel, async (req, res) => {
 app.post('/api/generar-informe', soloTecnico, async (req, res) => {
     const { cliente, direccion, comentarios, latitud, longitud, firmaTecnico, firmaCliente, evidencias, checklist, ordenId, inicio, fin, sinPdf } = req.body;
     try {
+        // Los formularios se arman con la definición guardada en la orden (no con la que manda el celular).
+        let completados = [];
+        let empresaDeLaOrden = null;
+        if (ordenId) {
+            const orden = await pool.query('SELECT formularios, empresa_id FROM ordenes WHERE id = $1 AND tecnico_id = $2', [ordenId, req.usuario.id]);
+            empresaDeLaOrden = orden.rows[0] ? orden.rows[0].empresa_id : null;
+            const deLaOrden = orden.rows[0] && Array.isArray(orden.rows[0].formularios) ? orden.rows[0].formularios : [];
+            const enviados = Array.isArray(req.body.formularios) ? req.body.formularios : [];
+            completados = deLaOrden.map((formulario) => normalizarRespuestas(formulario, enviados.find((e) => e && Number(e.id) === Number(formulario.id))));
+        }
         const fechaFin = fin && !Number.isNaN(Date.parse(fin)) ? new Date(fin) : new Date();
         const nombreCliente = (cliente || 'Sin nombre').replace(/[\\/]/g, '').trim() || 'Sin nombre';
         // El informe se guarda primero en este equipo (no depende de la carpeta de red) y de ahí se
@@ -697,12 +897,17 @@ app.post('/api/generar-informe', soloTecnico, async (req, res) => {
         // por falta de señal. Si ese archivo ya existe, no se genera un segundo PDF.
         const yaGenerado = Boolean(fin) && (fs.existsSync(rutaCompleta) || fs.existsSync(rutaEnviado));
         if (!yaGenerado) {
-            const datosTecnico = await pool.query('SELECT nombre FROM tecnicos WHERE id = $1', [req.usuario.id]);
+            const datosTecnico = await pool.query('SELECT nombre, matricula, firma_sello FROM tecnicos WHERE id = $1', [req.usuario.id]);
+            const perfil = datosTecnico.rows[0] || {};
             await crearInforme({
                 destino: rutaCompleta,
                 cliente, direccion, comentarios, latitud, longitud,
-                tecnico: datosTecnico.rows[0] ? datosTecnico.rows[0].nombre : null,
-                firmaTecnico, firmaCliente, evidencias, checklist,
+                tecnico: perfil.nombre || null,
+                matricula: perfil.matricula || null,
+                // Si el técnico tiene cargada su firma con sello, va esa: ya no tiene que firmar en el celular.
+                firmaTecnico: perfil.firma_sello || firmaTecnico,
+                firmaCliente, evidencias, checklist,
+                formularios: completados,
                 inicio, fin: fechaFin.toISOString(),
             });
         }
@@ -716,10 +921,22 @@ app.post('/api/generar-informe', soloTecnico, async (req, res) => {
                 `UPDATE ordenes SET
                     estado = 'Completada',
                     comentarios_cierre = CASE WHEN $5::boolean THEN $3 ELSE comentarios_cierre END,
-                    checklist_cierre = COALESCE($4::jsonb, checklist_cierre)
+                    checklist_cierre = COALESCE($4::jsonb, checklist_cierre),
+                    formularios_cierre = COALESCE($6::jsonb, formularios_cierre)
                  WHERE id = $1 AND tecnico_id = $2`,
-                [ordenId, req.usuario.id, comentario, checklistJson, hayComentario]
+                [ordenId, req.usuario.id, comentario, checklistJson, hayComentario, completados.length ? JSON.stringify(completados) : null]
             );
+            // Las fechas de vencimiento de las planillas (por ejemplo, la carga de cada extintor) pasan a Vencimientos.
+            for (const formulario of completados) {
+                for (const v of vencimientosDe(formulario)) {
+                    await pool.query(
+                        `INSERT INTO vencimientos (id_cliente, empresa_id, empresa_nombre, orden_id, tecnico_id, descripcion, cantidad, vence, creado_por)
+                         VALUES ($1, $2, $3, $4, $5, $6, 1, $7, $8)
+                         ON CONFLICT (id_cliente) DO UPDATE SET vence = EXCLUDED.vence, descripcion = EXCLUDED.descripcion`,
+                        [`f${Number(ordenId)}-${formulario.id}-${v.clave}`, empresaDeLaOrden, nombreCliente, ordenId, req.usuario.id, v.descripcion, v.vence, formulario.nombre]
+                    ).catch((error) => console.error('Vencimiento del formulario:', error.message));
+                }
+            }
             const pdfListo = fs.existsSync(rutaCompleta) ? rutaCompleta : (fs.existsSync(rutaEnviado) ? rutaEnviado : null);
             const cierre = await despuesDelInforme(pool, {
                 ordenId: Number(ordenId),
@@ -1007,6 +1224,45 @@ app.post('/api/analisis/comentarios/:ordenId/presupuesto', soloComercial, async 
     }
 });
 
+// Solicitudes de la página pública. La base de demostración no se toca: esto solo guarda el contacto.
+const pedidosContacto = new Map();
+app.post('/api/contacto', async (req, res) => {
+    const ip = req.headers['cf-connecting-ip'] || req.ip || 'local';
+    const ahora = Date.now();
+    const previas = (pedidosContacto.get(ip) || []).filter((cuando) => ahora - cuando < 15 * 60 * 1000);
+    if (previas.length >= 5) {
+        return res.status(429).json({ error: 'Espere unos minutos antes de enviar otra solicitud.' });
+    }
+    const limpiar = (valor, max) => {
+        const texto = String(valor ?? '').replace(/\s+/g, ' ').trim();
+        return texto && texto.length <= max ? texto : null;
+    };
+    const nombre = limpiar(req.body && req.body.nombre, 80);
+    const email = limpiar(req.body && req.body.email, 120);
+    const empresa = limpiar(req.body && req.body.empresa, 120);
+    const telefono = limpiar(req.body && req.body.telefono, 40);
+    const tecnicos = parseInt(req.body && req.body.tecnicos, 10);
+    if (!nombre || nombre.length < 2) return res.status(400).json({ error: 'Indique su nombre.' });
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'Indique un correo corporativo.' });
+    if (!empresa || empresa.length < 2) return res.status(400).json({ error: 'Indique la empresa.' });
+    if (!telefono || telefono.replace(/\D/g, '').length < 6) return res.status(400).json({ error: 'Indique un teléfono de contacto.' });
+    if (!Number.isInteger(tecnicos) || tecnicos < 1 || tecnicos > 100000) {
+        return res.status(400).json({ error: 'Indique la cantidad de técnicos en terreno.' });
+    }
+    try {
+        await pool.query(
+            'INSERT INTO solicitudes_contacto (nombre, email, empresa, telefono, tecnicos) VALUES ($1, $2, $3, $4, $5)',
+            [nombre, email.toLowerCase(), empresa, telefono, tecnicos]
+        );
+        previas.push(ahora);
+        pedidosContacto.set(ip, previas);
+        res.json({ ok: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'No se pudo registrar la solicitud.' });
+    }
+});
+
 // El propio servidor entrega la página pública y el panel. La página abre en la raíz
 // y el panel queda en /panel/, para que sonoperation.com sea la presentación.
 const RUTA_PANEL = process.env.PANEL_DIR || path.join(__dirname, '..', 'son_admin', 'build', 'web');
@@ -1050,6 +1306,10 @@ async function iniciar() {
     const avisarSalidas = () => avisarLosQueEstanPorSalir(pool).catch((error) => console.error('Aviso en camino:', error.message));
     setInterval(avisarSalidas, 60 * 1000);
     avisarSalidas();
+    // Vencimientos que se acercan: un correo por día a la oficina (y el técnico los ve en la app).
+    const vencimientos = () => avisarVencimientos(pool).catch((error) => console.error('Vencimientos:', error.message));
+    setInterval(vencimientos, 6 * 60 * 60 * 1000);
+    vencimientos();
     // Cada tanto se intenta copiar a la carpeta de clientes lo que quedó esperando.
     const cadaMs = Number(process.env.ENTREGA_CADA_MS) || 60 * 1000;
     const entregar = () => intentarEntrega().catch((error) => console.error('Entrega de informes:', error.message));
@@ -1072,6 +1332,9 @@ async function iniciar() {
             : `Carpeta de clientes: ${RUTA_INFORMES}`);
         console.log(`Informes en espera: ${RUTA_PENDIENTES}`);
         console.log(PANEL_DISPONIBLE ? `Panel de administración: http://localhost:${puerto}/panel/` : 'Panel no compilado (falta son_admin/build/web)');
+        if (String(process.env.BASE_VACIA || '').trim()) {
+            console.log(`Base vacía para entregar a una empresa. Administrador: ${process.env.ADMIN_EMAIL}`);
+        }
         console.log(TECNICO_DISPONIBLE ? `App del técnico: http://localhost:${puerto}/tecnico/` : 'App del técnico no compilada');
     });
 }
