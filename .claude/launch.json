@@ -1,0 +1,57 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "son-prueba",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "C:/Users/franc/AppData/Local/Temp/claude/205d20f2bbbdc138/7892e30c-e405-4f25-8558-259346812132/scratchpad/servidor-prueba.js"
+      ],
+      "port": 3999
+    },
+    {
+      "name": "son-local",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "C:/Users/franc/AppData/Local/Temp/claude/9a19db550d5d5f28/34159abc-2e67-4469-9c44-47c2be7df93e/scratchpad/backend-local.js"
+      ],
+      "port": 3000
+    },
+    {
+      "name": "panel-estatico",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4100",
+        "--directory",
+        "C:/Users/franc/SONoperation/son_admin/build/web"
+      ],
+      "port": 4100
+    },
+    {
+      "name": "tecnico-estatico",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4101",
+        "--directory",
+        "C:/Users/franc/SONoperation/son_tecnico/build/web"
+      ],
+      "port": 4101
+    },
+    {
+      "name": "landing-estatica",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4102",
+        "--directory",
+        "C:/Users/franc/SONoperation/backend/presentacion"
+      ],
+      "port": 4102
+    }
+  ]
+}

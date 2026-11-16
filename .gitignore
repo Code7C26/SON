@@ -1,0 +1,6 @@
+# Paquetes de la app ya compilados (se generan con flutter build, pesan ~50 MB)
+*.aab
+*.apk
+
+# Credenciales de prueba locales
+.claude/tecnico-de-prueba.txt

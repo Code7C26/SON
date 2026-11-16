@@ -1,3 +1,13 @@
+import java.util.Properties
+import java.io.FileInputStream
+
+// Clave de publicación para las tiendas. android/key.properties y el .jks NO se suben a git.
+val propiedadesClave = Properties()
+val archivoClave = rootProject.file("key.properties")
+if (archivoClave.exists()) {
+    propiedadesClave.load(FileInputStream(archivoClave))
+}
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
@@ -5,7 +15,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.son_tecnico"
+    namespace = "com.sonoperation.tecnico"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -15,8 +25,8 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.son_tecnico"
+        // Identificador definitivo en Google Play: no se puede cambiar después de publicar.
+        applicationId = "com.sonoperation.tecnico"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -29,11 +39,22 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        create("release") {
+            if (archivoClave.exists()) {
+                keyAlias = propiedadesClave["keyAlias"] as String
+                keyPassword = propiedadesClave["keyPassword"] as String
+                storeFile = file(propiedadesClave["storeFile"] as String)
+                storePassword = propiedadesClave["storePassword"] as String
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // Con android/key.properties firma con la clave de publicación; sin ella, con la de
+            // prueba (sirve para probar, pero las tiendas la rechazan).
+            signingConfig = if (archivoClave.exists()) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
         }
     }
 }

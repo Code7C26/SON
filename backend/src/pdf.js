@@ -163,7 +163,7 @@ function textoEncabezado({ cliente, direccion, fin }) {
 }
 
 // --- Planilla igual al Excel, completada (va como anexo al final del informe) ---
-const COLOR_CARGADO = '#1F4E9A'; // lo que escribió el técnico, en azul como birome
+const COLOR_CARGADO = '#C46A3A'; // lo que escribió el técnico, en terracota de SON (se distingue de lo impreso)
 
 function anchoDeBorde(estilo) {
     if ([2, 8, 10, 12].includes(estilo)) return 1.1; // medio
@@ -245,7 +245,7 @@ function dibujarPlanillaExcel(doc, formulario, { cliente, fin, fuentes }) {
         ];
         for (const [estilo, ax, ay, bx, by] of lados) {
             if (!estilo) continue;
-            doc.save().lineWidth(anchoDeBorde(estilo)).strokeColor('#222222').moveTo(ax, ay).lineTo(bx, by).stroke().restore();
+            doc.save().lineWidth(anchoDeBorde(estilo)).strokeColor('#2E2E2E').moveTo(ax, ay).lineTo(bx, by).stroke().restore();
         }
         let texto = celda.t || '';
         if (celda.auto === 'empresa' && cliente) texto = `${texto} ${cliente}`;

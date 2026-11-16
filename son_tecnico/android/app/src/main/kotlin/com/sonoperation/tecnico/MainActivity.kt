@@ -1,4 +1,4 @@
-package com.example.son_tecnico
+package com.sonoperation.tecnico
 
 import io.flutter.embedding.android.FlutterActivity
 

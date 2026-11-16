@@ -47,8 +47,10 @@
 			</array>
 		</dict>
 	</dict>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>SON usa tu ubicación para el check-in en el lugar de trabajo.</string>
+	<string>SON usa tu ubicación para validar el check-in en cada visita y, mientras la app está abierta, para que la oficina vea dónde está el equipo y ordene el recorrido del día.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>SON usa la cámara para adjuntar evidencias del trabajo.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

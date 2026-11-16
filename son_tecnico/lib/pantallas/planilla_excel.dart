@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 // Formulario "igual al Excel": se dibuja la planilla tal cual (celdas, bordes, anchos) y el técnico
 // toca los casilleros vacíos para completarlos. Lo que carga se ve en azul, como en el informe.
 
-const Color colorCargado = Color(0xFF1F4E9A);
-const Color _colorTinta = Color(0xFF222222);
-const Color _colorCasillero = Color(0x14FFB300); // casillero para completar: apenas marcado
+const Color colorCargado = Color(0xFFC46A3A); // terracota de SON: lo que cargó el técnico
+const Color _colorTinta = Color(0xFF2E2E2E); // tinta de SON
+const Color _colorCasillero = Color(0x1AD99C13); // casillero para completar: dorado de SON apenas marcado
 
 List<Map<String, dynamic>> _mapas(dynamic lista) => (lista as List? ?? []).whereType<Map>().map((m) => Map<String, dynamic>.from(m)).toList();
 List<double> _numeros(dynamic lista) => (lista as List? ?? []).map((n) => (n as num).toDouble()).toList();
@@ -289,7 +289,7 @@ class _PantallaPlanillaExcelState extends State<PantallaPlanillaExcel> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              color: Colors.black12,
+              color: const Color(0x1FD99C13), // dorado de SON al 12 %
               child: Text(
                 'Tocá un casillero para completarlo. Con dos dedos agrandás. $cargados cargado${cargados == 1 ? '' : 's'}.',
                 style: const TextStyle(fontSize: 13),
