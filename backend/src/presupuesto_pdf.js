@@ -10,9 +10,9 @@ const RUTA_LOGO = path.join(CARPETA_ASSETS, 'pdf', 'logo.png');
 // Imagen de la firma (PNG con fondo transparente). Si no está, se deja el espacio en blanco para firmar a mano.
 const RUTA_FIRMA = path.join(CARPETA_ASSETS, 'pdf', 'firma_presupuestos.png');
 const FUENTES = {
-    regular: path.join(CARPETA_ASSETS, 'fonts', 'BwGradualDEMO-Regular.otf'),
-    media: path.join(CARPETA_ASSETS, 'fonts', 'BwGradualDEMO-Medium.otf'),
-    negrita: path.join(CARPETA_ASSETS, 'fonts', 'BwGradualDEMO-Bold.otf'),
+    regular: path.join(CARPETA_ASSETS, 'fonts', 'Inter-Regular.ttf'),
+    media: path.join(CARPETA_ASSETS, 'fonts', 'Inter-Medium.ttf'),
+    negrita: path.join(CARPETA_ASSETS, 'fonts', 'Inter-Bold.ttf'),
 };
 
 // Colores del formulario (azul con celdas de rótulo celestes).

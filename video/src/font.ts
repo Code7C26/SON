@@ -1,22 +1,22 @@
-// Bw Gradual es la fuente del sitio y del panel (archivos .otf propios,
-// no está en Google Fonts). Los archivos reales son Regular 400, Medium 500
-// y Bold 700. El video usa 400, 600 y 800: 600 carga Medium y 800 carga Bold,
-// que son los pesos más cercanos.
+// Tipografías de SON: Plus Jakarta Sans para títulos e Inter para el resto.
+// Los .ttf son los mismos que usan las apps (son_admin/assets/fonts).
+// El video usa pesos 400, 600 y 800: 800 carga Bold (700), el más cercano.
 import {continueRender, delayRender, staticFile} from "remotion";
 
-const family = "Bw Gradual";
-
-const weights = [
-  {file: "fonts/BwGradualDEMO-Regular.otf", weight: "400"},
-  {file: "fonts/BwGradualDEMO-Medium.otf", weight: "600"},
-  {file: "fonts/BwGradualDEMO-Bold.otf", weight: "800"},
+const archivos = [
+  {family: "Inter", file: "fonts/Inter-Regular.ttf", weight: "400"},
+  {family: "Inter", file: "fonts/Inter-SemiBold.ttf", weight: "600"},
+  {family: "Inter", file: "fonts/Inter-Bold.ttf", weight: "800"},
+  {family: "Plus Jakarta Sans", file: "fonts/PlusJakartaSans-Regular.ttf", weight: "400"},
+  {family: "Plus Jakarta Sans", file: "fonts/PlusJakartaSans-SemiBold.ttf", weight: "600"},
+  {family: "Plus Jakarta Sans", file: "fonts/PlusJakartaSans-Bold.ttf", weight: "800"},
 ];
 
 if (typeof document !== "undefined") {
-  const handle = delayRender("Cargando Bw Gradual");
+  const handle = delayRender("Cargando Inter y Plus Jakarta Sans");
   Promise.all(
-    weights.map(({file, weight}) => {
-      const face = new FontFace(family, `url(${staticFile(file)}) format("opentype")`, {
+    archivos.map(({family, file, weight}) => {
+      const face = new FontFace(family, `url(${staticFile(file)}) format("truetype")`, {
         weight,
         style: "normal",
       });
@@ -32,4 +32,7 @@ if (typeof document !== "undefined") {
     });
 }
 
-export const fontFamily = `"${family}", sans-serif`;
+// Texto general (Inter).
+export const fontFamily = `"Inter", sans-serif`;
+// Títulos (Plus Jakarta Sans).
+export const fontDisplay = `"Plus Jakarta Sans", sans-serif`;

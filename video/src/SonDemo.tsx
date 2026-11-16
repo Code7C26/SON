@@ -12,7 +12,7 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import {fontFamily} from "./font";
+import {fontDisplay, fontFamily} from "./font";
 
 /* ------------------------------------------------------------------ */
 /* Configuración: colores, imágenes y duraciones                       */
@@ -117,6 +117,7 @@ const StepText: React.FC<{n: string; title: string; text: string; width?: number
         style={{
           opacity: a,
           transform: `translateY(${(1 - a) * 24}px)`,
+          fontFamily: fontDisplay,
           fontSize: 40,
           fontWeight: 800,
           color: C.accent,
@@ -129,6 +130,7 @@ const StepText: React.FC<{n: string; title: string; text: string; width?: number
         style={{
           opacity: b,
           transform: `translateY(${(1 - b) * 24}px)`,
+          fontFamily: fontDisplay,
           fontSize: 84,
           fontWeight: 800,
           lineHeight: 1.02,
@@ -469,12 +471,13 @@ const Intro: React.FC<{d: number}> = ({d}) => {
           }}
         >
           <Img src={ASSETS.logo} style={{height: 96, width: "auto"}} />
-          <div style={{fontSize: 44, fontWeight: 800, color: C.ink}}>
+          <div style={{fontFamily: fontDisplay, fontSize: 44, fontWeight: 800, color: C.ink}}>
             SON <span style={{fontWeight: 400, color: C.muted}}>Operation Platform</span>
           </div>
         </div>
         <div
           style={{
+            fontFamily: fontDisplay,
             fontSize: 120,
             fontWeight: 800,
             lineHeight: 1.02,

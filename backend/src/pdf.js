@@ -19,9 +19,9 @@ const DISENO = {
 const CARPETA_ASSETS = path.join(__dirname, '..', 'assets');
 const RUTA_LOGO = path.join(CARPETA_ASSETS, 'pdf', 'logo.png');
 const FUENTES = {
-    regular: path.join(CARPETA_ASSETS, 'fonts', 'BwGradualDEMO-Regular.otf'),
-    media: path.join(CARPETA_ASSETS, 'fonts', 'BwGradualDEMO-Medium.otf'),
-    negrita: path.join(CARPETA_ASSETS, 'fonts', 'BwGradualDEMO-Bold.otf'),
+    regular: path.join(CARPETA_ASSETS, 'fonts', 'Inter-Regular.ttf'),
+    media: path.join(CARPETA_ASSETS, 'fonts', 'Inter-Medium.ttf'),
+    negrita: path.join(CARPETA_ASSETS, 'fonts', 'Inter-Bold.ttf'),
 };
 
 // Medidas de la hoja A4 (en puntos)
