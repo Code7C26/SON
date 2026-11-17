@@ -11,21 +11,6 @@
 
 ---
 
-## 🌐 Ver SON en vivo
-
-| | Enlace |
-| --- | --- |
-| Página web | <https://sonoperation.com> |
-| Panel de administración | <https://sonoperation.com/panel/> |
-| App del técnico (versión web) | <https://sonoperation.com/tecnico/> |
-
-**Usuario de prueba**
-
-* Correo: `pruebascolegio@gmail.com`
-* Contraseña: `123456`
-
----
-
 ## 📌 Visión General
 
 **SON (Operation Platform)** es una solución empresarial Full-Stack concebida para centralizar, auditar y optimizar los flujos de trabajo de organizaciones con despliegue de personal técnico y operarios en campo.
@@ -105,6 +90,17 @@ Los originales de marca se encuentran en `DESINGS/`.
 | `DESINGS/` | Sistema de identidad visual |
 | `DOCUMENTACION COMERCIAL/` | FODA, público objetivo, perfil del cliente y modelo de negocio |
 
+---
 
+## 🌐 Ver SON en vivo
 
+| | Enlace |
+| --- | --- |
+| Página web | <https://sonoperation.com> |
+| Panel de administración | <https://sonoperation.com/panel/> |
+| App del técnico (versión web) | <https://sonoperation.com/tecnico/> |
 
+**Usuario de prueba**
+
+* Correo: `pruebascolegio@gmail.com`
+* Contraseña: `123456`
