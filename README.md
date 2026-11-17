@@ -4,10 +4,25 @@
   <p><strong>Plataforma integral SaaS para la digitalización, auditoría y control de operaciones técnicas en terreno.</strong></p>
   <p>
     <img src="https://img.shields.io/badge/Versi%C3%B3n-2.0.0-ff6147?style=flat-square" alt="Version"/>
-    <img src="https://img.shields.io/badge/Entorno-Flutter%20%7C%20Node.js%20%7C%20PostgreSQL-1c1c1e?style=flat-square" alt="Tech Stack"/>
+    <img src="https://img.shields.io/badge/Entorno-Flutter%20%7C%20Node.js%20%7C%20PostgreSQL-2e2e2e?style=flat-square" alt="Tech Stack"/>
     <img src="https://img.shields.io/badge/Estado-Producci%C3%B3n-d99c13?style=flat-square" alt="Estado"/>
   </p>
 </div>
+
+---
+
+## 🌐 Ver SON en vivo
+
+| | Enlace |
+| --- | --- |
+| Página web | <https://sonoperation.com> |
+| Panel de administración | <https://sonoperation.com/panel/> |
+| App del técnico (versión web) | <https://sonoperation.com/tecnico/> |
+
+**Usuario de prueba**
+
+* Correo: `pruebascolegio@gmail.com`
+* Contraseña: `123456`
 
 ---
 
@@ -64,8 +79,8 @@ El diseño de interfaces responde a un sistema visual de alto contraste y legibi
   * Base principal: `#f4f4f4`
   * Acento primario / Acción: `#ff6147` (Naranja coral)
   * Acento secundario / Indicadores de estado: `#d99c13` (Dorado/Ocre)
-  * Paneles de contraste: `#1c1c1e` (Gris oscuro corporativo)
-* **Tipografía Oficial:** `BwGradualDEMO` implementada de manera unificada en interfaces web y móviles.
+  * Paneles de contraste: `#2e2e2e` (Gris oscuro corporativo)
+* **Tipografía Oficial:** `Plus Jakarta Sans` en títulos e `Inter` en textos de interfaz, unificadas en web y móvil.
 
 Los originales de marca se encuentran en `DESINGS/`.
 
@@ -88,6 +103,7 @@ Los originales de marca se encuentran en `DESINGS/`.
 | `agente/` | Agente de oficina que entrega los informes al disco de red |
 | `despliegue/` | Contenedores, proxy HTTPS y procedimiento de publicación |
 | `DESINGS/` | Sistema de identidad visual |
+| `DOCUMENTACION COMERCIAL/` | FODA, público objetivo, perfil del cliente y modelo de negocio |
 
 
 
