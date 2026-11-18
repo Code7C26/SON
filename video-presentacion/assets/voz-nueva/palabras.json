@@ -1,0 +1,577 @@
+[
+ {
+  "palabra": "Planillas",
+  "inicio": 0.0,
+  "fin": 0.46
+ },
+ {
+  "palabra": "en",
+  "inicio": 0.46,
+  "fin": 0.7
+ },
+ {
+  "palabra": "papel,",
+  "inicio": 0.7,
+  "fin": 1.02
+ },
+ {
+  "palabra": "mensajes",
+  "inicio": 1.48,
+  "fin": 1.88
+ },
+ {
+  "palabra": "sueltos",
+  "inicio": 1.88,
+  "fin": 2.58
+ },
+ {
+  "palabra": "y",
+  "inicio": 2.58,
+  "fin": 3.0
+ },
+ {
+  "palabra": "un",
+  "inicio": 3.0,
+  "fin": 3.1
+ },
+ {
+  "palabra": "informe",
+  "inicio": 3.1,
+  "fin": 3.56
+ },
+ {
+  "palabra": "que",
+  "inicio": 3.56,
+  "fin": 3.66
+ },
+ {
+  "palabra": "tarda",
+  "inicio": 3.66,
+  "fin": 3.9
+ },
+ {
+  "palabra": "días",
+  "inicio": 3.9,
+  "fin": 4.42
+ },
+ {
+  "palabra": "en",
+  "inicio": 4.42,
+  "fin": 4.66
+ },
+ {
+  "palabra": "salir.",
+  "inicio": 4.66,
+  "fin": 5.0
+ },
+ {
+  "palabra": "¿El",
+  "inicio": 5.48,
+  "fin": 5.62
+ },
+ {
+  "palabra": "técnico",
+  "inicio": 5.62,
+  "fin": 5.98
+ },
+ {
+  "palabra": "fue",
+  "inicio": 5.98,
+  "fin": 6.18
+ },
+ {
+  "palabra": "a",
+  "inicio": 6.18,
+  "fin": 6.26
+ },
+ {
+  "palabra": "la",
+  "inicio": 6.26,
+  "fin": 6.32
+ },
+ {
+  "palabra": "planta?",
+  "inicio": 6.32,
+  "fin": 6.74
+ },
+ {
+  "palabra": "¿Dónde",
+  "inicio": 7.08,
+  "fin": 7.42
+ },
+ {
+  "palabra": "quedó",
+  "inicio": 7.42,
+  "fin": 7.66
+ },
+ {
+  "palabra": "el",
+  "inicio": 7.66,
+  "fin": 7.76
+ },
+ {
+  "palabra": "remito",
+  "inicio": 7.76,
+  "fin": 8.04
+ },
+ {
+  "palabra": "firmado?",
+  "inicio": 8.04,
+  "fin": 8.56
+ },
+ {
+  "palabra": "Con",
+  "inicio": 9.16,
+  "fin": 9.36
+ },
+ {
+  "palabra": "SON,",
+  "inicio": 9.36,
+  "fin": 9.62
+ },
+ {
+  "palabra": "toda",
+  "inicio": 9.9,
+  "fin": 10.04
+ },
+ {
+  "palabra": "su",
+  "inicio": 10.04,
+  "fin": 10.3
+ },
+ {
+  "palabra": "operación",
+  "inicio": 10.3,
+  "fin": 10.78
+ },
+ {
+  "palabra": "queda",
+  "inicio": 10.78,
+  "fin": 11.02
+ },
+ {
+  "palabra": "sincronizada",
+  "inicio": 11.02,
+  "fin": 11.72
+ },
+ {
+  "palabra": "en",
+  "inicio": 11.72,
+  "fin": 11.96
+ },
+ {
+  "palabra": "un",
+  "inicio": 11.96,
+  "fin": 12.12
+ },
+ {
+  "palabra": "único",
+  "inicio": 12.12,
+  "fin": 12.58
+ },
+ {
+  "palabra": "ecosistema.",
+  "inicio": 12.58,
+  "fin": 13.26
+ },
+ {
+  "palabra": "Desde",
+  "inicio": 13.78,
+  "fin": 13.84
+ },
+ {
+  "palabra": "el",
+  "inicio": 13.84,
+  "fin": 14.04
+ },
+ {
+  "palabra": "panel,",
+  "inicio": 14.04,
+  "fin": 14.26
+ },
+ {
+  "palabra": "el",
+  "inicio": 14.58,
+  "fin": 14.64
+ },
+ {
+  "palabra": "administrador",
+  "inicio": 14.64,
+  "fin": 15.26
+ },
+ {
+  "palabra": "asigna",
+  "inicio": 15.26,
+  "fin": 15.72
+ },
+ {
+  "palabra": "la",
+  "inicio": 15.72,
+  "fin": 15.86
+ },
+ {
+  "palabra": "orden.",
+  "inicio": 15.86,
+  "fin": 16.16
+ },
+ {
+  "palabra": "La",
+  "inicio": 16.62,
+  "fin": 16.78
+ },
+ {
+  "palabra": "orden",
+  "inicio": 16.78,
+  "fin": 17.08
+ },
+ {
+  "palabra": "llega",
+  "inicio": 17.08,
+  "fin": 17.32
+ },
+ {
+  "palabra": "al",
+  "inicio": 17.32,
+  "fin": 17.52
+ },
+ {
+  "palabra": "celular",
+  "inicio": 17.52,
+  "fin": 17.86
+ },
+ {
+  "palabra": "del",
+  "inicio": 17.86,
+  "fin": 18.06
+ },
+ {
+  "palabra": "técnico.",
+  "inicio": 18.06,
+  "fin": 18.58
+ },
+ {
+  "palabra": "Al",
+  "inicio": 18.96,
+  "fin": 19.08
+ },
+ {
+  "palabra": "llegar,",
+  "inicio": 19.08,
+  "fin": 19.34
+ },
+ {
+  "palabra": "el",
+  "inicio": 19.68,
+  "fin": 19.76
+ },
+ {
+  "palabra": "GPS",
+  "inicio": 19.76,
+  "fin": 20.14
+ },
+ {
+  "palabra": "registra",
+  "inicio": 20.14,
+  "fin": 20.96
+ },
+ {
+  "palabra": "que",
+  "inicio": 20.96,
+  "fin": 21.1
+ },
+ {
+  "palabra": "está",
+  "inicio": 21.1,
+  "fin": 21.36
+ },
+ {
+  "palabra": "en",
+  "inicio": 21.36,
+  "fin": 21.52
+ },
+ {
+  "palabra": "el",
+  "inicio": 21.52,
+  "fin": 21.64
+ },
+ {
+  "palabra": "sitio.",
+  "inicio": 21.64,
+  "fin": 21.96
+ },
+ {
+  "palabra": "Completa",
+  "inicio": 22.3,
+  "fin": 22.76
+ },
+ {
+  "palabra": "el",
+  "inicio": 22.76,
+  "fin": 22.88
+ },
+ {
+  "palabra": "checklist,",
+  "inicio": 22.88,
+  "fin": 23.26
+ },
+ {
+  "palabra": "saca",
+  "inicio": 23.7,
+  "fin": 23.94
+ },
+ {
+  "palabra": "las",
+  "inicio": 23.94,
+  "fin": 24.1
+ },
+ {
+  "palabra": "fotos",
+  "inicio": 24.1,
+  "fin": 24.36
+ },
+ {
+  "palabra": "y",
+  "inicio": 24.36,
+  "fin": 24.78
+ },
+ {
+  "palabra": "el",
+  "inicio": 24.78,
+  "fin": 24.9
+ },
+ {
+  "palabra": "cliente",
+  "inicio": 24.9,
+  "fin": 25.34
+ },
+ {
+  "palabra": "firma",
+  "inicio": 25.34,
+  "fin": 25.72
+ },
+ {
+  "palabra": "en",
+  "inicio": 25.72,
+  "fin": 25.8
+ },
+ {
+  "palabra": "la",
+  "inicio": 25.8,
+  "fin": 25.9
+ },
+ {
+  "palabra": "pantalla.",
+  "inicio": 25.9,
+  "fin": 26.3
+ },
+ {
+  "palabra": "Al",
+  "inicio": 26.3,
+  "fin": 26.9
+ },
+ {
+  "palabra": "finalizar,",
+  "inicio": 26.9,
+  "fin": 27.54
+ },
+ {
+  "palabra": "SON",
+  "inicio": 27.88,
+  "fin": 28.04
+ },
+ {
+  "palabra": "arma",
+  "inicio": 28.04,
+  "fin": 28.42
+ },
+ {
+  "palabra": "el",
+  "inicio": 28.42,
+  "fin": 28.56
+ },
+ {
+  "palabra": "informe",
+  "inicio": 28.56,
+  "fin": 29.02
+ },
+ {
+  "palabra": "en",
+  "inicio": 29.02,
+  "fin": 29.14
+ },
+ {
+  "palabra": "PDF",
+  "inicio": 29.14,
+  "fin": 29.54
+ },
+ {
+  "palabra": "con",
+  "inicio": 29.54,
+  "fin": 30.08
+ },
+ {
+  "palabra": "fotos",
+  "inicio": 30.08,
+  "fin": 30.4
+ },
+ {
+  "palabra": "y",
+  "inicio": 30.4,
+  "fin": 30.6
+ },
+ {
+  "palabra": "firmas",
+  "inicio": 30.6,
+  "fin": 31.06
+ },
+ {
+  "palabra": "y",
+  "inicio": 31.06,
+  "fin": 31.22
+ },
+ {
+  "palabra": "se",
+  "inicio": 31.22,
+  "fin": 31.32
+ },
+ {
+  "palabra": "lo",
+  "inicio": 31.32,
+  "fin": 31.44
+ },
+ {
+  "palabra": "envía",
+  "inicio": 31.44,
+  "fin": 31.74
+ },
+ {
+  "palabra": "al",
+  "inicio": 31.74,
+  "fin": 31.86
+ },
+ {
+  "palabra": "cliente",
+  "inicio": 31.86,
+  "fin": 32.28
+ },
+ {
+  "palabra": "junto",
+  "inicio": 32.28,
+  "fin": 32.42
+ },
+ {
+  "palabra": "con",
+  "inicio": 32.42,
+  "fin": 32.76
+ },
+ {
+  "palabra": "una",
+  "inicio": 32.76,
+  "fin": 32.92
+ },
+ {
+  "palabra": "encuesta.",
+  "inicio": 32.92,
+  "fin": 33.34
+ },
+ {
+  "palabra": "Sin",
+  "inicio": 33.72,
+  "fin": 33.92
+ },
+ {
+  "palabra": "papeles,",
+  "inicio": 33.92,
+  "fin": 34.48
+ },
+ {
+  "palabra": "sin",
+  "inicio": 34.82,
+  "fin": 34.96
+ },
+ {
+  "palabra": "pasar",
+  "inicio": 34.96,
+  "fin": 35.2
+ },
+ {
+  "palabra": "en",
+  "inicio": 35.2,
+  "fin": 35.38
+ },
+ {
+  "palabra": "limpio,",
+  "inicio": 35.38,
+  "fin": 35.82
+ },
+ {
+  "palabra": "sin",
+  "inicio": 36.1,
+  "fin": 36.28
+ },
+ {
+  "palabra": "esperar",
+  "inicio": 36.28,
+  "fin": 36.74
+ },
+ {
+  "palabra": "días.",
+  "inicio": 36.74,
+  "fin": 37.12
+ },
+ {
+  "palabra": "Todo",
+  "inicio": 37.62,
+  "fin": 37.8
+ },
+ {
+  "palabra": "tu",
+  "inicio": 37.8,
+  "fin": 38.02
+ },
+ {
+  "palabra": "trabajo",
+  "inicio": 38.02,
+  "fin": 38.44
+ },
+ {
+  "palabra": "terminado",
+  "inicio": 38.44,
+  "fin": 39.2
+ },
+ {
+  "palabra": "en",
+  "inicio": 39.2,
+  "fin": 39.32
+ },
+ {
+  "palabra": "el",
+  "inicio": 39.32,
+  "fin": 39.44
+ },
+ {
+  "palabra": "acto.",
+  "inicio": 39.44,
+  "fin": 39.82
+ },
+ {
+  "palabra": "SON,",
+  "inicio": 40.14,
+  "fin": 40.58
+ },
+ {
+  "palabra": "agente",
+  "inicio": 40.86,
+  "fin": 41.32
+ },
+ {
+  "palabra": "una",
+  "inicio": 41.32,
+  "fin": 41.58
+ },
+ {
+  "palabra": "demostración.",
+  "inicio": 41.58,
+  "fin": 42.22
+ }
+]

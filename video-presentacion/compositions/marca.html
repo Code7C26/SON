@@ -1,0 +1,144 @@
+<template>
+  <style>
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans-Regular.ttf"); font-weight: 400; }
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans-Bold.ttf"); font-weight: 700; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.ttf"); font-weight: 400; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.ttf"); font-weight: 600; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.ttf"); font-weight: 700; }
+    #root { position: absolute; inset: 0; background: #f4f4f4; overflow: hidden; font-family: "Inter", sans-serif; color: #2e2e2e; }
+
+    /* El fondo oscuro del cierre se contrae en un bloque de alto contraste */
+    #marca-bloque { position: absolute; inset: 0; background: #2e2e2e; }
+    #marca-reloj { position: absolute; left: 300px; top: 350px; width: 380px; height: 380px; overflow: visible; }
+
+    /* Columna derecha */
+    #marca-col { position: absolute; left: 980px; top: 0; width: 840px; height: 1080px; }
+    .eyebrow { position: absolute; left: 0; top: 214px; background: rgba(255, 97, 71, 0.12); color: #ff6147; border-radius: 999px;
+      padding: 12px 24px; font-size: 24px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; }
+    /* logo.png 1437×395 a escala 0.38 → 546×150; la palabra SON empieza en x 160 */
+    #marca-palabra { position: absolute; left: 0; top: 290px; width: 386px; height: 150px;
+      background: url("assets/img/logo.png") -160px 0 / 546px 150px no-repeat; }
+    #marca-tit { position: absolute; left: 0; top: 488px; width: 840px; font-family: "Plus Jakarta Sans", sans-serif; font-size: 56px;
+      line-height: 1.14; letter-spacing: -1.2px; }
+    #marca-tit .w { display: inline-block; }
+    #marca-tit .r { font-weight: 400; }
+    #marca-tit .b { font-weight: 700; }
+    #marca-fila { position: absolute; left: 0; top: 720px; display: flex; align-items: center; gap: 32px; }
+    #marca-cta { display: inline-flex; align-items: center; gap: 20px; background: #ff6147; color: #2e2e2e; border-radius: 999px;
+      padding: 14px 14px 14px 40px; font-size: 36px; font-weight: 700; }
+    #marca-flecha { width: 62px; height: 62px; border-radius: 50%; background: #2e2e2e; display: inline-flex; align-items: center; justify-content: center; }
+    #marca-url { font-size: 30px; color: #6e6e6e; font-weight: 600; }
+
+    /* Cinta de módulos reales (README) */
+    #marca-cinta { position: absolute; left: 980px; right: 0; top: 880px; height: 76px; overflow: hidden;
+      -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 60px, #000 calc(100% - 120px), transparent 100%);
+      mask-image: linear-gradient(90deg, transparent 0, #000 60px, #000 calc(100% - 120px), transparent 100%); }
+    #marca-pistas { position: absolute; left: 0; top: 0; display: flex; gap: 16px; white-space: nowrap; }
+    .modulo { display: inline-flex; align-items: center; gap: 12px; height: 68px; padding: 0 28px; border-radius: 999px; background: #ffffff;
+      border: 1px solid #d5d5d5; font-size: 26px; font-weight: 600; box-shadow: 0 8px 20px rgba(46, 46, 46, 0.04); }
+    .modulo i { width: 12px; height: 12px; border-radius: 50%; background: #ff6147; display: inline-block; }
+    .modulo.oro i { background: #d99c13; }
+
+    #marca-cursor { position: absolute; left: 0; top: 0; width: 56px; height: 56px; }
+  </style>
+  <div id="root" data-composition-id="marca" data-width="1920" data-height="1080">
+    <div id="marca-bloque" data-layout-allow-overlap></div>
+
+    <svg id="marca-reloj" viewBox="0 0 300 300" data-layout-allow-overflow>
+      <defs>
+        <clipPath id="marca-forma">
+          <path d="M0 0 H300 A150 150 0 0 1 0 0 Z" />
+          <path d="M0 300 H300 A150 150 0 0 0 0 300 Z" />
+        </clipPath>
+      </defs>
+      <g id="marca-giro" style="transform-origin: 150px 150px">
+        <g clip-path="url(#marca-forma)">
+          <rect id="marca-relleno" x="-10" y="0" width="320" height="320" fill="#ff6147" />
+        </g>
+        <path id="marca-arriba" d="M0 0 H300 A150 150 0 0 1 0 0 Z" fill="none" stroke="#ff6147" stroke-width="5" stroke-linejoin="round" />
+        <path id="marca-abajo" d="M0 300 H300 A150 150 0 0 0 0 300 Z" fill="none" stroke="#ff6147" stroke-width="5" stroke-linejoin="round" />
+      </g>
+    </svg>
+
+    <div id="marca-col">
+      <div class="eyebrow" id="marca-eyebrow">Gestión operativa</div>
+      <div id="marca-palabra" role="img" aria-label="SON"></div>
+      <div id="marca-tit">
+        <span class="w r">Toda</span> <span class="w r">su</span> <span class="w r">operación</span>
+        <span class="w b">sincronizada</span> <span class="w b">en</span> <span class="w b">un</span> <span class="w b">único</span> <span class="w b">ecosistema</span>
+      </div>
+      <div id="marca-fila">
+        <div id="marca-cta">Pedir demo<span id="marca-flecha"><svg id="marca-flecha-svg" width="30" height="30" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg></span></div>
+        <div id="marca-url">sonoperation.com</div>
+      </div>
+    </div>
+
+    <div id="marca-cinta" data-layout-allow-overflow data-layout-ignore>
+      <div id="marca-pistas">
+        <span class="modulo"><i></i>Órdenes recurrentes</span>
+        <span class="modulo oro"><i></i>Check-in por GPS</span>
+        <span class="modulo"><i></i>Checklists</span>
+        <span class="modulo oro"><i></i>Evidencia fotográfica</span>
+        <span class="modulo"><i></i>Firma digital</span>
+        <span class="modulo oro"><i></i>Informe en PDF</span>
+        <span class="modulo"><i></i>Encuesta de satisfacción</span>
+        <span class="modulo oro"><i></i>Mapa en vivo</span>
+        <span class="modulo"><i></i>Órdenes recurrentes</span>
+        <span class="modulo oro"><i></i>Check-in por GPS</span>
+      </div>
+    </div>
+
+    <svg id="marca-cursor" viewBox="0 0 56 56">
+      <path d="M8 4 L8 44 L19 34 L27 52 L35 48 L27 31 L42 31 Z" fill="#ffffff" stroke="#2e2e2e" stroke-width="3" stroke-linejoin="round" />
+    </svg>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+
+      // 0.0–0.65: el fondo oscuro del cierre se contrae en un bloque redondeado a la izquierda
+      tl.fromTo("#marca-bloque", { clipPath: "inset(0px 0px 0px 0px round 0px)" },
+        { clipPath: "inset(110px 1060px 110px 110px round 56px)", duration: 0.65, ease: "power3.inOut" }, 0);
+
+      // 0.2–0.75: el reloj de arena se dibuja en trazo
+      ["#marca-arriba", "#marca-abajo"].forEach((sel) => {
+        const p = document.querySelector(sel);
+        const L = p.getTotalLength();
+        p.style.strokeDasharray = L;
+        tl.fromTo(p, { strokeDashoffset: L }, { strokeDashoffset: 0, duration: 0.55, ease: "power2.inOut" }, 0.2);
+      });
+      // «SON» (0.7): el relleno coral sube desde abajo y lo completa
+      tl.fromTo("#marca-relleno", { y: 300 }, { y: 0, duration: 0.8, ease: "power3.inOut" }, 0.65);
+
+      // Columna derecha
+      tl.fromTo("#marca-eyebrow", { opacity: 0, scale: 0.8, transformOrigin: "0% 50%" }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.8)" }, 0.95);
+      tl.fromTo("#marca-palabra", { clipPath: "inset(0px 386px 0px 0px)" }, { clipPath: "inset(0px 0px 0px 0px)", duration: 0.6, ease: "power3.out" }, 1.1);
+      tl.fromTo("#marca-tit .w", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.14, stagger: 0.07, ease: "power2.out" }, 1.5);
+      // «Agende» (2.0): botón y dirección
+      tl.fromTo("#marca-cta", { opacity: 0, scale: 0.85, transformOrigin: "0% 50%" }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(1.6)" }, 2.05);
+      tl.fromTo("#marca-url", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2 }, 2.35);
+
+      // Cinta de módulos: entra y corre a velocidad constante hasta el final
+      tl.fromTo("#marca-cinta", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 2.5);
+      tl.fromTo("#marca-pistas", { x: 0 }, { x: -760, duration: 5, ease: "none" }, 2.5);
+
+      // El cursor entra y hace clic en «Pedir demo»
+      tl.fromTo("#marca-cursor", { x: 1500, y: 1120 }, { x: 1250, y: 758, duration: 0.7, ease: "power3.out" }, 3.6);
+      tl.to("#marca-cursor", { scale: 0.85, duration: 0.07, ease: "power2.in" }, 4.4);
+      tl.to("#marca-cursor", { scale: 1, duration: 0.12, ease: "power2.out" }, 4.47);
+      tl.to("#marca-cta", { scale: 0.95, duration: 0.07, ease: "power2.in" }, 4.4);
+      tl.to("#marca-cta", { scale: 1, duration: 0.2, ease: "back.out(2)" }, 4.47);
+      tl.to("#marca-flecha", { backgroundColor: "#ffffff", duration: 0.2 }, 4.45);
+      tl.to("#marca-flecha-svg path", { stroke: "#2e2e2e", duration: 0.2 }, 4.45);
+      tl.fromTo("#marca-flecha-svg", { x: 0 }, { x: 6, duration: 0.25, ease: "power2.out" }, 4.47);
+
+      // El cursor se va después del clic para que el botón quede limpio
+      tl.to("#marca-cursor", { x: 1420, y: 1140, duration: 0.5, ease: "power3.in" }, 4.9);
+
+      // 5.3: el reloj se da vuelta una vez, como al principio
+      tl.fromTo("#marca-giro", { rotation: 0 }, { rotation: 180, duration: 0.9, ease: "power3.inOut" }, 5.3);
+
+      window.__timelines["marca"] = tl;
+    })();
+  </script>
+</template>

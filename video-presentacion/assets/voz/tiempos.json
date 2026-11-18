@@ -1,0 +1,608 @@
+[
+  {
+    "id": "desorden",
+    "texto": "Planillas en papel. Mensajes sueltos. Y un informe que tarda días en salir.",
+    "palabras": [
+      {
+        "palabra": "Planillas",
+        "inicio": 0.1,
+        "fin": 0.675
+      },
+      {
+        "palabra": "en",
+        "inicio": 0.675,
+        "fin": 0.825
+      },
+      {
+        "palabra": "papel",
+        "inicio": 0.838,
+        "fin": 1.275
+      },
+      {
+        "palabra": "Mensajes",
+        "inicio": 2.188,
+        "fin": 2.712
+      },
+      {
+        "palabra": "sueltos",
+        "inicio": 2.725,
+        "fin": 3.4
+      },
+      {
+        "palabra": "Y",
+        "inicio": 4.325,
+        "fin": 4.45
+      },
+      {
+        "palabra": "un",
+        "inicio": 4.487,
+        "fin": 4.575
+      },
+      {
+        "palabra": "informe",
+        "inicio": 4.588,
+        "fin": 5.025
+      },
+      {
+        "palabra": "que",
+        "inicio": 5.075,
+        "fin": 5.138
+      },
+      {
+        "palabra": "tarda",
+        "inicio": 5.213,
+        "fin": 5.463
+      },
+      {
+        "palabra": "días",
+        "inicio": 5.5,
+        "fin": 5.812
+      },
+      {
+        "palabra": "en",
+        "inicio": 5.812,
+        "fin": 5.925
+      },
+      {
+        "palabra": "salir",
+        "inicio": 5.938,
+        "fin": 6.338
+      }
+    ]
+  },
+  {
+    "id": "dudas",
+    "texto": "¿El técnico fue a la planta? ¿Dónde quedó el remito firmado?",
+    "palabras": [
+      {
+        "palabra": "El",
+        "inicio": 0.1,
+        "fin": 0.275
+      },
+      {
+        "palabra": "técnico",
+        "inicio": 0.338,
+        "fin": 0.75
+      },
+      {
+        "palabra": "fue",
+        "inicio": 0.775,
+        "fin": 0.963
+      },
+      {
+        "palabra": "a",
+        "inicio": 0.963,
+        "fin": 1.0
+      },
+      {
+        "palabra": "la",
+        "inicio": 1.05,
+        "fin": 1.125
+      },
+      {
+        "palabra": "planta",
+        "inicio": 1.2,
+        "fin": 1.637
+      },
+      {
+        "palabra": "Dónde",
+        "inicio": 2.625,
+        "fin": 2.9
+      },
+      {
+        "palabra": "quedó",
+        "inicio": 2.962,
+        "fin": 3.212
+      },
+      {
+        "palabra": "el",
+        "inicio": 3.212,
+        "fin": 3.3
+      },
+      {
+        "palabra": "remito",
+        "inicio": 3.325,
+        "fin": 3.7
+      },
+      {
+        "palabra": "firmado",
+        "inicio": 3.725,
+        "fin": 4.263
+      }
+    ]
+  },
+  {
+    "id": "son",
+    "texto": "Con SON, toda su operación queda sincronizada en un único ecosistema.",
+    "palabras": [
+      {
+        "palabra": "Con",
+        "inicio": 0.1,
+        "fin": 0.325
+      },
+      {
+        "palabra": "SON",
+        "inicio": 0.35,
+        "fin": 0.75
+      },
+      {
+        "palabra": "toda",
+        "inicio": 1.038,
+        "fin": 1.25
+      },
+      {
+        "palabra": "su",
+        "inicio": 1.288,
+        "fin": 1.387
+      },
+      {
+        "palabra": "operación",
+        "inicio": 1.387,
+        "fin": 2.038
+      },
+      {
+        "palabra": "queda",
+        "inicio": 2.075,
+        "fin": 2.288
+      },
+      {
+        "palabra": "sincronizada",
+        "inicio": 2.325,
+        "fin": 3.15
+      },
+      {
+        "palabra": "en",
+        "inicio": 3.2,
+        "fin": 3.3
+      },
+      {
+        "palabra": "un",
+        "inicio": 3.325,
+        "fin": 3.425
+      },
+      {
+        "palabra": "único",
+        "inicio": 3.462,
+        "fin": 3.763
+      },
+      {
+        "palabra": "ecosistema",
+        "inicio": 3.763,
+        "fin": 4.5
+      }
+    ]
+  },
+  {
+    "id": "panel",
+    "texto": "Desde el panel, usted asigna la visita.",
+    "palabras": [
+      {
+        "palabra": "Desde",
+        "inicio": 0.1,
+        "fin": 0.375
+      },
+      {
+        "palabra": "el",
+        "inicio": 0.375,
+        "fin": 0.45
+      },
+      {
+        "palabra": "panel",
+        "inicio": 0.512,
+        "fin": 0.938
+      },
+      {
+        "palabra": "usted",
+        "inicio": 1.05,
+        "fin": 1.387
+      },
+      {
+        "palabra": "asigna",
+        "inicio": 1.387,
+        "fin": 1.825
+      },
+      {
+        "palabra": "la",
+        "inicio": 1.85,
+        "fin": 1.938
+      },
+      {
+        "palabra": "visita",
+        "inicio": 1.975,
+        "fin": 2.462
+      }
+    ]
+  },
+  {
+    "id": "celular",
+    "texto": "Y la orden llega al celular del técnico.",
+    "palabras": [
+      {
+        "palabra": "Y",
+        "inicio": 0.1,
+        "fin": 0.212
+      },
+      {
+        "palabra": "la",
+        "inicio": 0.263,
+        "fin": 0.362
+      },
+      {
+        "palabra": "orden",
+        "inicio": 0.425,
+        "fin": 0.713
+      },
+      {
+        "palabra": "llega",
+        "inicio": 0.738,
+        "fin": 1.038
+      },
+      {
+        "palabra": "al",
+        "inicio": 1.05,
+        "fin": 1.15
+      },
+      {
+        "palabra": "celular",
+        "inicio": 1.163,
+        "fin": 1.6
+      },
+      {
+        "palabra": "del",
+        "inicio": 1.637,
+        "fin": 1.8
+      },
+      {
+        "palabra": "técnico",
+        "inicio": 1.863,
+        "fin": 2.388
+      }
+    ]
+  },
+  {
+    "id": "checkin",
+    "texto": "Al llegar, el GPS registra que está en el sitio.",
+    "palabras": [
+      {
+        "palabra": "Al",
+        "inicio": 0.1,
+        "fin": 0.287
+      },
+      {
+        "palabra": "llegar",
+        "inicio": 0.312,
+        "fin": 0.725
+      },
+      {
+        "palabra": "el",
+        "inicio": 0.787,
+        "fin": 0.9
+      },
+      {
+        "palabra": "GPS",
+        "inicio": 0.912,
+        "fin": 1.438
+      },
+      {
+        "palabra": "registra",
+        "inicio": 1.475,
+        "fin": 1.95
+      },
+      {
+        "palabra": "que",
+        "inicio": 2.013,
+        "fin": 2.062
+      },
+      {
+        "palabra": "está",
+        "inicio": 2.062,
+        "fin": 2.337
+      },
+      {
+        "palabra": "en",
+        "inicio": 2.375,
+        "fin": 2.45
+      },
+      {
+        "palabra": "el",
+        "inicio": 2.475,
+        "fin": 2.587
+      },
+      {
+        "palabra": "sitio",
+        "inicio": 2.612,
+        "fin": 3.062
+      }
+    ]
+  },
+  {
+    "id": "checklist",
+    "texto": "Completa el checklist, saca las fotos,",
+    "palabras": [
+      {
+        "palabra": "Completa",
+        "inicio": 0.1,
+        "fin": 0.588
+      },
+      {
+        "palabra": "el",
+        "inicio": 0.588,
+        "fin": 0.7
+      },
+      {
+        "palabra": "checklist",
+        "inicio": 0.738,
+        "fin": 1.325
+      },
+      {
+        "palabra": "saca",
+        "inicio": 1.562,
+        "fin": 1.887
+      },
+      {
+        "palabra": "las",
+        "inicio": 1.925,
+        "fin": 2.025
+      },
+      {
+        "palabra": "fotos",
+        "inicio": 2.05,
+        "fin": 2.612
+      }
+    ]
+  },
+  {
+    "id": "firma",
+    "texto": "y el cliente firma en la pantalla.",
+    "palabras": [
+      {
+        "palabra": "y",
+        "inicio": 0.1,
+        "fin": 0.2
+      },
+      {
+        "palabra": "el",
+        "inicio": 0.212,
+        "fin": 0.35
+      },
+      {
+        "palabra": "cliente",
+        "inicio": 0.375,
+        "fin": 0.775
+      },
+      {
+        "palabra": "firma",
+        "inicio": 0.812,
+        "fin": 1.137
+      },
+      {
+        "palabra": "en",
+        "inicio": 1.137,
+        "fin": 1.188
+      },
+      {
+        "palabra": "la",
+        "inicio": 1.188,
+        "fin": 1.288
+      },
+      {
+        "palabra": "pantalla",
+        "inicio": 1.363,
+        "fin": 1.938
+      }
+    ]
+  },
+  {
+    "id": "informe",
+    "texto": "Al finalizar, SON arma el informe en PDF, con fotos y firmas, y se lo envía al cliente junto con una encuesta.",
+    "palabras": [
+      {
+        "palabra": "Al",
+        "inicio": 0.1,
+        "fin": 0.25
+      },
+      {
+        "palabra": "finalizar",
+        "inicio": 0.263,
+        "fin": 0.963
+      },
+      {
+        "palabra": "SON",
+        "inicio": 1.2,
+        "fin": 1.438
+      },
+      {
+        "palabra": "arma",
+        "inicio": 1.462,
+        "fin": 1.712
+      },
+      {
+        "palabra": "el",
+        "inicio": 1.75,
+        "fin": 1.8
+      },
+      {
+        "palabra": "informe",
+        "inicio": 1.812,
+        "fin": 2.225
+      },
+      {
+        "palabra": "en",
+        "inicio": 2.237,
+        "fin": 2.388
+      },
+      {
+        "palabra": "PDF",
+        "inicio": 2.4,
+        "fin": 3.013
+      },
+      {
+        "palabra": "con",
+        "inicio": 3.35,
+        "fin": 3.5
+      },
+      {
+        "palabra": "fotos",
+        "inicio": 3.513,
+        "fin": 3.888
+      },
+      {
+        "palabra": "y",
+        "inicio": 3.913,
+        "fin": 3.95
+      },
+      {
+        "palabra": "firmas",
+        "inicio": 3.987,
+        "fin": 4.537
+      },
+      {
+        "palabra": "y",
+        "inicio": 4.85,
+        "fin": 4.912
+      },
+      {
+        "palabra": "se",
+        "inicio": 4.938,
+        "fin": 5.062
+      },
+      {
+        "palabra": "lo",
+        "inicio": 5.1,
+        "fin": 5.175
+      },
+      {
+        "palabra": "envía",
+        "inicio": 5.175,
+        "fin": 5.475
+      },
+      {
+        "palabra": "al",
+        "inicio": 5.475,
+        "fin": 5.562
+      },
+      {
+        "palabra": "cliente",
+        "inicio": 5.6,
+        "fin": 5.938
+      },
+      {
+        "palabra": "junto",
+        "inicio": 5.975,
+        "fin": 6.3
+      },
+      {
+        "palabra": "con",
+        "inicio": 6.362,
+        "fin": 6.487
+      },
+      {
+        "palabra": "una",
+        "inicio": 6.513,
+        "fin": 6.638
+      },
+      {
+        "palabra": "encuesta",
+        "inicio": 6.638,
+        "fin": 7.213
+      }
+    ]
+  },
+  {
+    "id": "cierre",
+    "texto": "Sin papeles. Sin pasar en limpio. Sin esperar días.",
+    "palabras": [
+      {
+        "palabra": "Sin",
+        "inicio": 0.1,
+        "fin": 0.4
+      },
+      {
+        "palabra": "papeles",
+        "inicio": 0.412,
+        "fin": 1.087
+      },
+      {
+        "palabra": "Sin",
+        "inicio": 2.013,
+        "fin": 2.312
+      },
+      {
+        "palabra": "pasar",
+        "inicio": 2.325,
+        "fin": 2.638
+      },
+      {
+        "palabra": "en",
+        "inicio": 2.638,
+        "fin": 2.725
+      },
+      {
+        "palabra": "limpio",
+        "inicio": 2.725,
+        "fin": 3.263
+      },
+      {
+        "palabra": "Sin",
+        "inicio": 4.213,
+        "fin": 4.425
+      },
+      {
+        "palabra": "esperar",
+        "inicio": 4.438,
+        "fin": 4.888
+      },
+      {
+        "palabra": "días",
+        "inicio": 4.938,
+        "fin": 5.463
+      }
+    ]
+  },
+  {
+    "id": "marca",
+    "texto": "SON. Agende una demostración.",
+    "palabras": [
+      {
+        "palabra": "SON",
+        "inicio": 0.1,
+        "fin": 0.5
+      },
+      {
+        "palabra": "Agende",
+        "inicio": 1.4,
+        "fin": 1.837
+      },
+      {
+        "palabra": "una",
+        "inicio": 1.875,
+        "fin": 2.038
+      },
+      {
+        "palabra": "demostración",
+        "inicio": 2.112,
+        "fin": 2.837
+      }
+    ]
+  }
+]

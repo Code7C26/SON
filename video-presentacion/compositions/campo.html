@@ -1,0 +1,305 @@
+<template>
+  <style>
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans-Regular.ttf"); font-weight: 400; }
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans-Bold.ttf"); font-weight: 700; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.ttf"); font-weight: 400; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.ttf"); font-weight: 600; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.ttf"); font-weight: 700; }
+    #root { position: absolute; inset: 0; background: #f4f4f4; overflow: hidden; font-family: "Inter", sans-serif; color: #2e2e2e; }
+
+    /* Palabra-paso a la izquierda */
+    .paso { position: absolute; left: 150px; top: 380px; width: 860px; font-family: "Plus Jakarta Sans", sans-serif;
+      font-size: 104px; line-height: 1.06; letter-spacing: -2.5px; }
+    .paso .r { font-weight: 400; display: block; }
+    .paso .b { font-weight: 700; display: block; }
+
+    /* Celular */
+    #campo-tel { position: absolute; left: 1100px; top: 24px; width: 540px; height: 1032px; }
+    .marco { position: absolute; inset: 0; background: #2e2e2e; border-radius: 66px; box-shadow: 0 30px 60px rgba(46, 46, 46, 0.18); }
+    .pantalla { position: absolute; left: 14px; top: 14px; width: 512px; height: 1004px; border-radius: 52px; overflow: hidden; background: #f4f4f4; }
+    .estado { position: absolute; left: 0; right: 0; top: 0; height: 48px; display: flex; justify-content: space-between; align-items: center;
+      padding: 0 40px; font-size: 18px; font-weight: 600; }
+    .scr { position: absolute; inset: 0; }
+    .pad { position: absolute; left: 28px; right: 28px; }
+
+    .eyebrow { display: inline-block; background: rgba(255, 97, 71, 0.12); color: #ff6147; border-radius: 999px; padding: 8px 16px;
+      font-size: 16px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; }
+    .hola { font-family: "Plus Jakarta Sans", sans-serif; font-size: 40px; line-height: 1.12; letter-spacing: -0.5px; }
+    .tarjeta { background: #ffffff; border: 1px solid #d5d5d5; border-radius: 24px; padding: 24px; box-shadow: 0 8px 20px rgba(46, 46, 46, 0.04); }
+    .pill { display: inline-block; border-radius: 999px; padding: 6px 14px; font-size: 18px; font-weight: 600; }
+    .p-pend { background: #d99c13; color: #2e2e2e; }
+    .p-prog { background: rgba(196, 106, 58, 0.18); color: #2e2e2e; border: 1px solid #c46a3a; }
+    .cli { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 700; font-size: 30px; letter-spacing: -0.5px; margin-top: 14px; }
+    .dato { display: flex; align-items: center; gap: 14px; font-size: 23px; margin-top: 12px; }
+    .ic { width: 44px; height: 44px; border-radius: 50%; background: #2e2e2e; display: flex; align-items: center; justify-content: center; flex: none; }
+    .barra-tit { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 700; font-size: 28px; letter-spacing: -0.5px; }
+    .boton { position: absolute; left: 28px; right: 28px; height: 78px; border-radius: 999px; display: flex; align-items: center; justify-content: center;
+      gap: 12px; font-size: 28px; font-weight: 700; }
+    .b-coral { background: #ff6147; color: #2e2e2e; }
+    .b-tinta { background: #2e2e2e; color: #ffffff; }
+    .b-borde { border: 1.5px solid #2e2e2e; color: #2e2e2e; height: 64px; font-size: 23px; font-weight: 600; }
+    .seccion { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 700; font-size: 26px; letter-spacing: -0.3px; }
+    .pasos { position: absolute; left: 28px; right: 28px; top: 132px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; font-size: 17px; font-weight: 600; color: #9a9a9a; }
+    .pasos div { border-top: 5px solid #e7e7e7; padding-top: 8px; }
+    .pasos .on { color: #2e2e2e; border-color: #ff6147; }
+    .pasos .ok { color: #6e6e6e; border-color: #2e2e2e; }
+    .reloj { position: absolute; right: 28px; top: 64px; background: #2e2e2e; color: #ffffff; border-radius: 999px; padding: 8px 16px; font-size: 20px;
+      font-weight: 600; font-variant-numeric: tabular-nums; display: flex; gap: 8px; align-items: center; }
+    .check { display: flex; align-items: center; gap: 18px; height: 80px; padding: 0 22px; border-top: 1px solid #e7e7e7; font-size: 23px; }
+    .check:first-child { border-top: 0; }
+    .caja { width: 34px; height: 34px; border-radius: 8px; border: 2.5px solid #9a9a9a; position: relative; flex: none; }
+    .caja .lleno { position: absolute; inset: -2.5px; border-radius: 8px; background: #ff6147; }
+    .caja svg { position: absolute; left: 3px; top: 4px; }
+    .tachado { position: absolute; left: 0; top: 50%; height: 2px; background: #9a9a9a; width: 100%; transform-origin: 0 50%; }
+    .foto { width: 140px; height: 140px; border-radius: 20px; overflow: hidden; }
+    .snack { position: absolute; left: 28px; right: 28px; top: 790px; height: 70px; background: #2e2e2e; color: #ffffff; border-radius: 16px;
+      display: flex; align-items: center; padding: 0 24px; font-size: 22px; font-weight: 600; gap: 12px; }
+    .dedo { position: absolute; width: 70px; height: 70px; border-radius: 50%; background: rgba(46, 46, 46, 0.28); }
+    #campo-s2, #campo-s3, #campo-evid, #campo-firmas, #campo-fin, #campo-snack, #campo-ini-b, #campo-orden, .paso span, #campo-dedo { opacity: 0; }
+    .campo-n + .campo-n { opacity: 0; }
+    #campo-vuelo { position: absolute; left: 1142px; top: 308px; width: 456px; }
+  </style>
+  <div id="root" data-composition-id="campo" data-width="1920" data-height="1080">
+    <!-- Palabras-paso -->
+    <div id="campo-p1" class="paso"><span class="r">Orden</span><span class="b">asignada</span></div>
+    <div id="campo-p2" class="paso"><span class="r">Técnico</span><span class="b">en el sitio</span></div>
+    <div id="campo-p3" class="paso"><span class="r">Checklist</span><span class="b">y evidencias</span></div>
+    <div id="campo-p4" class="paso"><span class="r">Firma</span><span class="b">del cliente</span></div>
+
+    <div id="campo-tel" data-layout-allow-overflow data-layout-allow-overlap data-layout-allow-occlusion>
+      <div class="marco"></div>
+      <div class="pantalla">
+        <div class="estado"><span>9:02</span><span>●●● 4G</span></div>
+
+        <!-- 1. Inicio: Tu jornada de hoy -->
+        <div id="campo-s1" class="scr">
+          <div class="pad" style="top: 74px"><span class="eyebrow">Martes 18 nov</span></div>
+          <div class="pad hola" style="top: 130px">Hola, Martín.<br /><b>Tu jornada de hoy</b></div>
+          <div id="campo-orden" class="pad tarjeta" style="top: 284px">
+            <span class="pill p-pend">Pendiente</span>
+            <div class="cli">Metalúrgica Andina S.A.</div>
+            <div class="dato"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" fill="#fff" /></svg></span>Av. Colón 1250</div>
+            <div class="dato"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2.5" /><path d="M12 7v5l3 2" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" /></svg></span>09:00 – 12:00</div>
+          </div>
+          <div class="pad tarjeta" style="top: 590px; opacity: 0.55">
+            <span class="pill p-pend">Pendiente</span>
+            <div class="cli">Colegio San José</div>
+            <div class="dato"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2.5" /><path d="M12 7v5l3 2" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" /></svg></span>14:00 – 16:00</div>
+          </div>
+        </div>
+
+        <!-- 2. Detalle de la orden -->
+        <div id="campo-s2" class="scr">
+          <div class="pad barra-tit" style="top: 66px">← &nbsp;Orden #1042</div>
+          <div class="pad" style="top: 140px"><span class="pill p-pend">Pendiente</span></div>
+          <div class="pad cli" style="top: 180px; font-size: 40px; line-height: 1.12">Metalúrgica<br />Andina S.A.</div>
+          <div class="pad" style="top: 300px">
+            <div class="dato"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" fill="#fff" /></svg></span>Av. Colón 1250</div>
+            <div class="dato"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2.5" /><path d="M12 7v5l3 2" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" /></svg></span>18/11 · 09:00 – 12:00</div>
+          </div>
+          <div class="boton b-borde" style="top: 450px">Ir con Google Maps</div>
+          <div class="pad tarjeta" style="top: 540px">
+            <span class="eyebrow">Tarea</span>
+            <div style="font-size: 23px; line-height: 1.45; margin-top: 12px">Control de extintores, salidas de emergencia y tablero eléctrico.</div>
+          </div>
+          <div id="campo-iniciar" class="boton b-coral" style="top: 900px">
+            <svg width="28" height="28" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" fill="#2e2e2e" /></svg>
+            <span style="position: relative; display: inline-block; width: 210px; height: 36px">
+              <span id="campo-ini-a" style="position: absolute; left: 0; top: 0; line-height: 36px">Iniciar trabajo</span>
+              <span id="campo-ini-b" style="position: absolute; left: 0; top: 0; line-height: 36px">Ubicando...</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- 3–5. Trabajo en progreso -->
+        <div id="campo-s3" class="scr">
+          <div class="pad barra-tit" style="top: 66px; right: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Metalúrgica Andina S.A.</div>
+          <div class="reloj"><svg width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8" fill="none" stroke="#ff6147" stroke-width="2.5" /><path d="M12 9v4M9 2h6" stroke="#ff6147" stroke-width="2.5" stroke-linecap="round" /></svg><span id="campo-tiempo">00:00:00</span></div>
+          <div class="pasos">
+            <div id="campo-t1" class="on">Tareas</div><div id="campo-t2">Evidencia</div><div id="campo-t3">Notas</div><div id="campo-t4">Firmas</div>
+          </div>
+
+          <!-- Paso Tareas -->
+          <div id="campo-tareas" class="scr">
+            <div class="pad" style="top: 214px; display: flex; justify-content: space-between; align-items: baseline">
+              <span class="seccion">Checklist</span><span style="font-size: 20px; font-weight: 600; color: #6e6e6e; position: relative; width: 70px; height: 26px; display: inline-block"><span class="campo-n" style="position: absolute; right: 0">0 de 3</span><span class="campo-n" style="position: absolute; right: 0">1 de 3</span><span class="campo-n" style="position: absolute; right: 0">2 de 3</span><span class="campo-n" style="position: absolute; right: 0">3 de 3</span></span>
+            </div>
+            <div class="pad tarjeta" style="top: 262px; padding: 0">
+              <div class="check"><span class="caja"><span class="lleno"></span><svg width="24" height="22" viewBox="0 0 24 22"><path d="M3 11l6 6L21 4" stroke="#2e2e2e" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg></span><span style="position: relative">Extintores en fecha<i class="tachado"></i></span></div>
+              <div class="check"><span class="caja"><span class="lleno"></span><svg width="24" height="22" viewBox="0 0 24 22"><path d="M3 11l6 6L21 4" stroke="#2e2e2e" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg></span><span style="position: relative">Salidas de emergencia libres<i class="tachado"></i></span></div>
+              <div class="check"><span class="caja"><span class="lleno"></span><svg width="24" height="22" viewBox="0 0 24 22"><path d="M3 11l6 6L21 4" stroke="#2e2e2e" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg></span><span style="position: relative">Tablero eléctrico señalizado<i class="tachado"></i></span></div>
+            </div>
+            <div class="pad seccion" style="top: 540px">Check-in</div>
+            <div id="campo-mapa" class="pad tarjeta" style="top: 588px; height: 270px; padding: 0; overflow: hidden">
+              <svg width="456" height="270" viewBox="0 0 456 270">
+                <rect width="456" height="270" fill="#f4f4f4" />
+                <g fill="#e7e7e7"><rect x="20" y="20" width="120" height="80" rx="6" /><rect x="170" y="20" width="110" height="80" rx="6" /><rect x="310" y="20" width="130" height="80" rx="6" />
+                  <rect x="20" y="150" width="120" height="100" rx="6" /><rect x="310" y="150" width="130" height="100" rx="6" /></g>
+                <rect x="170" y="150" width="110" height="100" rx="6" fill="rgba(217,156,19,0.25)" />
+                <g stroke="#ffffff" stroke-width="18"><line x1="0" y1="125" x2="456" y2="125" /><line x1="155" y1="0" x2="155" y2="270" /><line x1="295" y1="0" x2="295" y2="270" /></g>
+                <circle id="campo-radio" cx="225" cy="168" r="46" fill="rgba(255,97,71,0.16)" />
+                <g id="campo-pin"><path d="M225 112a24 24 0 0 0-24 24c0 18 24 44 24 44s24-26 24-44a24 24 0 0 0-24-24zm0 33a9 9 0 1 1 0-18 9 9 0 0 1 0 18z" fill="#ff6147" /></g>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Paso Evidencia -->
+          <div id="campo-evid" class="scr">
+            <div class="pad seccion" style="top: 214px">Fotos</div>
+            <div class="pad" style="top: 262px; display: grid; grid-template-columns: repeat(3, 140px); gap: 18px">
+              <div class="foto" style="background: #2e2e2e; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 19px">
+                <svg width="34" height="34" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" /><circle cx="12" cy="13" r="3.5" fill="none" stroke="#fff" stroke-width="2" /></svg>Agregar
+              </div>
+              <!-- Fotos de ejemplo (ilustradas): extintor, salida de emergencia, tablero -->
+              <div id="campo-f1" class="foto"><svg width="140" height="140" viewBox="0 0 140 140"><rect width="140" height="140" fill="#e7e7e7" /><rect y="104" width="140" height="36" fill="#d5d5d5" /><rect x="54" y="40" width="34" height="78" rx="14" fill="#ff6147" /><rect x="62" y="26" width="18" height="16" rx="3" fill="#2e2e2e" /><path d="M80 32 h18 v10" stroke="#2e2e2e" stroke-width="5" fill="none" /><rect x="58" y="66" width="26" height="16" rx="2" fill="#ffffff" /></svg></div>
+              <div id="campo-f2" class="foto"><svg width="140" height="140" viewBox="0 0 140 140"><rect width="140" height="140" fill="#6e6e6e" /><rect x="22" y="40" width="96" height="56" rx="6" fill="#2e2e2e" /><rect x="30" y="48" width="80" height="40" rx="3" fill="#f4f4f4" /><circle cx="52" cy="58" r="5" fill="#2e2e2e" /><path d="M52 64 l-6 12 M52 64 l8 6 M50 70 l-8 10 M56 74 l6 8" stroke="#2e2e2e" stroke-width="4" stroke-linecap="round" /><path d="M72 68 h28 m-8 -7 l8 7 -8 7" stroke="#2e2e2e" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+              <div id="campo-f3" class="foto"><svg width="140" height="140" viewBox="0 0 140 140"><rect width="140" height="140" fill="#d5d5d5" /><rect x="30" y="20" width="80" height="104" rx="6" fill="#9a9a9a" /><rect x="38" y="28" width="64" height="88" rx="3" fill="#e7e7e7" /><path d="M70 44 l20 34 h-40 z" fill="#d99c13" stroke="#2e2e2e" stroke-width="3" stroke-linejoin="round" /><path d="M72 52 l-6 12 h8 l-6 10" stroke="#2e2e2e" stroke-width="3" fill="none" stroke-linejoin="round" /></svg></div>
+            </div>
+          </div>
+
+          <!-- Paso Firmas -->
+          <div id="campo-firmas" class="scr">
+            <div class="pad tarjeta" style="top: 214px; display: flex; align-items: center; gap: 16px; font-size: 22px; font-weight: 600">
+              <span class="ic"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg></span>Tu firma y sello van solos
+            </div>
+            <div class="pad seccion" style="top: 360px">Firma y sello del cliente</div>
+            <div id="campo-caja-firma" class="pad" style="top: 410px; height: 240px; background: #fff; border: 1px solid #d5d5d5; border-radius: 24px">
+              <div id="campo-tocar" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #6e6e6e; font-weight: 600; font-size: 22px">
+                <svg width="38" height="38" viewBox="0 0 24 24"><path d="M3 21l3-1 12-12-2-2L4 18zM15 5l2-2 4 4-2 2" stroke="#9a9a9a" stroke-width="2" fill="none" stroke-linejoin="round" /></svg>Tocar para firmar
+              </div>
+              <svg style="position: absolute; left: 0; top: 0" width="456" height="240" viewBox="0 0 456 240">
+                <path id="campo-trazo" d="M60 160 C 80 90, 110 80, 112 130 S 100 190, 128 150 S 170 70, 182 120 S 190 170, 214 132 S 250 100, 262 140 C 270 168, 300 120, 322 128 S 360 150, 396 112" fill="none" stroke="#2e2e2e" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+          </div>
+
+          <div id="campo-snack" class="snack"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7" stroke="#ff6147" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>Check-in registrado</div>
+          <div id="campo-sig" class="boton b-tinta" style="top: 900px"><span id="campo-sig-a">Evidencia →</span></div>
+          <div id="campo-fin" class="boton b-coral" style="top: 900px"><svg width="28" height="28" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7" stroke="#2e2e2e" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>Finalizar</div>
+        </div>
+
+        <div id="campo-dedo" class="dedo"></div>
+      </div>
+    </div>
+
+    <!-- La tarjeta que llega desde el panel -->
+    <div id="campo-vuelo" class="tarjeta" data-layout-allow-overlap>
+      <span class="pill p-pend">Pendiente</span>
+      <div class="cli">Metalúrgica Andina S.A.</div>
+      <div class="dato"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" fill="#fff" /></svg></span>Av. Colón 1250</div>
+      <div class="dato"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2.5" /><path d="M12 7v5l3 2" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" /></svg></span>09:00 – 12:00</div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const swapIn = (sel, t) => tl.fromTo(sel, { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }, t);
+      const swapOut = (sel, t) => tl.to(sel, { opacity: 0, duration: 0.15, ease: "power2.in" }, t);
+      const paso = (sel, t) => tl.fromTo(sel + " span", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.18, stagger: 0.08, ease: "power2.out" }, t);
+      const pasoFuera = (sel, t) => tl.to(sel + " span", { opacity: 0, filter: "blur(8px)", duration: 0.15, ease: "power2.in" }, t);
+      const toque = (x, y, t) => {
+        tl.fromTo("#campo-dedo", { x: x - 35, y: y - 35, opacity: 0, scale: 1.3 }, { opacity: 1, scale: 1, duration: 0.15, ease: "power2.out" }, t - 0.15);
+        tl.to("#campo-dedo", { scale: 0.8, duration: 0.08 }, t);
+        tl.to("#campo-dedo", { opacity: 0, scale: 1, duration: 0.18 }, t + 0.1);
+      };
+
+      // Estado inicial
+
+      // 0.0: el celular ya está; la tarjeta llega desde la izquierda (viene del panel) en «orden»
+      tl.fromTo("#campo-tel", { x: 60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.4, ease: "expo.out" }, 0);
+      tl.fromTo("#campo-vuelo", { x: -1500, filter: "blur(12px)" }, { x: 0, filter: "blur(0px)", duration: 0.75, ease: "expo.out" }, 0.05);
+      tl.set("#campo-orden", { opacity: 1 }, 0.85);
+      tl.set("#campo-vuelo", { opacity: 0 }, 0.85);
+      paso("#campo-p1", 0.7);
+
+      // Toque en la tarjeta → detalle de la orden
+      toque(256, 400, 2.0);
+      swapOut("#campo-s1", 2.1);
+      swapIn("#campo-s2", 2.2);
+
+      // «GPS» (23.71 → 4.11): toque en «Iniciar trabajo» → «Ubicando...»
+      pasoFuera("#campo-p1", 3.7);
+      paso("#campo-p2", 3.95);
+      toque(256, 939, 4.12);
+      tl.to("#campo-iniciar", { scale: 0.96, duration: 0.08 }, 4.12);
+      tl.to("#campo-iniciar", { scale: 1, duration: 0.15 }, 4.2);
+      tl.to("#campo-ini-a", { opacity: 0, duration: 0.1 }, 4.2);
+      tl.to("#campo-ini-b", { opacity: 1, duration: 0.1 }, 4.25);
+
+      // «sitio» (25.41 → 5.81): pantalla de trabajo, mapa con pin, «Check-in registrado»
+      swapOut("#campo-s2", 5.4);
+      swapIn("#campo-s3", 5.5);
+      tl.fromTo("#campo-pin", { y: -60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "bounce.out" }, 5.7);
+      tl.fromTo("#campo-radio", { scale: 0, transformOrigin: "225px 168px" }, { scale: 1, duration: 0.5, ease: "expo.out" }, 5.85);
+      tl.fromTo("#campo-snack", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.3, ease: "expo.out" }, 5.85);
+      tl.to("#campo-snack", { opacity: 0, duration: 0.2 }, 7.1);
+      // Cámara: empuje al mapa y vuelta
+      tl.fromTo("#campo-tel", { scale: 1, transformOrigin: "50% 70%" }, { scale: 1.22, duration: 0.6, ease: "power2.inOut" }, 5.6);
+      tl.to("#campo-tel", { scale: 1, duration: 0.6, ease: "power2.inOut" }, 6.8);
+
+      // Reloj de la visita
+      const reloj = { s: 0 };
+      tl.fromTo(reloj, { s: 0 }, { s: 382, duration: 6.5, ease: "none", onUpdate: () => {
+        const s = Math.floor(reloj.s), m = Math.floor(s / 60);
+        const el = document.querySelector("#campo-tiempo");
+        if (el) el.textContent = "00:" + String(m).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
+      } }, 5.5);
+
+      // «checklist» (27.14 → 7.54): tres tildes
+      pasoFuera("#campo-p2", 7.1);
+      paso("#campo-p3", 7.3);
+      const nums = gsap.utils.toArray("#campo-tareas .campo-n");
+      const cajas = gsap.utils.toArray("#campo-tareas .caja");
+      cajas.forEach((c, i) => {
+        const t = 7.5 + i * 0.3;
+        tl.fromTo(c.querySelector(".lleno"), { scale: 0 }, { scale: 1, duration: 0.25, ease: "back.out(2.2)" }, t);
+        tl.fromTo(c.querySelector("svg"), { opacity: 0 }, { opacity: 1, duration: 0.1 }, t + 0.08);
+        tl.fromTo(c.parentElement.querySelector(".tachado"), { scaleX: 0 }, { scaleX: 1, duration: 0.25, ease: "power2.out" }, t + 0.08);
+        tl.to(c.parentElement, { color: "#6e6e6e", duration: 0.2 }, t + 0.08);
+        tl.set(nums[i], { opacity: 0 }, t + 0.1);
+        tl.set(nums[i + 1], { opacity: 1 }, t + 0.1);
+      });
+
+      // Paso Evidencia: «fotos» (28.45 → 8.85)
+      toque(256, 939, 8.45);
+      swapOut("#campo-tareas", 8.5);
+      swapIn("#campo-evid", 8.55);
+      const ok = { color: "#6e6e6e", borderTopColor: "#2e2e2e" };
+      const on = { color: "#2e2e2e", borderTopColor: "#ff6147" };
+      tl.set("#campo-t1", ok, 8.55);
+      tl.set("#campo-t2", on, 8.55);
+      ["#campo-f1", "#campo-f2", "#campo-f3"].forEach((f, i) => {
+        tl.fromTo(f, { scale: 0.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "back.out(1.8)" }, 8.85 + i * 0.18);
+      });
+
+      // Paso Firmas: «firma» (30.01 → 10.41)
+      pasoFuera("#campo-p3", 9.5);
+      paso("#campo-p4", 9.75);
+      toque(256, 939, 9.6);
+      swapOut("#campo-evid", 9.65);
+      swapIn("#campo-firmas", 9.7);
+      tl.set(["#campo-t2", "#campo-t3"], ok, 9.7);
+      tl.set("#campo-t4", on, 9.7);
+      tl.to("#campo-sig", { opacity: 0, duration: 0.15 }, 9.7);
+      tl.to("#campo-fin", { opacity: 1, duration: 0.2 }, 9.75);
+      tl.to("#campo-tel", { scale: 1.2, transformOrigin: "50% 55%", duration: 0.6, ease: "power2.inOut" }, 9.8);
+      tl.to("#campo-tocar", { opacity: 0, duration: 0.15 }, 9.95);
+      const trazo = document.querySelector("#campo-trazo");
+      const L = trazo.getTotalLength();
+      trazo.style.strokeDasharray = L;
+      tl.fromTo(trazo, { strokeDashoffset: L }, { strokeDashoffset: 0, duration: 0.85, ease: "power1.inOut" }, 10.0);
+      tl.to("#campo-caja-firma", { borderColor: "#ff6147", duration: 0.2 }, 10.85);
+      tl.to("#campo-tel", { scale: 1, duration: 0.45, ease: "power2.inOut" }, 11.1);
+
+      // «Finalizar» (31.25 → 11.65)
+      toque(256, 939, 11.65);
+      tl.to("#campo-fin", { scale: 0.96, duration: 0.08 }, 11.65);
+      tl.to("#campo-fin", { scale: 1, duration: 0.12 }, 11.73);
+      pasoFuera("#campo-p4", 11.7);
+      // La pantalla se vacía: el informe nace de ella en la escena siguiente
+      tl.to(["#campo-s3", ".estado"], { opacity: 0, duration: 0.18, ease: "power2.in" }, 11.8);
+
+      window.__timelines["campo"] = tl;
+    })();
+  </script>
+</template>

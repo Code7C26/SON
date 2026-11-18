@@ -1,0 +1,41 @@
+<template>
+  <style>
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans-Regular.ttf"); font-weight: 400; }
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans-Bold.ttf"); font-weight: 700; }
+    #root { position: absolute; inset: 0; background: #f4f4f4; overflow: hidden; color: #2e2e2e; }
+    #reveal-iso { position: absolute; left: 960px; top: 540px; width: 420px; height: 420px; margin: -210px 0 0 -210px; }
+    #reveal-iso img { width: 100%; height: 100%; display: block; }
+    #reveal-tit { position: absolute; left: 860px; top: 400px; width: 1000px; font-family: "Plus Jakarta Sans", sans-serif;
+      font-size: 112px; line-height: 1.08; letter-spacing: -2.5px; }
+    #reveal-tit .w { display: inline-block; }
+    #reveal-tit .b { font-weight: 700; }
+    #reveal-tit .r { font-weight: 400; }
+  </style>
+  <div id="root" data-composition-id="reveal" data-width="1920" data-height="1080">
+    <div id="reveal-fondo" style="position: absolute; inset: 0; background: #f4f4f4"></div>
+    <div id="reveal-iso"><img src="assets/img/isotipo.png" alt="Isotipo de SON" /></div>
+    <div id="reveal-tit">
+      <span class="w r">Oficina</span> <span class="w r">y</span> <span class="w r">campo,</span><br />
+      <span class="w b">en</span> <span class="w b">la</span> <span class="w b">misma</span> <span class="w b">página</span>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      // Aparece en el punto donde se succionó el desorden
+      tl.fromTo("#reveal-iso", { scale: 0.05, rotation: 0, filter: "blur(10px)" }, { scale: 1, filter: "blur(0px)", duration: 0.55, ease: "expo.out" }, 0);
+      // «SON» (12.25 → 0.65 local): el reloj se da vuelta
+      tl.to("#reveal-iso", { rotation: 180, duration: 0.8, ease: "power3.inOut" }, 0.55);
+      // Se corre a la izquierda para dar lugar al titular
+      tl.to("#reveal-iso", { x: -560, scale: 0.9, duration: 0.7, ease: "power2.inOut" }, 1.6);
+      // «sincronizada» (14.23 → 2.63 local): titular palabra por palabra, sin desplazamiento
+      tl.fromTo("#reveal-tit .w", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.13, stagger: 0.07, ease: "power2.out" }, 2.2);
+      // 4.5 s: el titular se va y el isotipo viaja a la barra lateral del panel
+      tl.to("#reveal-tit .w", { opacity: 0, filter: "blur(8px)", duration: 0.18, stagger: 0.03, ease: "power2.in" }, 4.4);
+      tl.to("#reveal-iso", { x: 144 - 960, y: 66 - 540, scale: 64 / 420, rotation: 360, duration: 0.5, ease: "power3.inOut" }, 4.5);
+      // Inundación de color: el fondo pasa al gris oscuro del panel mientras el isotipo viaja
+      tl.fromTo("#reveal-fondo", { backgroundColor: "#f4f4f4" }, { backgroundColor: "#2e2e2e", duration: 0.4, ease: "power2.inOut" }, 4.55);
+      window.__timelines["reveal"] = tl;
+    })();
+  </script>
+</template>

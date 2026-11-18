@@ -1,0 +1,153 @@
+<template>
+  <style>
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans-Regular.ttf"); font-weight: 400; }
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans-Bold.ttf"); font-weight: 700; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.ttf"); font-weight: 400; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.ttf"); font-weight: 600; }
+    #root { position: absolute; inset: 0; background: #f4f4f4; overflow: hidden; font-family: "Inter", sans-serif; color: #2e2e2e; }
+    #caos-pila { position: absolute; inset: 0; }
+
+    /* Planilla de papel */
+    #caos-hoja { position: absolute; left: 190px; top: 120px; width: 640px; height: 840px; }
+    .hoja { width: 100%; height: 100%; background: #ffffff; border: 1px solid #d5d5d5; border-radius: 6px;
+      box-shadow: 0 18px 40px rgba(46, 46, 46, 0.10); padding: 56px 56px; }
+    .hoja-tit { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 700; font-size: 34px; letter-spacing: -0.5px; }
+    .hoja-sub { font-size: 22px; color: #6e6e6e; margin-top: 6px; }
+    .hoja svg { position: absolute; left: 0; top: 0; }
+
+    /* Planilla de cálculo genérica */
+    #caos-grilla { position: absolute; left: 1010px; top: 96px; width: 760px; height: 430px; }
+    .grilla { width: 100%; height: 100%; background: #ffffff; border: 1px solid #d5d5d5; border-radius: 16px;
+      box-shadow: 0 18px 40px rgba(46, 46, 46, 0.08); overflow: hidden; }
+    .grilla-barra { height: 64px; background: #e7e7e7; display: flex; align-items: center; padding: 0 24px; gap: 12px;
+      font-weight: 600; font-size: 26px; color: #6e6e6e; }
+    .grilla-barra i { width: 14px; height: 14px; border-radius: 50%; background: #9a9a9a; display: inline-block; }
+    .grilla table { border-collapse: collapse; width: 100%; }
+    .grilla td { border: 1px solid #e7e7e7; height: 52px; width: 16.6%; padding: 0 12px; }
+    .grilla td b { display: block; height: 12px; border-radius: 6px; background: #d5d5d5; }
+
+    /* Burbujas de chat genéricas */
+    .burbuja { position: absolute; background: #ffffff; border: 1px solid #d5d5d5; border-radius: 28px 28px 28px 8px;
+      padding: 22px 30px 18px; box-shadow: 0 14px 30px rgba(46, 46, 46, 0.10); white-space: nowrap; }
+    .burbuja p { font-weight: 600; font-size: 36px; letter-spacing: -0.3px; }
+    .burbuja span { display: block; font-size: 22px; color: #6e6e6e; margin-top: 6px; }
+    #caos-b1 { left: 980px; top: 590px; }
+    #caos-b2 { left: 1180px; top: 730px; }
+    #caos-b3 { left: 520px; top: 430px; }
+    #caos-b4 { left: 760px; top: 640px; }
+
+    /* Informe pendiente */
+    #caos-pend { position: absolute; left: 1060px; top: 880px; display: flex; align-items: center; gap: 20px; }
+    .pend-pill { background: #d99c13; color: #2e2e2e; border-radius: 999px; padding: 14px 30px; font-weight: 600; font-size: 34px; }
+    .pend-dia { position: relative; height: 54px; width: 300px; overflow: hidden; font-family: "Plus Jakarta Sans", sans-serif;
+      font-weight: 700; font-size: 44px; letter-spacing: -1px; }
+    .pend-dia div { position: absolute; left: 0; top: 0; line-height: 54px; }
+  </style>
+  <div id="root" data-composition-id="caos" data-width="1920" data-height="1080">
+    <div id="caos-pila" data-layout-allow-overlap data-layout-allow-occlusion>
+      <div id="caos-hoja">
+        <div class="hoja" style="position: relative">
+          <div class="hoja-tit">Planilla de visita</div>
+          <div class="hoja-sub">Cliente · Fecha · Técnico</div>
+          <svg width="640" height="840" viewBox="0 0 640 840">
+            <g stroke="#e7e7e7" stroke-width="2">
+              <line x1="56" y1="200" x2="584" y2="200" /><line x1="56" y1="270" x2="584" y2="270" />
+              <line x1="56" y1="340" x2="584" y2="340" /><line x1="56" y1="410" x2="584" y2="410" />
+              <line x1="56" y1="480" x2="584" y2="480" /><line x1="56" y1="550" x2="584" y2="550" />
+              <line x1="56" y1="620" x2="584" y2="620" /><line x1="56" y1="690" x2="584" y2="690" />
+            </g>
+            <g fill="none" stroke="#6e6e6e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="60" y="164" width="26" height="26" rx="4" /><rect x="60" y="234" width="26" height="26" rx="4" />
+              <rect x="60" y="304" width="26" height="26" rx="4" /><rect x="60" y="374" width="26" height="26" rx="4" />
+              <path class="caos-trazo" d="M110 186 C 150 170, 170 192, 205 178 S 260 170, 300 184 S 360 176, 410 182" />
+              <path class="caos-trazo" d="M110 256 C 140 240, 175 262, 220 248 S 290 244, 330 254" />
+              <path class="caos-trazo" d="M110 326 C 160 312, 190 334, 240 318 S 320 316, 380 326 S 450 316, 500 324" />
+              <path class="caos-trazo" d="M110 396 C 150 384, 180 402, 230 390 S 280 388, 300 394" />
+              <path class="caos-trazo" d="M64 168 L 82 186 M 82 168 L 64 186" />
+              <path class="caos-trazo" d="M64 308 L 82 326 M 82 308 L 64 326" />
+              <path class="caos-trazo" d="M110 466 C 170 452, 220 476, 300 460 S 420 456, 470 468" />
+              <path class="caos-trazo" d="M110 536 C 160 522, 200 544, 250 530" />
+              <path class="caos-trazo" d="M380 760 C 400 720, 430 790, 452 748 S 488 724, 500 770 S 540 740, 560 752" />
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <div id="caos-grilla">
+        <div class="grilla">
+          <div class="grilla-barra"><i></i><i></i><i></i><span style="margin-left: 12px">visitas_final_v3.xlsx</span></div>
+          <table>
+            <tr><td><b style="width: 80%"></b></td><td><b style="width: 60%"></b></td><td><b style="width: 90%"></b></td><td><b style="width: 40%"></b></td><td></td><td><b style="width: 70%"></b></td></tr>
+            <tr><td><b style="width: 70%"></b></td><td></td><td><b style="width: 50%"></b></td><td><b style="width: 80%"></b></td><td><b style="width: 30%"></b></td><td></td></tr>
+            <tr><td><b style="width: 90%"></b></td><td><b style="width: 40%"></b></td><td></td><td><b style="width: 60%"></b></td><td><b style="width: 80%"></b></td><td><b style="width: 50%"></b></td></tr>
+            <tr><td></td><td><b style="width: 70%"></b></td><td><b style="width: 30%"></b></td><td></td><td><b style="width: 60%"></b></td><td><b style="width: 90%"></b></td></tr>
+            <tr><td><b style="width: 60%"></b></td><td><b style="width: 80%"></b></td><td><b style="width: 70%"></b></td><td><b style="width: 50%"></b></td><td></td><td><b style="width: 40%"></b></td></tr>
+            <tr><td><b style="width: 50%"></b></td><td></td><td><b style="width: 90%"></b></td><td><b style="width: 30%"></b></td><td><b style="width: 70%"></b></td><td></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div id="caos-b1" class="burbuja"><p>¿Llegaste a la planta?</p><span>Oficina · 9:12</span></div>
+      <div id="caos-b2" class="burbuja"><p>¿Me pasás el remito?</p><span>Oficina · 11:40</span></div>
+      <div id="caos-b3" class="burbuja"><p>¿Fuiste a lo de Andina?</p><span>Supervisor · 16:05</span></div>
+      <div id="caos-b4" class="burbuja"><p>¿Quién tiene el remito?</p><span>Administración · 18:30</span></div>
+
+      <div id="caos-pend">
+        <div class="pend-pill">Informe pendiente</div>
+        <div class="pend-dia">
+          <div id="caos-d1">lunes</div>
+          <div id="caos-d2">martes</div>
+          <div id="caos-d3">miércoles</div>
+          <div id="caos-d4">jueves</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const trazos = document.querySelectorAll("#root .caos-trazo");
+      trazos.forEach((p) => {
+        const L = p.getTotalLength();
+        p.style.strokeDasharray = L;
+      });
+
+      // Cuadro 0: la hoja ya está, se van escribiendo los renglones
+      tl.fromTo("#caos-hoja", { rotation: -6, x: 0, y: 0 }, { rotation: -4, duration: 2, ease: "power2.inOut" }, 0);
+      trazos.forEach((p, i) => {
+        const L = p.getTotalLength();
+        tl.fromTo(p, { strokeDashoffset: i < 2 ? L * 0.15 : L }, { strokeDashoffset: 0, duration: 0.45, ease: "power1.inOut" }, i * 0.22);
+      });
+
+      // «Mensajes» (2.49 s): llegan las burbujas
+      tl.fromTo("#caos-b1", { opacity: 0, scale: 0.6, y: 40, transformOrigin: "0% 100%" }, { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: "back.out(1.6)" }, 3.15);
+      tl.fromTo("#caos-b2", { opacity: 0, scale: 0.6, y: 40, transformOrigin: "0% 100%" }, { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: "back.out(1.6)" }, 3.55);
+
+      // «informe» (4.89 s): la planilla de cálculo y el pendiente
+      tl.fromTo("#caos-grilla", { opacity: 0, x: 120, rotation: 6 }, { opacity: 1, x: 0, rotation: 3, duration: 0.7, ease: "expo.out" }, 4.75);
+      tl.fromTo("#caos-pend", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 4.9);
+      // «días» (5.8 s): los días ruedan
+      tl.set(["#caos-d2", "#caos-d3", "#caos-d4"], { yPercent: 100 }, 0);
+      [["#caos-d1", "#caos-d2", 5.55], ["#caos-d2", "#caos-d3", 6.0], ["#caos-d3", "#caos-d4", 6.45]].forEach(([a, b, t]) => {
+        tl.to(a, { yPercent: -100, duration: 0.18, ease: "power2.in" }, t);
+        tl.fromTo(b, { yPercent: 100 }, { yPercent: 0, duration: 0.22, ease: "power3.out" }, t + 0.1);
+      });
+
+      // «planta» (8.2 s) y «remito» (10.33 s): el montón tapa la hoja
+      tl.fromTo("#caos-b3", { opacity: 0, scale: 0.6, y: 40, transformOrigin: "0% 100%" }, { opacity: 1, scale: 1, y: 0, rotation: -3, duration: 0.5, ease: "back.out(1.6)" }, 8.25);
+      tl.to("#caos-hoja", { x: -30, y: 20, duration: 0.6, ease: "power2.out" }, 8.25);
+      tl.fromTo("#caos-b4", { opacity: 0, scale: 0.6, y: 40, transformOrigin: "0% 100%" }, { opacity: 1, scale: 1, y: 0, rotation: 2, duration: 0.5, ease: "back.out(1.6)" }, 9.55);
+      tl.to("#caos-grilla", { x: 30, y: -16, duration: 0.6, ease: "power2.out" }, 9.55);
+
+      // 11.05 s: todo succionado al centro
+      // Desplazamientos fijos desde el centro de cada pieza hasta el centro del cuadro (960, 540)
+      const hacia = { "#caos-hoja": [450, 0], "#caos-grilla": [-430, 229], "#caos-b1": [-235, -105], "#caos-b2": [-420, -245],
+        "#caos-b3": [220, 55], "#caos-b4": [-10, -155], "#caos-pend": [-410, -375] };
+      Object.entries(hacia).forEach(([sel, [dx, dy]], i) => {
+        tl.to(sel, { x: dx, y: dy, scale: 0.05, opacity: 0, filter: "blur(10px)", duration: 0.45, ease: "power3.in" }, 11.05 + i * 0.02);
+      });
+
+      window.__timelines["caos"] = tl;
+    })();
+  </script>
+</template>

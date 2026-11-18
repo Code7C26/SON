@@ -1,0 +1,128 @@
+<template>
+  <style>
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans-Bold.ttf"); font-weight: 700; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.ttf"); font-weight: 400; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.ttf"); font-weight: 600; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.ttf"); font-weight: 700; }
+    #root { position: absolute; inset: 0; background: #f4f4f4; overflow: hidden; font-family: "Inter", sans-serif; color: #2e2e2e; }
+
+    #inf-marco { position: absolute; left: 1100px; top: 24px; width: 540px; height: 1032px; background: #2e2e2e; border-radius: 66px; }
+    #inf-hoja { position: absolute; left: 600px; top: 60px; width: 720px; height: 960px; background: #ffffff; border: 1px solid #d5d5d5;
+      border-radius: 10px; box-shadow: 0 30px 60px rgba(46, 46, 46, 0.12); padding: 52px 56px; }
+    .h-tit { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 700; font-size: 44px; letter-spacing: -1px; }
+    .h-sub { font-size: 22px; color: #6e6e6e; margin-top: 6px; }
+    .h-linea { height: 4px; background: #ff6147; width: 120px; border-radius: 2px; margin: 22px 0 22px; }
+    .h-dato { display: grid; grid-template-columns: 150px 1fr; font-size: 23px; line-height: 40px; }
+    .h-dato b { color: #6e6e6e; font-weight: 600; }
+    .h-sec { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 700; font-size: 26px; margin: 22px 0 10px; }
+    .h-tarea { font-size: 22px; line-height: 38px; display: flex; gap: 12px; align-items: center; }
+    .h-tarea i { width: 26px; height: 26px; border-radius: 6px; background: #ff6147; display: inline-flex; align-items: center; justify-content: center; }
+    .h-fotos { display: flex; gap: 16px; }
+    .h-fotos svg { border-radius: 14px; display: block; }
+    .h-firmas { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .h-firma { height: 120px; border: 1px solid #d5d5d5; border-radius: 14px; position: relative; }
+    .h-firma span { position: absolute; left: 14px; bottom: 8px; font-size: 18px; color: #6e6e6e; }
+
+    /* Correo al cliente */
+    #inf-mail { position: absolute; left: 460px; top: 170px; width: 1000px; background: #ffffff; border: 1px solid #d5d5d5; border-radius: 24px;
+      box-shadow: 0 30px 60px rgba(46, 46, 46, 0.10); padding: 44px 52px; }
+    .m-fila { font-size: 26px; line-height: 46px; }
+    .m-fila b { color: #6e6e6e; font-weight: 600; display: inline-block; width: 110px; }
+    .m-adj { margin-top: 26px; display: inline-flex; align-items: center; gap: 18px; padding: 16px 26px 16px 18px; border-radius: 18px; background: #e7e7e7; font-size: 26px; font-weight: 600; }
+    .m-pdf { width: 56px; height: 68px; background: #ffffff; border: 1px solid #d5d5d5; border-radius: 8px; position: relative; }
+    .m-pdf i { position: absolute; left: 8px; right: 8px; bottom: 10px; height: 20px; background: #ff6147; border-radius: 4px; }
+    .m-enc { margin-top: 34px; padding-top: 30px; border-top: 1px solid #e7e7e7; }
+    .m-enc p { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 700; font-size: 40px; letter-spacing: -0.5px; }
+    .estrellas { display: flex; gap: 18px; margin-top: 20px; }
+    .estrella { width: 72px; height: 72px; position: relative; }
+    .estrella svg { position: absolute; inset: 0; }
+  </style>
+  <div id="root" data-composition-id="informe" data-width="1920" data-height="1080">
+    <div id="inf-marco"></div>
+    <div id="inf-hoja" data-layout-allow-overlap>
+      <div id="inf-cab">
+        <div class="h-tit">Informe de visita</div>
+        <div class="h-sub">Orden #1042 · 18/11/2026</div>
+        <div class="h-linea"></div>
+      </div>
+      <div id="inf-datos">
+        <div class="h-dato"><b>Cliente</b><span>Metalúrgica Andina S.A.</span></div>
+        <div class="h-dato"><b>Técnico</b><span>Martín Ruiz</span></div>
+        <div class="h-dato"><b>Check-in</b><span>09:02 · Av. Colón 1250</span></div>
+      </div>
+      <div id="inf-tareas">
+        <div class="h-sec">Tareas</div>
+        <div class="h-tarea"><i><svg width="16" height="14" viewBox="0 0 24 22"><path d="M3 11l6 6L21 4" stroke="#2e2e2e" stroke-width="4" fill="none" stroke-linecap="round" /></svg></i>Extintores en fecha</div>
+        <div class="h-tarea"><i><svg width="16" height="14" viewBox="0 0 24 22"><path d="M3 11l6 6L21 4" stroke="#2e2e2e" stroke-width="4" fill="none" stroke-linecap="round" /></svg></i>Salidas de emergencia libres</div>
+        <div class="h-tarea"><i><svg width="16" height="14" viewBox="0 0 24 22"><path d="M3 11l6 6L21 4" stroke="#2e2e2e" stroke-width="4" fill="none" stroke-linecap="round" /></svg></i>Tablero eléctrico señalizado</div>
+      </div>
+      <div class="h-sec" id="inf-ev-t">Evidencias</div>
+      <div class="h-fotos">
+        <svg id="inf-f1" width="140" height="120" viewBox="0 10 140 120"><rect y="0" width="140" height="140" fill="#e7e7e7" /><rect y="104" width="140" height="36" fill="#d5d5d5" /><rect x="54" y="40" width="34" height="78" rx="14" fill="#ff6147" /><rect x="62" y="26" width="18" height="16" rx="3" fill="#2e2e2e" /><path d="M80 32 h18 v10" stroke="#2e2e2e" stroke-width="5" fill="none" /><rect x="58" y="66" width="26" height="16" rx="2" fill="#ffffff" /></svg>
+        <svg id="inf-f2" width="140" height="120" viewBox="0 10 140 120"><rect width="140" height="140" fill="#6e6e6e" /><rect x="22" y="40" width="96" height="56" rx="6" fill="#2e2e2e" /><rect x="30" y="48" width="80" height="40" rx="3" fill="#f4f4f4" /><circle cx="52" cy="58" r="5" fill="#2e2e2e" /><path d="M52 64 l-6 12 M52 64 l8 6 M50 70 l-8 10 M56 74 l6 8" stroke="#2e2e2e" stroke-width="4" stroke-linecap="round" /><path d="M72 68 h28 m-8 -7 l8 7 -8 7" stroke="#2e2e2e" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        <svg id="inf-f3" width="140" height="120" viewBox="0 10 140 120"><rect width="140" height="140" fill="#d5d5d5" /><rect x="30" y="20" width="80" height="104" rx="6" fill="#9a9a9a" /><rect x="38" y="28" width="64" height="88" rx="3" fill="#e7e7e7" /><path d="M70 44 l20 34 h-40 z" fill="#d99c13" stroke="#2e2e2e" stroke-width="3" stroke-linejoin="round" /><path d="M72 52 l-6 12 h8 l-6 10" stroke="#2e2e2e" stroke-width="3" fill="none" stroke-linejoin="round" /></svg>
+      </div>
+      <div class="h-sec" id="inf-fi-t">Firmas</div>
+      <div class="h-firmas">
+        <div class="h-firma" id="inf-fi1">
+          <svg width="290" height="120" viewBox="0 0 290 120"><path d="M30 80 C 50 40, 70 40, 80 70 S 110 90, 130 60 S 170 40, 190 70 S 230 80, 250 50" fill="none" stroke="#2e2e2e" stroke-width="3.5" stroke-linecap="round" /><circle cx="235" cy="58" r="30" fill="none" stroke="#6e6e6e" stroke-width="2.5" stroke-dasharray="5 4" /></svg>
+          <span>Técnico</span>
+        </div>
+        <div class="h-firma" id="inf-fi2">
+          <svg width="290" height="120" viewBox="0 0 456 240" preserveAspectRatio="xMidYMid meet"><path d="M60 160 C 80 90, 110 80, 112 130 S 100 190, 128 150 S 170 70, 182 120 S 190 170, 214 132 S 250 100, 262 140 C 270 168, 300 120, 322 128 S 360 150, 396 112" fill="none" stroke="#2e2e2e" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span>Cliente</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="inf-mail" data-layout-allow-overlap>
+      <div class="m-fila"><b>Para</b>Metalúrgica Andina S.A.</div>
+      <div class="m-fila"><b>Asunto</b>Informe de visita · Orden #1042</div>
+      <div id="inf-adj" class="m-adj"><span class="m-pdf"><i></i></span>Informe_1042.pdf</div>
+      <div class="m-enc">
+        <p>¿Cómo fue el servicio?</p>
+        <div class="estrellas">
+          <div class="estrella"><svg viewBox="0 0 24 24" width="72" height="72"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#e7e7e7" /></svg><svg class="llena" viewBox="0 0 24 24" width="72" height="72"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#d99c13" /></svg></div>
+          <div class="estrella"><svg viewBox="0 0 24 24" width="72" height="72"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#e7e7e7" /></svg><svg class="llena" viewBox="0 0 24 24" width="72" height="72"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#d99c13" /></svg></div>
+          <div class="estrella"><svg viewBox="0 0 24 24" width="72" height="72"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#e7e7e7" /></svg><svg class="llena" viewBox="0 0 24 24" width="72" height="72"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#d99c13" /></svg></div>
+          <div class="estrella"><svg viewBox="0 0 24 24" width="72" height="72"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#e7e7e7" /></svg><svg class="llena" viewBox="0 0 24 24" width="72" height="72"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#d99c13" /></svg></div>
+          <div class="estrella"><svg viewBox="0 0 24 24" width="72" height="72"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#e7e7e7" /></svg><svg class="llena" viewBox="0 0 24 24" width="72" height="72"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#d99c13" /></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      // Morph: la pantalla del celular (512×1004, centro 1370,540) se convierte en la hoja (720×960, centro 960,540)
+      tl.fromTo("#inf-marco", { opacity: 1 }, { opacity: 0, scale: 1.05, duration: 0.3, ease: "power2.in" }, 0.05);
+      tl.fromTo("#inf-hoja", { x: 410, scaleX: 512 / 720, scaleY: 1004 / 960, borderRadius: 52, backgroundColor: "#f4f4f4" },
+        { x: 0, scaleX: 1, scaleY: 1, borderRadius: 10, backgroundColor: "#ffffff", duration: 0.65, ease: "power3.inOut" }, 0.05);
+      // Se arma por secciones: «SON arma el informe en PDF» (1.5–2.7)
+      tl.fromTo("#inf-cab", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 0.75);
+      tl.fromTo("#inf-cab .h-linea", { scaleX: 0, transformOrigin: "0 50%" }, { scaleX: 1, duration: 0.4, ease: "expo.out" }, 0.9);
+      tl.fromTo("#inf-datos .h-dato", { opacity: 0 }, { opacity: 1, duration: 0.15, stagger: 0.08 }, 1.45);
+      tl.fromTo("#inf-tareas > *", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.3, stagger: 0.07, ease: "expo.out" }, 2.25);
+      // «fotos» (3.81): las fotos vuelan desde donde estaba el celular
+      tl.fromTo("#inf-ev-t", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 3.4);
+      ["#inf-f1", "#inf-f2", "#inf-f3"].forEach((f, i) => {
+        tl.fromTo(f, { x: 640 - i * 120, y: -120 + i * 60, scale: 1.6, rotation: 8 - i * 6, opacity: 0, filter: "blur(10px)" },
+          { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, filter: "blur(0px)", duration: 0.6, ease: "expo.out" }, 3.55 + i * 0.12);
+      });
+      // «firmas» (4.29)
+      tl.fromTo("#inf-fi-t", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 4.05);
+      tl.fromTo(["#inf-fi1", "#inf-fi2"], { opacity: 0, x: 500, scale: 1.4, filter: "blur(10px)" },
+        { opacity: 1, x: 0, scale: 1, filter: "blur(0px)", duration: 0.6, stagger: 0.12, ease: "expo.out" }, 4.15);
+      // «envía» (5.48): la hoja se pliega en el adjunto del correo
+      tl.fromTo("#inf-mail", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.45, ease: "expo.out" }, 5.55);
+      tl.to("#inf-hoja", { x: -250, y: -150, scale: 0.08, opacity: 0, filter: "blur(4px)", duration: 0.5, ease: "power3.in" }, 5.4);
+      tl.fromTo("#inf-adj", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "back.out(2)" }, 5.85);
+      // «encuesta» (6.94): cinco estrellas
+      tl.fromTo("#inf-mail .m-enc", { opacity: 0 }, { opacity: 1, duration: 0.2 }, 6.25);
+      tl.fromTo("#inf-mail .llena", { scale: 0, transformOrigin: "50% 55%" }, { scale: 1, duration: 0.3, stagger: 0.1, ease: "back.out(2.4)" }, 6.55);
+      // Salida hacia el cierre
+      tl.to("#inf-mail", { scale: 0.9, opacity: 0, filter: "blur(8px)", duration: 0.3, ease: "power3.in" }, 7.7);
+      window.__timelines["informe"] = tl;
+    })();
+  </script>
+</template>

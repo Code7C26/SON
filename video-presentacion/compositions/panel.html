@@ -1,0 +1,125 @@
+<template>
+  <style>
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans-Bold.ttf"); font-weight: 700; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.ttf"); font-weight: 400; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.ttf"); font-weight: 600; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.ttf"); font-weight: 700; }
+    #root { position: absolute; inset: 0; background: #2e2e2e; overflow: hidden; font-family: "Inter", sans-serif; color: #f4f4f4; }
+    #panel-cam { position: absolute; inset: 0; }
+
+    /* Barra lateral real del panel */
+    .lateral { position: absolute; left: 0; top: 0; bottom: 0; width: 288px; background: #262626; border-right: 1px solid #4c4c4c; padding: 120px 16px 0; }
+    .lat-iso { position: absolute; left: 112px; top: 34px; width: 64px; height: 64px; }
+    .lat-sec { font-size: 15px; font-weight: 600; letter-spacing: 1.2px; color: #b3b3b3; margin: 18px 16px 10px; }
+    .lat-item { display: flex; align-items: center; gap: 14px; height: 54px; padding: 0 14px; border-radius: 14px; font-size: 19px; white-space: nowrap; color: #f4f4f4; }
+    .lat-item i { width: 22px; height: 22px; border: 2px solid #b3b3b3; border-radius: 5px; display: inline-block; }
+    .lat-item.on { background: rgba(255, 97, 71, 0.16); border: 1px solid rgba(255, 97, 71, 0.6); font-weight: 700; }
+    .lat-item.on i { border-color: #ff6147; }
+
+    .contenido { position: absolute; left: 288px; right: 0; top: 0; bottom: 0; padding: 56px 56px; }
+    .cont-tit { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 700; font-size: 46px; letter-spacing: -0.5px; }
+    .tabla { margin-top: 36px; background: #353535; border: 1px solid #4c4c4c; border-radius: 24px; overflow: hidden; }
+    .fila { display: grid; grid-template-columns: 130px 1.6fr 1.1fr 1.2fr 220px; align-items: center; height: 92px; padding: 0 32px;
+      border-top: 1px solid #4c4c4c; font-size: 24px; }
+    .fila.cab { border-top: 0; height: 64px; font-size: 16px; font-weight: 600; letter-spacing: 1.2px; color: #b3b3b3; text-transform: uppercase; }
+    .fila .sec { color: #b3b3b3; }
+    .pill { display: inline-block; padding: 8px 18px; border-radius: 999px; font-size: 19px; font-weight: 600; }
+    .p-prog { background: rgba(196, 106, 58, 0.22); color: #f4f4f4; border: 1px solid #c46a3a; }
+    .p-comp { background: rgba(255, 97, 71, 0.18); color: #f4f4f4; border: 1px solid #ff6147; }
+    .p-pend { background: #d99c13; color: #2e2e2e; }
+
+    #panel-nueva { position: absolute; left: 0; right: 0; top: 0; height: 92px; background: #3f3f3f; }
+
+    /* Formulario real «Nueva orden» */
+    #panel-dialogo { position: absolute; left: 820px; top: 150px; width: 820px; background: #353535; border: 1px solid #4c4c4c;
+      border-radius: 24px; padding: 40px 44px 36px; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35); }
+    .dlg-tit { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 700; font-size: 36px; letter-spacing: -0.5px; margin-bottom: 24px; }
+    .campo { background: #3f3f3f; border: 1px solid #4c4c4c; border-radius: 14px; padding: 12px 20px 14px; margin-bottom: 16px; }
+    .campo label { display: block; font-size: 17px; color: #b3b3b3; }
+    .campo div { font-size: 27px; margin-top: 4px; }
+    .linea3 { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 14px; }
+    .acciones { display: flex; justify-content: flex-end; align-items: center; gap: 30px; margin-top: 10px; }
+    .acciones .cancelar { font-size: 24px; color: #b3b3b3; font-weight: 600; }
+    #panel-asignar { background: #ff6147; color: #2e2e2e; font-weight: 700; font-size: 26px; padding: 18px 34px; border-radius: 999px; }
+
+    #panel-cursor { position: absolute; left: 0; top: 0; width: 56px; height: 56px; }
+  </style>
+  <div id="root" data-composition-id="panel" data-width="1920" data-height="1080">
+    <div id="panel-cam" data-layout-allow-overflow data-layout-allow-overlap data-layout-allow-occlusion>
+      <div class="lateral">
+        <img class="lat-iso" src="assets/img/isotipo.png" alt="" />
+        <div class="lat-sec">OPERACIÓN</div>
+        <div class="lat-item"><i></i>Panel de Control</div>
+        <div class="lat-item on"><i></i>Órdenes de Trabajo</div>
+        <div class="lat-item"><i></i>Técnicos</div>
+        <div class="lat-item"><i></i>Informes</div>
+        <div class="lat-item"><i></i>Análisis</div>
+        <div class="lat-sec">COMERCIAL</div>
+        <div class="lat-item"><i></i>Presupuestos</div>
+        <div class="lat-item"><i></i>Clientes</div>
+      </div>
+      <div class="contenido">
+        <div class="cont-tit">Órdenes de Trabajo</div>
+        <div class="tabla">
+          <div class="fila cab"><span>Orden</span><span>Cliente</span><span>Técnico</span><span>Fecha</span><span>Estado</span></div>
+          <div style="position: relative">
+            <div id="panel-fila" class="fila" style="border-top: 0; position: relative; z-index: 2">
+              <span>#1042</span><span>Metalúrgica Andina S.A.</span><span>Martín Ruiz</span><span class="sec">18/11 · 09:00</span><span><span class="pill p-pend">Pendiente</span></span>
+            </div>
+            <div id="panel-nueva"></div>
+          </div>
+          <div class="fila"><span>#1041</span><span>Frigorífico del Sur</span><span>Lucía Pérez</span><span class="sec">17/11 · 14:00</span><span><span class="pill p-prog">En progreso</span></span></div>
+          <div class="fila"><span>#1039</span><span>Colegio San José</span><span>Martín Ruiz</span><span class="sec">17/11 · 08:30</span><span><span class="pill p-comp">Completada</span></span></div>
+          <div class="fila"><span>#1038</span><span>Hotel Central</span><span>Lucía Pérez</span><span class="sec">16/11 · 10:00</span><span><span class="pill p-comp">Completada</span></span></div>
+          <div class="fila"><span>#1036</span><span>Depósito Ruta 5</span><span>Martín Ruiz</span><span class="sec">15/11 · 16:00</span><span><span class="pill p-comp">Completada</span></span></div>
+        </div>
+      </div>
+
+      <div id="panel-dialogo">
+        <div class="dlg-tit">Nueva orden</div>
+        <div class="campo"><label>Cliente</label><div>Metalúrgica Andina S.A.</div></div>
+        <div class="campo"><label>Técnico asignado</label><div>Martín Ruiz</div></div>
+        <div class="linea3">
+          <div class="campo"><label>Fecha</label><div>18/11/2026</div></div>
+          <div class="campo"><label>Desde</label><div>09:00</div></div>
+          <div class="campo"><label>Hasta</label><div>12:00</div></div>
+        </div>
+        <div class="campo"><label>Checklist de la visita</label><div>Extintores en fecha<br />Salidas de emergencia libres</div></div>
+        <div class="acciones"><span class="cancelar">Cancelar</span><span id="panel-asignar">Asignar Trabajo</span></div>
+      </div>
+    </div>
+
+    <svg id="panel-cursor" viewBox="0 0 56 56">
+      <path d="M8 4 L8 44 L19 34 L27 52 L35 48 L27 31 L42 31 Z" fill="#f4f4f4" stroke="#2e2e2e" stroke-width="3" stroke-linejoin="round" />
+    </svg>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      // El panel ya está: el isotipo acaba de aterrizar en su barra lateral
+      tl.fromTo(".contenido", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.3, ease: "power2.out" }, 0);
+      tl.fromTo("#panel-fila", { opacity: 0 }, { opacity: 0, duration: 0.01 }, 0);
+      tl.fromTo("#panel-nueva", { opacity: 0 }, { opacity: 0, duration: 0.01 }, 0);
+      // El formulario «Nueva orden» se abre
+      tl.fromTo("#panel-dialogo", { opacity: 0, scale: 0.9, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.45, ease: "expo.out" }, 0.15);
+      // Cámara: empuje hacia el formulario
+      tl.fromTo("#panel-cam", { scale: 1, x: 0, y: 0, transformOrigin: "0px 0px" }, { scale: 1.22, x: -330, y: -150, duration: 0.6, ease: "power2.inOut" }, 0.45);
+      // Cursor: entra desde abajo y hace clic en «Asignar Trabajo» en «asigna» (18.29 → 1.69 local)
+      tl.fromTo("#panel-cursor", { x: 1500, y: 1180, scale: 1 }, { x: 1432, y: 722, duration: 0.6, ease: "power3.out" }, 0.95);
+      tl.to("#panel-cursor", { scale: 0.85, duration: 0.07, ease: "power2.in" }, 1.68);
+      tl.to("#panel-cursor", { scale: 1, duration: 0.12, ease: "power2.out" }, 1.75);
+      tl.to("#panel-asignar", { scale: 0.94, duration: 0.07, ease: "power2.in" }, 1.68);
+      tl.to("#panel-asignar", { scale: 1, duration: 0.12, ease: "power2.out" }, 1.75);
+      // El formulario se pliega en la nueva fila de la tabla
+      tl.to("#panel-cursor", { opacity: 0, duration: 0.15 }, 1.85);
+      tl.to("#panel-dialogo", { scale: 0.2, x: -330, y: -260, opacity: 0, filter: "blur(6px)", duration: 0.4, ease: "power3.in" }, 1.8);
+      tl.to("#panel-cam", { scale: 1, x: 0, y: 0, duration: 0.5, ease: "power2.inOut" }, 1.8);
+      tl.to("#panel-nueva", { opacity: 1, duration: 0.15 }, 2.1);
+      tl.to("#panel-fila", { opacity: 1, duration: 0.2, ease: "power2.out" }, 2.15);
+      tl.fromTo("#panel-fila .pill", { scale: 0.6 }, { scale: 1, duration: 0.35, ease: "back.out(2)" }, 2.2);
+      // La fila sale a la derecha hacia el celular
+      tl.to("#panel-fila", { x: 1700, filter: "blur(10px)", duration: 0.4, ease: "power3.in" }, 2.6);
+      window.__timelines["panel"] = tl;
+    })();
+  </script>
+</template>
