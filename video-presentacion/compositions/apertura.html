@@ -1,0 +1,54 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; background: transparent; }
+    #ap-fondo { position: absolute; inset: 0; background: #f4f4f4; }
+    #ap-reloj { position: absolute; left: 770px; top: 350px; width: 380px; height: 380px; overflow: visible; }
+  </style>
+  <div id="root" data-composition-id="apertura" data-width="1920" data-height="1080">
+    <div id="ap-fondo"></div>
+    <svg id="ap-reloj" viewBox="0 0 300 300" data-layout-allow-overflow>
+      <defs>
+        <clipPath id="ap-nivel" clipPathUnits="userSpaceOnUse">
+          <rect id="ap-nivel-rect" x="-10" y="0" width="320" height="320" />
+        </clipPath>
+      </defs>
+      <g id="ap-giro">
+        <g id="ap-arriba">
+          <path d="M0 0 H300 A150 150 0 0 1 0 0 Z" fill="#ff6147" clip-path="url(#ap-nivel)" />
+          <path id="ap-trazo-arriba" d="M0 0 H300 A150 150 0 0 1 0 0 Z" fill="none" stroke="#ff6147" stroke-width="5" stroke-linejoin="round" />
+        </g>
+        <g id="ap-abajo">
+          <path d="M0 300 H300 A150 150 0 0 0 0 300 Z" fill="#ff6147" clip-path="url(#ap-nivel)" />
+          <path id="ap-trazo-abajo" d="M0 300 H300 A150 150 0 0 0 0 300 Z" fill="none" stroke="#ff6147" stroke-width="5" stroke-linejoin="round" />
+        </g>
+      </g>
+    </svg>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+
+      // 0.05–0.65: el reloj de arena se dibuja en trazo
+      ["#ap-trazo-arriba", "#ap-trazo-abajo"].forEach((sel, i) => {
+        const p = document.querySelector(sel);
+        const L = p.getTotalLength();
+        p.style.strokeDasharray = L;
+        tl.fromTo(p, { strokeDashoffset: L }, { strokeDashoffset: 0, duration: 0.6, ease: "power2.inOut" }, 0.05 + i * 0.08);
+      });
+      tl.fromTo("#ap-reloj", { scale: 0.85 }, { scale: 1, duration: 1.2, ease: "power2.out" }, 0);
+
+      // 0.55–1.2: se llena de abajo hacia arriba
+      tl.fromTo("#ap-nivel-rect", { y: 300 }, { y: 0, duration: 0.65, ease: "power3.inOut" }, 0.55);
+
+      // 1.25: se da vuelta, como un reloj de arena que empieza a correr
+      tl.fromTo("#ap-giro", { rotation: 0, svgOrigin: "150 150" }, { rotation: 180, svgOrigin: "150 150", duration: 0.6, ease: "back.inOut(1.4)" }, 1.25);
+
+      // 2.2: se abre en dos y deja ver lo que sigue
+      tl.to("#ap-arriba", { y: -720, duration: 0.55, ease: "power3.in" }, 2.2);
+      tl.to("#ap-abajo", { y: 720, duration: 0.55, ease: "power3.in" }, 2.2);
+      tl.to("#ap-fondo", { opacity: 0, duration: 0.15, ease: "none" }, 2.32);
+
+      window.__timelines["apertura"] = tl;
+    })();
+  </script>
+</template>

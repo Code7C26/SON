@@ -31,47 +31,52 @@
     </style>
   </head>
   <body>
-    <div id="root" data-composition-id="main" data-start="0" data-duration="55.7" data-width="1920" data-height="1080">
+    <div id="root" data-composition-id="main" data-start="0" data-duration="56.36" data-width="1920" data-height="1080">
       <!-- Escenas -->
-      <div id="caos" data-composition-id="caos" data-composition-src="compositions/caos.html" data-start="0" data-duration="11.6" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
-      <div id="reveal" data-composition-id="reveal" data-composition-src="compositions/reveal.html" data-start="11.6" data-duration="5" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
-      <div id="panel" data-composition-id="panel" data-composition-src="compositions/panel.html" data-start="16.6" data-duration="3" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
-      <div id="campo" data-composition-id="campo" data-composition-src="compositions/campo.html" data-start="19.6" data-duration="12" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
-      <div id="informe" data-composition-id="informe" data-composition-src="compositions/informe.html" data-start="31.6" data-duration="8" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
-      <div id="cierre" data-composition-id="cierre" data-composition-src="compositions/cierre.html" data-start="39.6" data-duration="8.6" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
-      <div id="marca" data-composition-id="marca" data-composition-src="compositions/marca.html" data-start="48.2" data-duration="7.5" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="apertura" data-composition-id="apertura" data-composition-src="compositions/apertura.html" data-start="0" data-duration="2.9" data-track-index="0" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index: 2"></div>
+      <div id="caos" data-composition-id="caos" data-composition-src="compositions/caos.html" data-start="2.3" data-duration="9.96" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="reveal" data-composition-id="reveal" data-composition-src="compositions/reveal.html" data-start="12.26" data-duration="5" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="panel" data-composition-id="panel" data-composition-src="compositions/panel.html" data-start="17.26" data-duration="3" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="campo" data-composition-id="campo" data-composition-src="compositions/campo.html" data-start="20.26" data-duration="12" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="informe" data-composition-id="informe" data-composition-src="compositions/informe.html" data-start="32.26" data-duration="8" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="cierre" data-composition-id="cierre" data-composition-src="compositions/cierre.html" data-start="40.26" data-duration="8.6" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="marca" data-composition-id="marca" data-composition-src="compositions/marca.html" data-start="48.86" data-duration="7.5" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
 
       <!-- Voz en off: Fernanda (ElevenLabs), normalizada a -17.5 LUFS, un archivo recortado por frase -->
-      <audio id="voz-desorden" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="1.79" data-media-start="0.0" data-duration="5.3" data-track-index="3" data-volume="1"></audio>
-      <audio id="voz-dudas" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="7.34" data-media-start="5.3" data-duration="3.6" data-track-index="2" data-volume="1"></audio>
-      <audio id="voz-son" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="11.79" data-media-start="8.9" data-duration="4.6" data-track-index="3" data-volume="1"></audio>
-      <audio id="voz-panel" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="16.53" data-media-start="13.5" data-duration="2.95" data-track-index="2" data-volume="1"></audio>
-      <audio id="voz-celular" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="20.0" data-media-start="16.45" data-duration="2.3" data-track-index="3" data-volume="1"></audio>
-      <audio id="voz-checkin" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="22.7" data-media-start="18.75" data-duration="3.45" data-track-index="2" data-volume="1"></audio>
-      <audio id="voz-checklist" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="26.46" data-media-start="22.2" data-duration="4.4" data-track-index="3" data-volume="1"></audio>
-      <audio id="voz-informe" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="31.86" data-media-start="26.6" data-duration="6.95" data-track-index="2" data-volume="1"></audio>
-      <audio id="voz-cierre" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="40.59" data-media-start="33.55" data-duration="3.95" data-track-index="3" data-volume="1"></audio>
-      <audio id="voz-acto" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="44.54" data-media-start="37.5" data-duration="2.5" data-track-index="2" data-volume="1"></audio>
-      <audio id="voz-marca" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="48.76" data-media-start="40.0" data-duration="2.52" data-track-index="3" data-volume="1"></audio>
+      <audio id="voz-desorden" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="2.45" data-media-start="0.0" data-duration="5.3" data-track-index="3" data-volume="1"></audio>
+      <audio id="voz-dudas" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="8.0" data-media-start="5.3" data-duration="3.6" data-track-index="2" data-volume="1"></audio>
+      <audio id="voz-son" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="12.45" data-media-start="8.9" data-duration="4.6" data-track-index="3" data-volume="1"></audio>
+      <audio id="voz-panel" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="17.19" data-media-start="13.5" data-duration="2.95" data-track-index="2" data-volume="1"></audio>
+      <audio id="voz-celular" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="20.66" data-media-start="16.45" data-duration="2.3" data-track-index="3" data-volume="1"></audio>
+      <audio id="voz-checkin" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="23.36" data-media-start="18.75" data-duration="3.45" data-track-index="2" data-volume="1"></audio>
+      <audio id="voz-checklist" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="27.12" data-media-start="22.2" data-duration="4.4" data-track-index="3" data-volume="1"></audio>
+      <audio id="voz-informe" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="32.52" data-media-start="26.6" data-duration="6.95" data-track-index="2" data-volume="1"></audio>
+      <audio id="voz-cierre" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="41.25" data-media-start="33.55" data-duration="3.95" data-track-index="3" data-volume="1"></audio>
+      <audio id="voz-acto" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="45.2" data-media-start="37.5" data-duration="2.5" data-track-index="2" data-volume="1"></audio>
+      <audio id="voz-marca" class="clip" src="assets/voz-nueva/fernanda-v2-norm.mp3" data-start="49.42" data-media-start="40.0" data-duration="2.52" data-track-index="3" data-volume="1"></audio>
 
-      <!-- Música: paulyudin «minimal» (Pixabay). Su entrada fuerte (16.8 s del tema) cae en la aparición de SON (12 s) -->
-      <audio id="musica" class="clip" src="assets/musica/minimal.mp3" data-start="0" data-media-start="4.8" data-duration="55.7" data-track-index="6" data-volume="1" data-timeline-role="music" data-automation="{&quot;version&quot;: 1, &quot;lanes&quot;: [{&quot;target&quot;: &quot;volume&quot;, &quot;points&quot;: [{&quot;t&quot;: 0, &quot;v&quot;: 0}, {&quot;t&quot;: 0.8, &quot;v&quot;: 0.35}, {&quot;t&quot;: 11.4, &quot;v&quot;: 0.35}, {&quot;t&quot;: 12.2, &quot;v&quot;: 0.6}, {&quot;t&quot;: 51.3, &quot;v&quot;: 0.6}, {&quot;t&quot;: 52.0, &quot;v&quot;: 0.9}, {&quot;t&quot;: 54.8, &quot;v&quot;: 0.9}, {&quot;t&quot;: 55.7, &quot;v&quot;: 0}]}]}"></audio>
+      <!-- Música: paulyudin «minimal» (Pixabay). Su entrada fuerte (16.8 s del tema) cae en la aparición de SON (12.66 s) -->
+      <audio id="musica" class="clip" src="assets/musica/minimal.mp3" data-start="0" data-media-start="4.14" data-duration="56.36" data-track-index="6" data-volume="1" data-timeline-role="music" data-automation="{&quot;version&quot;: 1, &quot;lanes&quot;: [{&quot;target&quot;: &quot;volume&quot;, &quot;points&quot;: [{&quot;t&quot;: 0, &quot;v&quot;: 0}, {&quot;t&quot;: 0.6, &quot;v&quot;: 0.35}, {&quot;t&quot;: 12.06, &quot;v&quot;: 0.35}, {&quot;t&quot;: 12.86, &quot;v&quot;: 0.6}, {&quot;t&quot;: 51.96, &quot;v&quot;: 0.6}, {&quot;t&quot;: 52.66, &quot;v&quot;: 0.9}, {&quot;t&quot;: 55.46, &quot;v&quot;: 0.9}, {&quot;t&quot;: 56.36, &quot;v&quot;: 0}]}]}"></audio>
 
       <!-- Efectos: cada uno con su causa en pantalla -->
-      <audio id="sfx-pop-1" class="clip" src="assets/sfx/pop.mp3" data-start="3.17" data-duration="0.71" data-track-index="4" data-volume="0.35"></audio>
-      <audio id="sfx-pop-2" class="clip" src="assets/sfx/pop.mp3" data-start="8.27" data-duration="0.71" data-track-index="5" data-volume="0.3"></audio>
-      <audio id="sfx-pop-3" class="clip" src="assets/sfx/pop.mp3" data-start="9.57" data-duration="0.71" data-track-index="4" data-volume="0.3"></audio>
-      <audio id="sfx-whoosh-1" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="11.15" data-duration="0.56" data-track-index="5" data-volume="0.35"></audio>
-      <audio id="sfx-whoosh-2" class="clip" src="assets/sfx/whoosh.mp3" data-start="12.1" data-duration="0.56" data-track-index="4" data-volume="0.3"></audio>
-      <audio id="sfx-click-1" class="clip" src="assets/sfx/click-soft.mp3" data-start="18.32" data-duration="0.36" data-track-index="5" data-volume="0.5"></audio>
-      <audio id="sfx-whoosh-3" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="19.25" data-duration="0.56" data-track-index="4" data-volume="0.3"></audio>
-      <audio id="sfx-click-2" class="clip" src="assets/sfx/click-soft.mp3" data-start="21.85" data-duration="0.36" data-track-index="5" data-volume="0.45"></audio>
-      <audio id="sfx-click-3" class="clip" src="assets/sfx/click.mp3" data-start="23.75" data-duration="0.36" data-track-index="4" data-volume="0.4"></audio>
-      <audio id="sfx-pop-4" class="clip" src="assets/sfx/pop.mp3" data-start="25.45" data-duration="0.71" data-track-index="5" data-volume="0.3"></audio>
-      <audio id="sfx-pop-5" class="clip" src="assets/sfx/pop.mp3" data-start="27.2" data-duration="0.71" data-track-index="4" data-volume="0.25"></audio>
-      <audio id="sfx-click-4" class="clip" src="assets/sfx/click-soft.mp3" data-start="31.25" data-duration="0.36" data-track-index="5" data-volume="0.45"></audio>
-      <audio id="sfx-whoosh-4" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="37.1" data-duration="0.56" data-track-index="4" data-volume="0.3"></audio>
-      <audio id="sfx-notif" class="clip" src="assets/sfx/notification.mp3" data-start="37.75" data-duration="2.45" data-track-index="5" data-volume="0.3"></audio>
+      <audio id="sfx-giro" class="clip" src="assets/sfx/click-soft.mp3" data-start="1.3" data-duration="0.36" data-track-index="5" data-volume="0.45"></audio>
+      <audio id="sfx-apertura" class="clip" src="assets/sfx/whoosh.mp3" data-start="2.15" data-duration="0.56" data-track-index="4" data-volume="0.35"></audio>
+      <audio id="sfx-pop-1" class="clip" src="assets/sfx/pop.mp3" data-start="3.93" data-duration="0.71" data-track-index="4" data-volume="0.35"></audio>
+      <audio id="sfx-pop-0" class="clip" src="assets/sfx/pop.mp3" data-start="4.51" data-duration="0.71" data-track-index="5" data-volume="0.25"></audio>
+      <audio id="sfx-dias" class="clip" src="assets/sfx/click-soft.mp3" data-start="6.26" data-duration="0.36" data-track-index="4" data-volume="0.45"></audio>
+      <audio id="sfx-pop-2" class="clip" src="assets/sfx/pop.mp3" data-start="8.96" data-duration="0.71" data-track-index="5" data-volume="0.3"></audio>
+      <audio id="sfx-pop-3" class="clip" src="assets/sfx/pop.mp3" data-start="10.46" data-duration="0.71" data-track-index="4" data-volume="0.3"></audio>
+      <audio id="sfx-whoosh-1" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="11.81" data-duration="0.56" data-track-index="5" data-volume="0.35"></audio>
+      <audio id="sfx-whoosh-2" class="clip" src="assets/sfx/whoosh.mp3" data-start="12.76" data-duration="0.56" data-track-index="4" data-volume="0.3"></audio>
+      <audio id="sfx-click-1" class="clip" src="assets/sfx/click-soft.mp3" data-start="18.98" data-duration="0.36" data-track-index="5" data-volume="0.5"></audio>
+      <audio id="sfx-whoosh-3" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="19.91" data-duration="0.56" data-track-index="4" data-volume="0.3"></audio>
+      <audio id="sfx-click-2" class="clip" src="assets/sfx/click-soft.mp3" data-start="22.51" data-duration="0.36" data-track-index="5" data-volume="0.45"></audio>
+      <audio id="sfx-click-3" class="clip" src="assets/sfx/click.mp3" data-start="24.41" data-duration="0.36" data-track-index="4" data-volume="0.4"></audio>
+      <audio id="sfx-pop-4" class="clip" src="assets/sfx/pop.mp3" data-start="26.11" data-duration="0.71" data-track-index="5" data-volume="0.3"></audio>
+      <audio id="sfx-pop-5" class="clip" src="assets/sfx/pop.mp3" data-start="27.86" data-duration="0.71" data-track-index="4" data-volume="0.25"></audio>
+      <audio id="sfx-click-4" class="clip" src="assets/sfx/click-soft.mp3" data-start="31.91" data-duration="0.36" data-track-index="5" data-volume="0.45"></audio>
+      <audio id="sfx-whoosh-4" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="37.76" data-duration="0.56" data-track-index="4" data-volume="0.3"></audio>
+      <audio id="sfx-notif" class="clip" src="assets/sfx/notification.mp3" data-start="38.41" data-duration="2.45" data-track-index="5" data-volume="0.3"></audio>
     </div>
     <script>
       window.__timelines = window.__timelines || {};
