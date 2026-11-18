@@ -88,7 +88,7 @@ Los originales de marca se encuentran en `DESINGS/`.
 | `agente/` | Agente de oficina que entrega los informes al disco de red |
 | `despliegue/` | Contenedores, proxy HTTPS y procedimiento de publicación |
 | `DESINGS/` | Sistema de identidad visual |
-| `DOCUMENTACION COMERCIAL/` | FODA, público objetivo, perfil del cliente y modelo de negocio |
+| `DOCUMENTACION COMERCIAL/` | FODA, público objetivo, perfil del cliente, match tecnológico, modelo de negocio, costos, Canvas, punto de equilibrio, tamaño de mercado, estrategia de adquisición y matriz de frecuencia e impacto |
 
 ---
 
