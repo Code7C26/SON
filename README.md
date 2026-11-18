@@ -1,6 +1,6 @@
 <div align="center">
   <img src="DESINGS/1.png" alt="SON Operation Platform" width="220"/>
-  <h1>SON — Sistema de Gestión Operativa</h1>
+  <h1>SON — Operation Platform</h1>
   <p><strong>Plataforma integral SaaS para la digitalización, auditoría y control de operaciones técnicas en terreno.</strong></p>
   <p>
     <img src="https://img.shields.io/badge/Versi%C3%B3n-2.0.0-ff6147?style=flat-square" alt="Version"/>
