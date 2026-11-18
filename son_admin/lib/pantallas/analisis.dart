@@ -31,6 +31,7 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
   int? _empresaId;
   int? _tecnicoId;
   String _filtroEncuesta = 'todas';
+  final _comentariosAbiertos = <String>{};
   int _pedido = 0;
 
   @override
@@ -51,6 +52,7 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
       if (respuesta.statusCode == 200) {
         setState(() {
           _datos = Map<String, dynamic>.from(json.decode(respuesta.body) as Map);
+          _comentariosAbiertos.clear();
           _cargando = false;
         });
       } else {
@@ -680,6 +682,39 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
           const SizedBox(height: 6),
           Row(children: [_estrellas(nota, tamano: 16), const SizedBox(width: 6), Text(_nota(nota), style: TextStyle(color: sonTexto, fontWeight: FontWeight.w700))]),
           if (comentario.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            _comentarioPlegable(respuesta, comentario, baja, indice),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _comentarioPlegable(Map<String, dynamic> respuesta, String comentario, bool baja, int indice) {
+    final clave = '${respuesta['id'] ?? ''}|${respuesta['cliente']}|${respuesta['cuando']}|${respuesta['tecnico']}|$comentario';
+    final abierto = _comentariosAbiertos.contains(clave);
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOutCubic,
+      alignment: Alignment.topLeft,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          OutlinedButton.icon(
+            key: Key('ver_comentario_$indice'),
+            onPressed: () => setState(() {
+              if (!_comentariosAbiertos.remove(clave)) _comentariosAbiertos.add(clave);
+            }),
+            icon: Icon(abierto ? Icons.visibility_off_outlined : Icons.chat_bubble_outline, size: 18),
+            label: Text(abierto ? 'Ocultar' : 'Ver comentario'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: sonTexto,
+              minimumSize: const Size(48, 48),
+              shape: const StadiumBorder(),
+              side: BorderSide(color: baja ? sonRojo : sonBorde),
+            ),
+          ),
+          if (abierto) ...[
             const SizedBox(height: 8),
             Container(
               width: double.infinity,

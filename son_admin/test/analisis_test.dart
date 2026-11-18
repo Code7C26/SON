@@ -144,6 +144,15 @@ void main() {
       expect(find.text('Cliente Alto'), findsOneWidget);
       expect(find.byKey(const Key('crear_presupuesto_7')), findsNothing);
 
+      expect(find.text('Todo bien'), findsNothing);
+      await tester.ensureVisible(find.byKey(const Key('ver_comentario_0')));
+      await tester.tap(find.byKey(const Key('ver_comentario_0')));
+      await tester.pumpAndSettle();
+      expect(find.text('Todo bien'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('ver_comentario_0')));
+      await tester.pumpAndSettle();
+      expect(find.text('Todo bien'), findsNothing);
+
       await tester.tap(find.byKey(const Key('encuesta_bajas')));
       await tester.pumpAndSettle();
       expect(find.text('Cliente Alto'), findsNothing);
