@@ -617,6 +617,8 @@ class _LayoutAdministradorState extends State<LayoutAdministrador> {
     for (final opcion in _visibles) {
       grupos.putIfAbsent(opcion.grupo, () => []).add(opcion);
     }
+    // Idioma vive en Sistema, así que ese grupo se muestra para todos los usuarios.
+    grupos.putIfAbsent('Sistema', () => []);
     final items = <Widget>[];
     var primero = true;
     grupos.forEach((grupo, opciones) {
@@ -654,6 +656,7 @@ class _LayoutAdministradorState extends State<LayoutAdministrador> {
                   insignia: opcion.id == 'presupuestos' ? _nuevas : 0,
                   alTocar: () => _irA(opcion.id),
                 ),
+              if (grupo == 'Sistema' && (compacto || !cerrado)) _ItemIdioma(compacto: compacto),
             ],
           ),
         ),
@@ -751,57 +754,40 @@ class _LayoutAdministradorState extends State<LayoutAdministrador> {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        const SelectorIdioma(compacto: true),
                         const BotonTema(),
                         IconButton(tooltip: tr('Cerrar sesión'), onPressed: _cerrarSesion, icon: Icon(Icons.logout_rounded, color: sonTextoSuave, size: 20)),
                       ],
                     )
-                  : Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: AppSpacing.s8, bottom: AppSpacing.s8),
-                          child: Row(
-                            children: [
-                              Icon(Icons.translate_rounded, size: 18, color: sonTextoSuave),
-                              const SizedBox(width: AppSpacing.s8),
-                              Expanded(child: Tx('Idioma', style: TextStyle(color: sonTextoSuave, fontSize: 13, fontWeight: FontWeight.w500))),
-                              const SelectorIdioma(),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(8, 8, 4, 8),
-                          decoration: BoxDecoration(color: sonTarjeta.withValues(alpha: 0.7), borderRadius: AppRadius.rPildora, border: Border.all(color: sonBorde.withValues(alpha: 0.6))),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: InkWell(
-                                  borderRadius: AppRadius.rChico,
-                                  onTap: _mostrarPerfil,
-                                  child: Row(
-                                    children: [
-                                      CircleAvatar(radius: 17, backgroundColor: sonAcento, child: Tx(inicial, style: TextStyle(color: sonSobreAcento, fontWeight: FontWeight.w700))),
-                                      const SizedBox(width: 10),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Tx(nombre, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600, fontSize: 13)),
-                                            Tx(email, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoTenue, fontSize: 11)),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
+                  : Container(
+                      padding: const EdgeInsets.fromLTRB(8, 8, 4, 8),
+                      decoration: BoxDecoration(color: sonTarjeta.withValues(alpha: 0.7), borderRadius: AppRadius.rPildora, border: Border.all(color: sonBorde.withValues(alpha: 0.6))),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: InkWell(
+                              borderRadius: AppRadius.rChico,
+                              onTap: _mostrarPerfil,
+                              child: Row(
+                                children: [
+                                  CircleAvatar(radius: 17, backgroundColor: sonAcento, child: Tx(inicial, style: TextStyle(color: sonSobreAcento, fontWeight: FontWeight.w700))),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Tx(nombre, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600, fontSize: 13)),
+                                        Tx(email, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoTenue, fontSize: 11)),
+                                      ],
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                              const BotonTema(),
-                              IconButton(tooltip: tr('Cerrar sesión'), onPressed: _cerrarSesion, icon: Icon(Icons.logout_rounded, color: sonTextoSuave, size: 20)),
-                            ],
+                            ),
                           ),
-                        ),
-                      ],
+                          const BotonTema(),
+                          IconButton(tooltip: tr('Cerrar sesión'), onPressed: _cerrarSesion, icon: Icon(Icons.logout_rounded, color: sonTextoSuave, size: 20)),
+                        ],
+                      ),
                     ),
             ),
           ],
@@ -864,6 +850,32 @@ class _CabeceraGrupoState extends State<_CabeceraGrupo> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Fila de Idioma dentro del grupo Sistema: mismo alto y sangría que las demás opciones.
+class _ItemIdioma extends StatelessWidget {
+  final bool compacto;
+  const _ItemIdioma({required this.compacto});
+
+  @override
+  Widget build(BuildContext context) {
+    if (compacto) {
+      return const Padding(padding: EdgeInsets.symmetric(vertical: 2), child: Center(child: SelectorIdioma(compacto: true)));
+    }
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 2),
+      height: 44,
+      padding: const EdgeInsets.only(left: 14, right: 2),
+      child: Row(
+        children: [
+          Icon(Icons.translate_rounded, color: sonTextoSuave, size: 20),
+          const SizedBox(width: 12),
+          Expanded(child: Tx('Idioma', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoSuave, fontWeight: FontWeight.w500, fontSize: 14))),
+          const SelectorIdioma(),
+        ],
       ),
     );
   }
