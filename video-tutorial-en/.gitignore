@@ -1,0 +1,5 @@
+# Caché y salidas de HyperFrames (se regeneran)
+.hyperframes/
+renders/
+node_modules/
+.thumbnails/

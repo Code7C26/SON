@@ -1,0 +1,95 @@
+<template>
+  <style>
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans-Regular.ttf"); font-weight: 400; }
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans-Bold.ttf"); font-weight: 700; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.ttf"); font-weight: 600; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.ttf"); font-weight: 700; }
+    #root { position: absolute; inset: 0; overflow: hidden; background: #f4f4f4; font-family: "Inter", sans-serif; color: #2e2e2e; }
+
+    .ceja { position: absolute; left: 200px; top: 300px; height: 56px; padding: 0 24px; border-radius: 999px; background: rgba(255, 97, 71, 0.12);
+      color: #ff6147; font-size: 28px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; display: inline-flex; align-items: center; opacity: 0; }
+    .paso { position: absolute; left: 200px; top: 390px; width: 700px; font-family: "Plus Jakarta Sans", sans-serif; font-size: 112px;
+      line-height: 1.04; letter-spacing: -3px; opacity: 0; }
+    .paso .r { font-weight: 400; display: block; }
+    .paso .b { font-weight: 700; display: block; }
+
+    /* Hojas del PDF real (backend/src/pdf.js), recortadas al cuerpo del informe */
+    .hoja { position: absolute; width: 680px; overflow: hidden; background: #ffffff; border-radius: 16px; border: 1px solid #d5d5d5;
+      box-shadow: 0 24px 50px rgba(46, 46, 46, 0.14); opacity: 0; }
+    .hoja img { position: absolute; left: 0; width: 680px; }
+    #in-h1 { left: 960px; top: 128px; height: 585px; }
+    #in-h1 img { top: -94px; }
+    #in-h2 { left: 1080px; top: 470px; height: 488px; }
+    #in-h2 img { top: -135px; }
+    .marca { position: absolute; border: 5px solid #ff6147; border-radius: 14px; opacity: 0; }
+
+    /* Envío al cliente */
+    #in-envio { position: absolute; left: 200px; top: 700px; display: flex; align-items: center; gap: 16px; height: 80px; padding: 0 12px 0 28px;
+      border-radius: 999px; background: #2e2e2e; color: #ffffff; font-size: 28px; font-weight: 600; opacity: 0;
+      box-shadow: 0 16px 36px rgba(46, 46, 46, 0.18); }
+    #in-envio .adj { display: inline-flex; align-items: center; gap: 10px; height: 56px; padding: 0 22px; border-radius: 999px; background: #ffffff;
+      color: #2e2e2e; font-size: 28px; font-weight: 700; }
+    #in-envio .adj i { width: 12px; height: 12px; border-radius: 50%; background: #ff6147; display: inline-block; }
+  </style>
+  <div id="root" data-composition-id="informe" data-width="1920" data-height="1080">
+    <div id="in-ceja" class="ceja">Informe PDF</div>
+    <div id="in-p1" class="paso"><span class="r">Se arma</span><span class="b">solo</span></div>
+    <div id="in-p2" class="paso"><span class="r">Y llega</span><span class="b">al cliente</span></div>
+
+    <div id="in-h1" class="hoja" data-layout-allow-overlap>
+      <img src="assets/capturas/i01-informe.png" alt="" />
+      <div id="in-m1" class="marca"></div>
+      <div id="in-m2" class="marca"></div>
+    </div>
+    <div id="in-h2" class="hoja" data-layout-allow-overlap>
+      <img src="assets/capturas/i02-informe.png" alt="" />
+      <div id="in-m3" class="marca"></div>
+      <div id="in-m4" class="marca"></div>
+    </div>
+
+    <div id="in-envio">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#ff6147" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" />
+      </svg>
+      compras@andina.example.com
+      <span class="adj"><i></i>Informe.pdf</span>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      function marca(t, id, x, y, w, h, dur) {
+        gsap.set(id, { left: x - 8, top: y - 8, width: w + 16, height: h + 16 });
+        tl.fromTo(id, { opacity: 0, scale: 1.05 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power3.out" }, t);
+        tl.to(id, { opacity: 0, duration: 0.25, ease: "none" }, t + dur);
+      }
+
+      tl.fromTo("#in-ceja", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.45, ease: "power4.out" }, 0.1);
+      tl.fromTo("#in-p1", { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.45, ease: "power3.out" }, 0.25);
+
+      // Hoja 1: datos de la visita, check-in GPS y tareas
+      tl.fromTo("#in-h1", { opacity: 0, y: 90, rotation: -3 }, { opacity: 1, y: 0, rotation: -1.5, duration: 0.8, ease: "expo.out" }, 0.3);
+      marca(1.8, "#in-m1", 60, 235, 300, 26, 1.4);
+      marca(3.0, "#in-m2", 58, 362, 285, 132, 1.4);
+
+      // Hoja 2: fotos y firmas
+      tl.fromTo("#in-h2", { opacity: 0, x: 120, rotation: 4 }, { opacity: 1, x: 0, rotation: 1.5, duration: 0.8, ease: "expo.out" }, 3.8);
+      marca(4.5, "#in-m3", 58, 40, 562, 238, 1.2);
+      marca(5.3, "#in-m4", 58, 268, 562, 218, 1.4);
+
+      // Envío al cliente por correo
+      tl.to("#in-p1", { opacity: 0, filter: "blur(10px)", duration: 0.25, ease: "power2.in" }, 5.5);
+      tl.fromTo("#in-p2", { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.45, ease: "power3.out" }, 5.7);
+      tl.to(["#in-h1", "#in-h2"], { x: "+=40", y: "-=24", scale: 0.94, duration: 0.8, ease: "power2.inOut" }, 5.6);
+      tl.fromTo("#in-envio", { opacity: 0, y: 30, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "back.out(1.5)" }, 5.8);
+
+      // Mientras se lee el envío, las hojas siguen acercándose despacio
+      tl.to(["#in-h1", "#in-h2"], { scale: 0.97, x: "-=16", duration: 2.0, ease: "sine.inOut" }, 6.4);
+
+      // Salida
+      tl.to(["#in-h1", "#in-h2", "#in-envio", "#in-p2", "#in-ceja"], { opacity: 0, y: -30, duration: 0.4, ease: "power3.in", stagger: 0.04 }, 8.4);
+
+      window.__timelines["informe"] = tl;
+    })();
+  </script>
+</template>

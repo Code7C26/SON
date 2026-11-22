@@ -1,0 +1,41 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.ttf"); font-weight: 600; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.ttf"); font-weight: 700; }
+    #root { position: absolute; inset: 0; overflow: hidden; background: transparent; font-family: "Inter", sans-serif; pointer-events: none; }
+    /* Píldora flotante con las cuatro etapas del recorrido */
+    #gu-pildora { position: absolute; left: 472px; top: 34px; width: 976px; height: 72px; border-radius: 999px; background: #ffffff;
+      border: 1px solid #d5d5d5; box-shadow: 0 10px 28px rgba(46, 46, 46, 0.08); }
+    #gu-activo { position: absolute; left: 8px; top: 8px; width: 240px; height: 56px; border-radius: 999px; background: #ff6147; }
+    .gu-item { position: absolute; top: 8px; width: 240px; height: 56px; display: flex; align-items: center; justify-content: center;
+      font-size: 28px; font-weight: 700; color: #6e6e6e; letter-spacing: -0.3px; }
+    #gu-i1 { left: 8px; } #gu-i2 { left: 248px; } #gu-i3 { left: 488px; } #gu-i4 { left: 728px; }
+  </style>
+  <div id="root" data-composition-id="guia" data-width="1920" data-height="1080">
+    <div id="gu-pildora">
+      <div id="gu-activo"></div>
+      <div id="gu-i1" class="gu-item">Web panel</div>
+      <div id="gu-i2" class="gu-item">Field app</div>
+      <div id="gu-i3" class="gu-item">Client</div>
+      <div id="gu-i4" class="gu-item">Results</div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      gsap.set("#gu-i1", { color: "#2e2e2e" });
+      tl.fromTo("#gu-pildora", { opacity: 0, y: -24 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 0.2);
+      // Cambio de etapa: la píldora coral se desliza al siguiente paso
+      function etapa(t, desde, hasta, x) {
+        tl.to("#gu-activo", { x: x, duration: 0.55, ease: "power3.inOut" }, t);
+        tl.to(desde, { color: "#6e6e6e", duration: 0.3, ease: "none" }, t);
+        tl.to(hasta, { color: "#2e2e2e", duration: 0.3, ease: "none" }, t + 0.25);
+      }
+      etapa(31.9, "#gu-i1", "#gu-i2", 240);
+      etapa(71.9, "#gu-i2", "#gu-i3", 480);
+      etapa(87.9, "#gu-i3", "#gu-i4", 720);
+      tl.to("#gu-pildora", { opacity: 0, y: -24, duration: 0.4, ease: "power3.in" }, 101.5);
+      window.__timelines["guia"] = tl;
+    })();
+  </script>
+</template>

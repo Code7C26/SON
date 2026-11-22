@@ -1,0 +1,66 @@
+<template>
+  <style>
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans-Regular.ttf"); font-weight: 400; }
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans-Bold.ttf"); font-weight: 700; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.ttf"); font-weight: 600; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.ttf"); font-weight: 700; }
+    #root { position: absolute; inset: 0; overflow: hidden; background: #f4f4f4; font-family: "Inter", sans-serif; color: #2e2e2e; }
+    #ci-bloque { position: absolute; left: 0; top: 0; width: 820px; height: 1080px; background: #2e2e2e; }
+    #ci-reloj { position: absolute; left: 220px; top: 350px; width: 380px; height: 380px; overflow: visible; }
+    #ci-col { position: absolute; left: 980px; top: 0; width: 860px; height: 1080px; }
+    /* logo.png 1437×395 a escala 0.38 → 546×150; la palabra SON empieza en x 160 */
+    #ci-palabra { position: absolute; left: 0; top: 262px; width: 386px; height: 150px;
+      background: url("assets/img/logo.png") -160px 0 / 546px 150px no-repeat; }
+    #ci-tit { position: absolute; left: 0; top: 464px; width: 860px; font-family: "Plus Jakarta Sans", sans-serif; font-size: 64px;
+      line-height: 1.12; letter-spacing: -1.5px; }
+    #ci-tit .r { font-weight: 400; display: block; }
+    #ci-tit .b { font-weight: 700; display: block; }
+    #ci-fila { position: absolute; left: 0; top: 690px; display: flex; align-items: center; gap: 32px; }
+    #ci-cta { display: inline-flex; align-items: center; gap: 20px; background: #ff6147; color: #2e2e2e; border-radius: 999px;
+      padding: 14px 14px 14px 40px; font-size: 36px; font-weight: 700; }
+    #ci-flecha { width: 62px; height: 62px; border-radius: 50%; background: #2e2e2e; display: inline-flex; align-items: center; justify-content: center; }
+    #ci-url { font-size: 30px; color: #6e6e6e; font-weight: 600; }
+    #ci-palabra, #ci-tit .r, #ci-tit .b, #ci-fila { opacity: 0; }
+  </style>
+  <div id="root" data-composition-id="cierre" data-width="1920" data-height="1080">
+    <div id="ci-bloque"></div>
+    <svg id="ci-reloj" viewBox="0 0 300 300" data-layout-allow-overflow>
+      <defs>
+        <clipPath id="ci-nivel" clipPathUnits="userSpaceOnUse"><rect id="ci-nivel-rect" x="-10" y="0" width="320" height="320" /></clipPath>
+      </defs>
+      <g id="ci-giro">
+        <path d="M0 0 H300 A150 150 0 0 1 0 0 Z" fill="#ff6147" clip-path="url(#ci-nivel)" />
+        <path id="ci-t1" d="M0 0 H300 A150 150 0 0 1 0 0 Z" fill="none" stroke="#ff6147" stroke-width="5" stroke-linejoin="round" />
+        <path d="M0 300 H300 A150 150 0 0 0 0 300 Z" fill="#ff6147" clip-path="url(#ci-nivel)" />
+        <path id="ci-t2" d="M0 300 H300 A150 150 0 0 0 0 300 Z" fill="none" stroke="#ff6147" stroke-width="5" stroke-linejoin="round" />
+      </g>
+    </svg>
+    <div id="ci-col">
+      <div id="ci-palabra" role="img" aria-label="SON"></div>
+      <div id="ci-tit"><span class="r">Toda tu operación,</span><span class="b">en un solo lugar</span></div>
+      <div id="ci-fila">
+        <span id="ci-cta">Pedir demo<span id="ci-flecha"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg></span></span>
+        <span id="ci-url">sonoperation.com</span>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#ci-bloque", { scaleX: 0, transformOrigin: "0 50%" }, { scaleX: 1, duration: 0.7, ease: "power3.inOut" }, 0);
+      ["#ci-t1", "#ci-t2"].forEach((sel, i) => {
+        const p = document.querySelector(sel);
+        const L = p.getTotalLength();
+        p.style.strokeDasharray = L;
+        tl.fromTo(p, { strokeDashoffset: L }, { strokeDashoffset: 0, duration: 0.6, ease: "power2.inOut" }, 0.45 + i * 0.08);
+      });
+      tl.fromTo("#ci-nivel-rect", { y: 300 }, { y: 0, duration: 0.65, ease: "power3.inOut" }, 0.95);
+      tl.fromTo("#ci-giro", { rotation: 0, svgOrigin: "150 150" }, { rotation: 180, svgOrigin: "150 150", duration: 0.6, ease: "back.inOut(1.4)" }, 1.7);
+      tl.fromTo("#ci-palabra", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.6, ease: "expo.out" }, 0.7);
+      tl.fromTo("#ci-tit .r", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.55, ease: "expo.out" }, 1.0);
+      tl.fromTo("#ci-tit .b", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.55, ease: "expo.out" }, 1.15);
+      tl.fromTo("#ci-fila", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.5, ease: "power4.out" }, 2.2);
+      window.__timelines["cierre"] = tl;
+    })();
+  </script>
+</template>
