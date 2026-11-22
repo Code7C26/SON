@@ -25,7 +25,7 @@
         "http.server",
         "4100",
         "--directory",
-        "C:/Users/franc/SONoperation/son_admin/build/web"
+        "C:/Users/franc/SONoperation/src/son_admin/build/web"
       ],
       "port": 4100
     },
@@ -37,7 +37,7 @@
         "http.server",
         "4101",
         "--directory",
-        "C:/Users/franc/SONoperation/son_tecnico/build/web"
+        "C:/Users/franc/SONoperation/src/son_tecnico/build/web"
       ],
       "port": 4101
     },
@@ -49,7 +49,7 @@
         "http.server",
         "4102",
         "--directory",
-        "C:/Users/franc/SONoperation/backend/presentacion"
+        "C:/Users/franc/SONoperation/src/backend/presentacion"
       ],
       "port": 4102
     }

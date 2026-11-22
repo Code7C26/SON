@@ -89,9 +89,11 @@ public static class LogosSon {
 }
 "@
 
-$raiz = "C:\Users\franc\SIMAOPERATION"
-$icono = [LogosSon]::Recortar([LogosSon]::QuitarNegro("$raiz\DESINGS\5SINCOLOR.png"), 0.08)
-$marca = [LogosSon]::Recortar([LogosSon]::QuitarNegro("$raiz\DESINGS\1SINCOLOR.png"), 0.04)
+# $raiz es la carpeta src/ (donde están las apps); los diseños están en design/, en la raíz del repo.
+$raiz = Split-Path -Parent $PSScriptRoot
+$disenos = Join-Path (Split-Path -Parent $raiz) 'design'
+$icono = [LogosSon]::Recortar([LogosSon]::QuitarNegro("$disenos\5SINCOLOR.png"), 0.08)
+$marca = [LogosSon]::Recortar([LogosSon]::QuitarNegro("$disenos\1SINCOLOR.png"), 0.04)
 
 function Guardar($im, $ruta) {
     $dir = Split-Path $ruta

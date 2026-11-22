@@ -5,9 +5,9 @@
 
 ## Contexto
 SON tiene tres frentes visuales que hoy no comparten un sistema común:
-- **Landing:** `backend/presentacion/index.html`, servida en `/`.
-- **Panel admin:** `son_admin`, Flutter Web, servido en `/panel/`.
-- **App de técnicos:** `son_tecnico`, Flutter, como APK y en `/tecnico/`.
+- **Landing:** `src/backend/presentacion/index.html`, servida en `/`.
+- **Panel admin:** `src/son_admin`, Flutter Web, servido en `/panel/`.
+- **App de técnicos:** `src/son_tecnico`, Flutter, como APK y en `/tecnico/`.
 
 Los tres usan la fuente **Bw Gradual DEMO**, que es una versión de prueba con riesgo de licencia. Arrancan en modo oscuro, usan tinta `#2E2E2E` o `#1C1C1E` en lugar de `#111827`, no tienen tokens de tipografía ni de espaciado, y tienen estados de carga, vacío y error desparejos.
 
@@ -47,7 +47,7 @@ Ambas reemplazan a **Bw Gradual DEMO** (familia `TuFuente`) en los tres frentes.
 
 ## Auditoría UX
 
-### Landing (`backend/presentacion/index.html`)
+### Landing (`src/backend/presentacion/index.html`)
 | Problema | Simplificación |
 |---|---|
 | La barra de navegación ocupa todo el ancho y está pegada arriba, no es una píldora | Píldora flotante con margen superior de 16px |
@@ -59,7 +59,7 @@ Ambas reemplazan a **Bw Gradual DEMO** (familia `TuFuente`) en los tres frentes.
 | Falta una sección de preguntas frecuentes | Acordeón de FAQ con las categorías en una columna lateral, como en la referencia 5 |
 | Formulario de contacto sobre fondo claro genérico | Bloque oscuro `#111827`: foto a la izquierda, formulario a la derecha y botón coral. Se mantiene la misma lógica de formsubmit y mailto |
 
-### Panel web (`son_admin`)
+### Panel web (`src/son_admin`)
 | Problema | Simplificación |
 |---|---|
 | Arranca en oscuro; tinta `#2E2E2E`; getters con nombres engañosos (`sonDarkGreen` devuelve la tinta y `sonLightGreen` el coral) | Tokens `AppColors`, `AppTypography` y `AppSpacing`. Los getters viejos quedan como alias `@Deprecated` para no romper nada |
@@ -81,7 +81,7 @@ Ambas reemplazan a **Bw Gradual DEMO** (familia `TuFuente`) en los tres frentes.
 | Las tarjetas de KPI del dashboard son tiles chicos | Fila de KPIs grandes y protagonistas, cada uno clickeable hacia su lista filtrada |
 | Padding de página hardcodeado (40, o 40/32/40/24) | `AppSpacing.page`, en múltiplos de 8 |
 
-### App móvil (`son_tecnico`)
+### App móvil (`src/son_tecnico`)
 | Problema | Simplificación |
 |---|---|
 | Arranca en oscuro; el ícono del AppBar se fuerza a blanco y la flecha de volver desaparece en modo claro (`main.dart:1070`, `:1501`) | Usar los colores del tema; quitar el blanco forzado |
@@ -106,8 +106,8 @@ Ambas reemplazan a **Bw Gradual DEMO** (familia `TuFuente`) en los tres frentes.
 ## Fases (cada una se puede publicar por separado y no rompe nada)
 
 ### Fase 0 — Preparación (sin cambios visibles)
-1. Crear `DESIGN_PLAN.md` en la raíz del repo con este contenido.
-2. Agregar las fuentes **Plus Jakarta Sans** e **Inter** (`.ttf`, OFL) en `son_admin/assets/fonts/` y `son_tecnico/assets/fonts/`, y declararlas en cada `pubspec.yaml`. Bw Gradual se mantiene hasta la Fase 1.
+1. Crear `docs/DESIGN_PLAN.md` con este contenido.
+2. Agregar las fuentes **Plus Jakarta Sans** e **Inter** (`.ttf`, OFL) en `src/son_admin/assets/fonts/` y `src/son_tecnico/assets/fonts/`, y declararlas en cada `pubspec.yaml`. Bw Gradual se mantiene hasta la Fase 1.
 3. Tomar capturas de referencia de cada pantalla actual, para comparar antes y después.
 
 ### Fase 1 — Tokens y tema (las dos apps de Flutter)
@@ -117,13 +117,13 @@ Ambas reemplazan a **Bw Gradual DEMO** (familia `TuFuente`) en los tres frentes.
 - Verificación: `flutter analyze` sin errores nuevos y recorrido visual de todas las pantallas en claro y en oscuro.
 
 ### Fase 2 — Biblioteca de componentes compartidos
-Cada app tiene su propio `lib/ui/` con la misma API, porque no hay un paquete compartido. Se parte de lo que ya hay en `son_admin/lib/pantallas/piezas.dart` (`PildoraFiltro`, `EtiquetaEstado`, `DatoConIcono`).
+Cada app tiene su propio `lib/ui/` con la misma API, porque no hay un paquete compartido. Se parte de lo que ya hay en `src/son_admin/lib/pantallas/piezas.dart` (`PildoraFiltro`, `EtiquetaEstado`, `DatoConIcono`).
 - `TituloContraste` (regular + negrita), `Eyebrow`, `BotonPrincipal` y `BotonSecundario` en píldora.
 - `TarjetaSon` con hover y elevación, `KpiBloque`, `IconoCircular`.
 - `EstadoCargando` (skeleton), `EstadoVacio` y `EstadoError`.
 - `AparecerEscalonado`, con fade y slide de 250–350ms y `easeOutCubic`.
 
-### Fase 3 — Landing (`backend/presentacion/index.html`)
+### Fase 3 — Landing (`src/backend/presentacion/index.html`)
 - Cambiar las fuentes, con aviso: **Plus Jakarta Sans** e **Inter**.
 - Variables CSS con la paleta de `CLAUDE.md`, con tinta `#111827`.
 - Navegación en píldora flotante y un solo CTA.
@@ -169,24 +169,24 @@ Cada pantalla es un commit aparte. La lógica (`http`, endpoints y modelos) no s
 - Limpiar los alias `@Deprecated` cuando ya no los use nadie.
 - Borrar los logos que no se usan (`COLOR4.png`, `3.png`).
 - Cambiar la `description` del `pubspec.yaml` de la app de técnicos.
-- Marca: el UI ya no muestra "Sima". Quedan solo comentarios (`son_tecnico/lib/config/api_config.dart:3`, `son_admin/lib/pantallas/crm.dart:11`), que pasan a "SON". **No se tocan** las referencias a "SIMA Ambiente" como empresa cliente: PDF, mails, tarifario y portal.
+- Marca: el UI ya no muestra "Sima". Quedan solo comentarios (`src/son_tecnico/lib/config/api_config.dart:3`, `src/son_admin/lib/pantallas/crm.dart:11`), que pasan a "SON". **No se tocan** las referencias a "SIMA Ambiente" como empresa cliente: PDF, mails, tarifario y portal.
 
 ## Reglas de seguridad durante la ejecución
-- No se modifica nada de `backend/src/*.js` salvo `index.html` de la presentación. Las firmas de los servicios Flutter (`lib/services/`) no cambian.
-- El autoguardado del borrador y la cola offline (`son_tecnico/lib/services/sincronizacion.dart`) se mantienen intactos.
+- No se modifica nada de `src/backend/src/*.js` salvo `index.html` de la presentación. Las firmas de los servicios Flutter (`lib/services/`) no cambian.
+- El autoguardado del borrador y la cola offline (`src/son_tecnico/lib/services/sincronizacion.dart`) se mantienen intactos.
 - Una fase o pantalla por commit, para poder revertir aislado.
 
 ## Verificación
 - **Flutter (las dos apps):** `flutter analyze` y `flutter build web --release --base-href /panel/` (o `/tecnico/`), y `flutter build apk --release` para técnicos.
 - **Navegador:** recorrer cada pantalla con `flutter run -d chrome`, en claro, en oscuro, a 375px y en escritorio. Forzar los estados de carga, vacío y error cortando el backend.
-- **Backend sin cambios de lógica:** `node --test test/` en `backend/`, y los e2e (`node test/formularios.e2e.js`, `node test/reunion.e2e.js`, etc.) con el backend levantado.
+- **Backend sin cambios de lógica:** `node --test test/` en `src/backend/`, y los e2e (`node test/formularios.e2e.js`, `node test/reunion.e2e.js`, etc.) con el backend levantado.
 - **Landing:** abrir `/`, revisar la consola sin errores, el formulario de contacto, los enlaces a `/panel/` y `/tecnico/`, `prefers-reduced-motion` y el ancho de 375px.
 - **Flujo de campo de punta a punta:** login → orden → check-in → 4 pasos → finalizar, primero en línea y después sin conexión, verificando que se sincroniza al volver la red.
 
 ---
 
 ## Anexo — Fotos de la landing (generadas con IA)
-Van en `backend/presentacion/medios/ia/` con estos nombres exactos (JPG, horizontales salvo que se indique). Mientras no estén, la página muestra un fondo de marca.
+Van en `src/backend/presentacion/medios/ia/` con estos nombres exactos (JPG, horizontales salvo que se indique). Mientras no estén, la página muestra un fondo de marca.
 
 | Archivo | Dónde se ve | Formato |
 |---|---|---|

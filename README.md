@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="DESINGS/1.png" alt="SON Operation Platform" width="220"/>
+  <img src="design/1.png" alt="SON Operation Platform" width="220"/>
   <h1>SON — Operation Platform</h1>
   <p><strong>Plataforma integral SaaS para la digitalización, auditoría y control de operaciones técnicas en terreno.</strong></p>
   <p>
@@ -67,7 +67,7 @@ El diseño de interfaces responde a un sistema visual de alto contraste y legibi
   * Paneles de contraste: `#2e2e2e` (Gris oscuro corporativo)
 * **Tipografía Oficial:** `Plus Jakarta Sans` en títulos e `Inter` en textos de interfaz, unificadas en web y móvil.
 
-Los originales de marca se encuentran en `DESINGS/`.
+Los originales de marca se encuentran en `design/`.
 
 ---
 
@@ -80,15 +80,29 @@ Los originales de marca se encuentran en `DESINGS/`.
 
 ### Organización del repositorio
 
+```
+/
+├── docs/      → Documentación y análisis
+├── src/       → Código fuente
+├── design/    → Mockups y prototipos
+├── assets/    → Imágenes y recursos
+├── README.md  → Presentación general del proyecto
+└── .gitignore → Archivos a excluir del seguimiento
+```
+
 | Ruta | Responsabilidad |
 | --- | --- |
-| `backend/` | API REST, autenticación, recurrencia, correo y motor PDF |
-| `son_admin/` | Panel de control (Flutter Web) |
-| `son_tecnico/` | Aplicación de campo (Flutter) |
-| `agente/` | Agente de oficina que entrega los informes al disco de red |
-| `despliegue/` | Contenedores, proxy HTTPS y procedimiento de publicación |
-| `DESINGS/` | Sistema de identidad visual |
-| `DOCUMENTACION COMERCIAL/` | FODA, público objetivo, perfil del cliente, match tecnológico, modelo de negocio, costos, Canvas, punto de equilibrio, tamaño de mercado, estrategia de adquisición y matriz de frecuencia e impacto |
+| `docs/DOCUMENTACION COMERCIAL/` | FODA, público objetivo, perfil del cliente, match tecnológico, modelo de negocio, costos, Canvas, punto de equilibrio, tamaño de mercado, estrategia de adquisición y matriz de frecuencia e impacto |
+| `docs/DESIGN_PLAN.md` | Plan de rediseño visual y UX |
+| `src/backend/` | API REST, autenticación, recurrencia, correo y motor PDF |
+| `src/son_admin/` | Panel de control (Flutter Web) |
+| `src/son_tecnico/` | Aplicación de campo (Flutter) |
+| `src/agente/` | Agente de oficina que entrega los informes al disco de red |
+| `src/despliegue/` | Contenedores, proxy HTTPS y procedimiento de publicación |
+| `src/tools/` | Scripts auxiliares (armado de logos) |
+| `src/video/`, `src/video-presentacion/` | Videos de demostración y presentación |
+| `design/` | Sistema de identidad visual |
+| `assets/` | Imágenes y recursos sueltos |
 
 ---
 

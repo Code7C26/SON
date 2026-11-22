@@ -1,9 +1,10 @@
-"""Arma los PNG transparentes del logo nuevo a partir de DESINGS."""
+"""Arma los PNG transparentes del logo nuevo a partir de design/."""
 from pathlib import Path
 from PIL import Image
 
-raiz = Path(r"C:\Users\franc\SIMAOPERATION")
-disenos = raiz / "DESINGS"
+# raiz es la carpeta src/ (donde están las apps); los diseños están en design/, en la raíz del repo.
+raiz = Path(__file__).resolve().parent.parent
+disenos = raiz.parent / "design"
 
 
 def quitar_negro(origen: Path) -> Image.Image:

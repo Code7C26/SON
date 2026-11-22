@@ -60,7 +60,7 @@ Los pasos son los mismos: cargar la llave SSH, elegir Ubuntu 24.04 y anotar la I
 - Si el proveedor tiene el recuadro **"User data"** o **"Cloud-init"**, pegá ahí `cloud-init.yaml` (igual que en Hetzner).
 - Si **no** lo tiene, esperá a que el servidor esté creado y después, desde tu PC:
   ```powershell
-  cd C:\Users\franc\SIMAOPERATION\despliegue
+  cd C:\Users\franc\SONoperation\src\despliegue
   scp .\preparar-servidor.sh root@LA.IP:/root/
   ssh root@LA.IP "bash /root/preparar-servidor.sh"
   ```
@@ -83,7 +83,7 @@ Tu dirección va a ser `son.tudominio.com`.
 ## Paso 4 – Preparar la configuración (en tu PC)
 
 ```powershell
-cd C:\Users\franc\SIMAOPERATION\despliegue
+cd C:\Users\franc\SONoperation\src\despliegue
 .\generar-env.ps1 -Dominio son.tudominio.com -EmailAdmin tucorreo@ejemplo.com -NombreAdmin "Francina De Napoli"
 ```
 
@@ -131,7 +131,7 @@ El registro de lo que hace queda en `%APPDATA%\SON-Agente\agente.log`.
 Android (APK):
 
 ```powershell
-cd C:\Users\franc\SIMAOPERATION\son_tecnico
+cd C:\Users\franc\SONoperation\src\son_tecnico
 flutter build apk --release --dart-define=API_URL=https://son.tudominio.com
 ```
 
