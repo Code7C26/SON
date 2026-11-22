@@ -89,9 +89,9 @@ public static class LogosSon {
 }
 "@
 
-# $raiz es la carpeta src/ (donde están las apps); los diseños están en design/, en la raíz del repo.
+# $raiz es la carpeta src/ (donde están las apps); los logos están en design/Logos/, en la raíz del repo.
 $raiz = Split-Path -Parent $PSScriptRoot
-$disenos = Join-Path (Split-Path -Parent $raiz) 'design'
+$disenos = Join-Path (Split-Path -Parent $raiz) 'design\Logos'
 $icono = [LogosSon]::Recortar([LogosSon]::QuitarNegro("$disenos\5SINCOLOR.png"), 0.08)
 $marca = [LogosSon]::Recortar([LogosSon]::QuitarNegro("$disenos\1SINCOLOR.png"), 0.04)
 

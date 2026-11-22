@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="design/1.png" alt="SON Operation Platform" width="220"/>
+  <img src="design/Logos/1.png" alt="SON Operation Platform" width="220"/>
   <h1>SON — Operation Platform</h1>
   <p><strong>Plataforma integral SaaS para la digitalización, auditoría y control de operaciones técnicas en terreno.</strong></p>
   <p>
@@ -67,7 +67,7 @@ El diseño de interfaces responde a un sistema visual de alto contraste y legibi
   * Paneles de contraste: `#2e2e2e` (Gris oscuro corporativo)
 * **Tipografía Oficial:** `Plus Jakarta Sans` en títulos e `Inter` en textos de interfaz, unificadas en web y móvil.
 
-Los originales de marca se encuentran en `design/`.
+Los originales de marca se encuentran en `design/Logos/`.
 
 ---
 
@@ -102,7 +102,7 @@ Los originales de marca se encuentran en `design/`.
 | `src/tools/` | Scripts auxiliares (armado de logos) |
 | `src/video/`, `src/video-presentacion/` | Videos de demostración y presentación |
 | `.claude/` | Instrucciones para Claude (`CLAUDE.md`), skills y configuración local |
-| `design/` | Sistema de identidad visual |
+| `design/Logos/` | Logos e isologo de SON (sistema de identidad visual) |
 | `assets/` | Imágenes y recursos sueltos |
 
 ---
