@@ -10,6 +10,7 @@ import 'package:son_admin/services/sesion.dart';
 import 'package:son_admin/theme/tema.dart';
 import 'package:son_admin/ui/componentes.dart';
 
+import 'package:son_admin/i18n/idioma.dart';
 // Pantallas nuevas pedidas por los técnicos (reunión de noviembre de 2026):
 //  - Vencimientos: extintores, mediciones, habilitaciones. Avisa con tiempo.
 //  - Gastos y vehículos: lo que antes se cargaba en el Forms (kilometraje, combustible, peajes).
@@ -88,10 +89,10 @@ class _PantallaVencimientosState extends State<PantallaVencimientos> {
       if (respuesta.statusCode == 200) {
         _cargar();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensajeError(respuesta))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx(mensajeError(respuesta))));
       }
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(mensajeSinConexion)));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx(mensajeSinConexion)));
     }
   }
 
@@ -99,11 +100,11 @@ class _PantallaVencimientosState extends State<PantallaVencimientos> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (dialogo) => AlertDialog(
-        title: const Text('¿Borrar el vencimiento?'),
-        content: Text('${v['descripcion']} — ${v['empresa']}. Si ya se resolvió, mejor marcalo como resuelto.'),
+        title: const Tx('¿Borrar el vencimiento?'),
+        content: Tx('${v['descripcion']} — ${v['empresa']}. Si ya se resolvió, mejor marcalo como resuelto.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogo, false), child: const Text('Cancelar')),
-          TextButton(onPressed: () => Navigator.pop(dialogo, true), child: Text('Borrar', style: TextStyle(color: sonRojo))),
+          TextButton(onPressed: () => Navigator.pop(dialogo, false), child: const Tx('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(dialogo, true), child: Tx('Borrar', style: TextStyle(color: sonRojo))),
         ],
       ),
     );
@@ -130,7 +131,7 @@ class _PantallaVencimientosState extends State<PantallaVencimientos> {
       context: context,
       builder: (dialogo) => StatefulBuilder(
         builder: (dialogo, actualizar) => AlertDialog(
-          title: const Text('Nuevo vencimiento'),
+          title: const Tx('Nuevo vencimiento'),
           content: SizedBox(
             width: 440,
             child: Column(
@@ -141,15 +142,15 @@ class _PantallaVencimientosState extends State<PantallaVencimientos> {
                   onSelected: (valor) => empresa.text = valor,
                   fieldViewBuilder: (context, control, foco, alEnviar) {
                     control.addListener(() => empresa.text = control.text);
-                    return TextField(controller: control, focusNode: foco, decoration: const InputDecoration(labelText: 'Empresa'));
+                    return TextField(controller: control, focusNode: foco, decoration: InputDecoration(labelText: tr('Empresa')));
                   },
                 ),
                 const SizedBox(height: 10),
-                TextField(controller: descripcion, decoration: const InputDecoration(labelText: '¿Qué vence?', hintText: 'Ej: Habilitación municipal')),
+                TextField(controller: descripcion, decoration: InputDecoration(labelText: tr('¿Qué vence?'), hintText: tr('Ej: Habilitación municipal'))),
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    SizedBox(width: 100, child: TextField(controller: cantidad, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Cantidad'))),
+                    SizedBox(width: 100, child: TextField(controller: cantidad, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: tr('Cantidad')))),
                     const SizedBox(width: 12),
                     Expanded(
                       child: OutlinedButton.icon(
@@ -159,17 +160,17 @@ class _PantallaVencimientosState extends State<PantallaVencimientos> {
                           if (elegida != null) actualizar(() => vence = elegida);
                         },
                         icon: const Icon(Icons.event_outlined),
-                        label: Text(vence == null ? 'Fecha de vencimiento' : 'Vence el ${vence!.day}/${vence!.month}/${vence!.year}'),
+                        label: Tx(vence == null ? 'Fecha de vencimiento' : 'Vence el ${vence!.day}/${vence!.month}/${vence!.year}'),
                       ),
                     ),
                   ],
                 ),
-                if (error != null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600))),
+                if (error != null) Padding(padding: const EdgeInsets.only(top: 10), child: Tx(error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600))),
               ],
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogo, false), child: const Text('Cancelar')),
+            TextButton(onPressed: () => Navigator.pop(dialogo, false), child: const Tx('Cancelar')),
             ElevatedButton(
               onPressed: () async {
                 if (vence == null) return actualizar(() => error = 'Elegí la fecha de vencimiento');
@@ -189,7 +190,7 @@ class _PantallaVencimientosState extends State<PantallaVencimientos> {
                   actualizar(() => error = mensajeSinConexion);
                 }
               },
-              child: const Text('Guardar'),
+              child: const Tx('Guardar'),
             ),
           ],
         ),
@@ -213,7 +214,7 @@ class _PantallaVencimientosState extends State<PantallaVencimientos> {
           _encabezado(
             'Control de',
             'vencimientos',
-            [ElevatedButton.icon(onPressed: _nuevo, icon: const Icon(Icons.add), label: const Text('Nuevo'))],
+            [ElevatedButton.icon(onPressed: _nuevo, icon: const Icon(Icons.add), label: const Tx('Nuevo'))],
           ),
           const SizedBox(height: 20),
           Wrap(
@@ -225,10 +226,10 @@ class _PantallaVencimientosState extends State<PantallaVencimientos> {
               EtiquetaEstado(texto: '$proximos en los próximos $_diasAviso días', color: sonAmbar),
               SizedBox(
                 width: 320,
-                child: TextField(controller: _busqueda, decoration: const InputDecoration(hintText: 'Buscar empresa o qué vence...', prefixIcon: Icon(Icons.search), isDense: true)),
+                child: TextField(controller: _busqueda, decoration: InputDecoration(hintText: tr('Buscar empresa o qué vence...'), prefixIcon: Icon(Icons.search), isDense: true)),
               ),
               FilterChip(
-                label: const Text('Ver también los resueltos'),
+                label: const Tx('Ver también los resueltos'),
                 selected: _conResueltos,
                 onSelected: (valor) {
                   setState(() => _conResueltos = valor);
@@ -244,9 +245,9 @@ class _PantallaVencimientosState extends State<PantallaVencimientos> {
               child: _cargando
                   ? const Center(child: CircularProgressIndicator())
                   : _error != null
-                      ? Center(child: Text(_error!, style: TextStyle(color: sonRojo)))
+                      ? Center(child: Tx(_error!, style: TextStyle(color: sonRojo)))
                       : visibles.isEmpty
-                          ? Center(child: Text('No hay vencimientos cargados.', style: TextStyle(color: sonTextoSuave)))
+                          ? Center(child: Tx('No hay vencimientos cargados.', style: TextStyle(color: sonTextoSuave)))
                           : ListView.separated(
                               padding: const EdgeInsets.all(12),
                               itemCount: visibles.length,
@@ -258,8 +259,8 @@ class _PantallaVencimientosState extends State<PantallaVencimientos> {
                                 final cuando = resuelto ? 'Resuelto' : (dias < 0 ? 'Vencido hace ${-dias} días' : (dias == 0 ? 'Vence hoy' : 'Faltan $dias días'));
                                 return ListTile(
                                   leading: Icon(resuelto ? Icons.check_circle_outline : Icons.event_busy_outlined, color: _color(dias, resuelto)),
-                                  title: Text('${v['descripcion']}${((v['cantidad'] as num?) ?? 1) > 1 ? ' (x${v['cantidad']})' : ''}', style: TextStyle(fontWeight: FontWeight.w600, decoration: resuelto ? TextDecoration.lineThrough : null)),
-                                  subtitle: Text('${v['empresa']} · vence el ${_fecha(v['vence'])}${v['creado_por'] != null ? ' · cargó ${v['creado_por']}' : ''}'),
+                                  title: Tx('${v['descripcion']}${((v['cantidad'] as num?) ?? 1) > 1 ? ' (x${v['cantidad']})' : ''}', style: TextStyle(fontWeight: FontWeight.w600, decoration: resuelto ? TextDecoration.lineThrough : null)),
+                                  subtitle: Tx('${v['empresa']} · vence el ${_fecha(v['vence'])}${v['creado_por'] != null ? ' · cargó ${v['creado_por']}' : ''}'),
                                   trailing: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -267,10 +268,10 @@ class _PantallaVencimientosState extends State<PantallaVencimientos> {
                                       const SizedBox(width: 8),
                                       TextButton(
                                         onPressed: () => _cambiar(v, {'resuelto': !resuelto}),
-                                        child: Text(resuelto ? 'Reabrir' : 'Resuelto'),
+                                        child: Tx(resuelto ? 'Reabrir' : 'Resuelto'),
                                       ),
                                       IconButton(
-                                        tooltip: 'Cambiar fecha',
+                                        tooltip: tr('Cambiar fecha'),
                                         icon: const Icon(Icons.edit_calendar_outlined),
                                         onPressed: () async {
                                           final actual = DateTime.tryParse('${v['vence']}') ?? DateTime.now();
@@ -278,7 +279,7 @@ class _PantallaVencimientosState extends State<PantallaVencimientos> {
                                           if (elegida != null) _cambiar(v, {'vence': _iso(elegida)});
                                         },
                                       ),
-                                      IconButton(tooltip: 'Borrar', icon: Icon(Icons.delete_outline, color: sonRojo), onPressed: () => _borrar(v)),
+                                      IconButton(tooltip: tr('Borrar'), icon: Icon(Icons.delete_outline, color: sonRojo), onPressed: () => _borrar(v)),
                                     ],
                                   ),
                                 );
@@ -368,7 +369,7 @@ class _PantallaGastosState extends State<PantallaGastos> {
     await showDialog<void>(
       context: context,
       builder: (dialogo) => AlertDialog(
-        title: Text('${g['tipo']} · ${g['tecnico'] ?? ''}'),
+        title: Tx('${g['tipo']} · ${g['tecnico'] ?? ''}'),
         content: SizedBox(
           width: 520,
           child: FutureBuilder<Uint8List?>(
@@ -378,12 +379,12 @@ class _PantallaGastosState extends State<PantallaGastos> {
             }(),
             builder: (context, foto) {
               if (foto.connectionState != ConnectionState.done) return const SizedBox(height: 200, child: Center(child: CircularProgressIndicator()));
-              if (foto.data == null) return Text('No se pudo cargar la foto.', style: TextStyle(color: sonRojo));
+              if (foto.data == null) return Tx('No se pudo cargar la foto.', style: TextStyle(color: sonRojo));
               return InteractiveViewer(child: Image.memory(foto.data!, fit: BoxFit.contain));
             },
           ),
         ),
-        actions: [TextButton(onPressed: () => Navigator.pop(dialogo), child: const Text('Cerrar'))],
+        actions: [TextButton(onPressed: () => Navigator.pop(dialogo), child: const Tx('Cerrar'))],
       ),
     );
   }
@@ -416,7 +417,7 @@ class _PantallaGastosState extends State<PantallaGastos> {
               OutlinedButton.icon(
                 onPressed: () => abrirInforme('$apiBaseUrl/api/gastos/planilla?$_filtros&token=${SesionAdmin.token}'),
                 icon: const Icon(Icons.table_view_outlined),
-                label: const Text('Planilla para Excel'),
+                label: const Tx('Planilla para Excel'),
               ),
             ],
           ),
@@ -426,17 +427,17 @@ class _PantallaGastosState extends State<PantallaGastos> {
             runSpacing: 12,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              OutlinedButton.icon(onPressed: () => _elegirFecha(true), icon: const Icon(Icons.event_outlined), label: Text('Desde ${_desde.day}/${_desde.month}/${_desde.year}')),
-              OutlinedButton.icon(onPressed: () => _elegirFecha(false), icon: const Icon(Icons.event_outlined), label: Text('Hasta ${_hasta.day}/${_hasta.month}/${_hasta.year}')),
+              OutlinedButton.icon(onPressed: () => _elegirFecha(true), icon: const Icon(Icons.event_outlined), label: Tx('Desde ${_desde.day}/${_desde.month}/${_desde.year}')),
+              OutlinedButton.icon(onPressed: () => _elegirFecha(false), icon: const Icon(Icons.event_outlined), label: Tx('Hasta ${_hasta.day}/${_hasta.month}/${_hasta.year}')),
               SizedBox(
                 width: 220,
                 child: DropdownButtonFormField<int?>(
                   initialValue: _tecnicoId,
                   isDense: true,
-                  decoration: const InputDecoration(labelText: 'Técnico', isDense: true),
+                  decoration: InputDecoration(labelText: tr('Técnico'), isDense: true),
                   items: [
-                    const DropdownMenuItem<int?>(value: null, child: Text('Todos')),
-                    ..._tecnicos.map((t) => DropdownMenuItem<int?>(value: (t['id'] as num).toInt(), child: Text('${t['nombre']}'))),
+                    const DropdownMenuItem<int?>(value: null, child: Tx('Todos')),
+                    ..._tecnicos.map((t) => DropdownMenuItem<int?>(value: (t['id'] as num).toInt(), child: Tx('${t['nombre']}'))),
                   ],
                   onChanged: (valor) {
                     setState(() => _tecnicoId = valor);
@@ -446,7 +447,7 @@ class _PantallaGastosState extends State<PantallaGastos> {
               ),
               for (final (valor, texto) in const [('todos', 'Todos'), ('no', 'Sin revisar'), ('si', 'Revisados')])
                 ChoiceChip(
-                  label: Text(texto),
+                  label: Tx(texto),
                   selected: _revisado == valor,
                   onSelected: (_) {
                     setState(() => _revisado = valor);
@@ -471,9 +472,9 @@ class _PantallaGastosState extends State<PantallaGastos> {
               child: _cargando
                   ? const Center(child: CircularProgressIndicator())
                   : _error != null
-                      ? Center(child: Text(_error!, style: TextStyle(color: sonRojo)))
+                      ? Center(child: Tx(_error!, style: TextStyle(color: sonRojo)))
                       : _gastos.isEmpty
-                          ? Center(child: Text('No hay gastos en estas fechas.', style: TextStyle(color: sonTextoSuave)))
+                          ? Center(child: Tx('No hay gastos en estas fechas.', style: TextStyle(color: sonTextoSuave)))
                           : ListView.separated(
                               padding: const EdgeInsets.all(12),
                               itemCount: _gastos.length,
@@ -485,11 +486,11 @@ class _PantallaGastosState extends State<PantallaGastos> {
                                 final kmTexto = inicio != null && fin != null ? '${fin - inicio} km ($inicio → $fin)' : (inicio ?? fin)?.toString();
                                 return ListTile(
                                   leading: Checkbox(value: g['revisado'] == true, onChanged: (valor) => _marcar(g, valor ?? false)),
-                                  title: Text(
+                                  title: Tx(
                                     [g['tipo'], if (g['monto'] != null) pesos(g['monto'] as num)].join(' · '),
                                     style: const TextStyle(fontWeight: FontWeight.w600),
                                   ),
-                                  subtitle: Text([
+                                  subtitle: Tx([
                                     _fecha(g['dia']),
                                     '${g['tecnico'] ?? ''}',
                                     if (g['empresa'] != null) '${g['empresa']}',
@@ -498,7 +499,7 @@ class _PantallaGastosState extends State<PantallaGastos> {
                                     if ('${g['descripcion'] ?? ''}'.isNotEmpty) '${g['descripcion']}',
                                   ].where((t) => t.isNotEmpty).join(' · ')),
                                   trailing: g['tiene_foto'] == true
-                                      ? TextButton.icon(onPressed: () => _verFoto(g), icon: const Icon(Icons.receipt_long_outlined), label: const Text('Ticket'))
+                                      ? TextButton.icon(onPressed: () => _verFoto(g), icon: const Icon(Icons.receipt_long_outlined), label: const Tx('Ticket'))
                                       : null,
                                 );
                               },
@@ -567,14 +568,14 @@ class _DialogoAccesoState extends State<_DialogoAcceso> {
     final activo = estado?['activo'] == true;
     final enlace = '${estado?['enlace'] ?? ''}';
     return AlertDialog(
-      title: Text('Acceso de ${widget.nombre}'),
+      title: Tx('Acceso de ${widget.nombre}'),
       content: SizedBox(
         width: 520,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            Tx(
               'Con este enlace el cliente ve los informes de cada visita, las próximas visitas y lo que tiene por vencer. '
               'No necesita usuario. Activalo solo para los clientes que lo pidan.',
               style: TextStyle(color: sonTextoSuave),
@@ -585,7 +586,7 @@ class _DialogoAccesoState extends State<_DialogoAcceso> {
             else ...[
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: Text(activo ? 'Acceso activado' : 'Acceso desactivado', style: const TextStyle(fontWeight: FontWeight.bold)),
+                title: Tx(activo ? 'Acceso activado' : 'Acceso desactivado', style: const TextStyle(fontWeight: FontWeight.bold)),
                 value: activo,
                 onChanged: _ocupado ? null : (valor) => _pedir('POST', '/api/clientes/${widget.empresaId}/portal', {'activo': valor}),
               ),
@@ -602,17 +603,17 @@ class _DialogoAccesoState extends State<_DialogoAcceso> {
                         setState(() { _mensaje = 'Enlace copiado'; _error = false; });
                       },
                       icon: const Icon(Icons.copy),
-                      label: const Text('Copiar'),
+                      label: const Tx('Copiar'),
                     ),
-                    OutlinedButton.icon(onPressed: () => abrirInforme(enlace), icon: const Icon(Icons.open_in_new), label: const Text('Ver como el cliente')),
+                    OutlinedButton.icon(onPressed: () => abrirInforme(enlace), icon: const Icon(Icons.open_in_new), label: const Tx('Ver como el cliente')),
                     OutlinedButton.icon(
                       onPressed: _ocupado ? null : () => _pedir('POST', '/api/clientes/${widget.empresaId}/portal/enviar', {}, 'Enlace enviado a ${estado['email'] ?? 'su correo'}'),
                       icon: const Icon(Icons.outgoing_mail),
-                      label: Text(estado['email'] == null ? 'Mandar por correo (falta el correo)' : 'Mandar a ${estado['email']}'),
+                      label: Tx(estado['email'] == null ? 'Mandar por correo (falta el correo)' : 'Mandar a ${estado['email']}'),
                     ),
                     TextButton(
                       onPressed: _ocupado ? null : () => _pedir('POST', '/api/clientes/${widget.empresaId}/portal', {'activo': true, 'regenerar': true}, 'Enlace nuevo: el anterior ya no funciona'),
-                      child: const Text('Cambiar enlace'),
+                      child: const Tx('Cambiar enlace'),
                     ),
                   ],
                 ),
@@ -621,12 +622,12 @@ class _DialogoAccesoState extends State<_DialogoAcceso> {
             if (_mensaje != null)
               Padding(
                 padding: const EdgeInsets.only(top: 12),
-                child: Text(_mensaje!, style: TextStyle(color: _error ? sonRojo : sonLightGreen, fontWeight: FontWeight.w600)),
+                child: Tx(_mensaje!, style: TextStyle(color: _error ? sonRojo : sonLightGreen, fontWeight: FontWeight.w600)),
               ),
           ],
         ),
       ),
-      actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cerrar'))],
+      actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Tx('Cerrar'))],
     );
   }
 }

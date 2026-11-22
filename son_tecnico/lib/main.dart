@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,6 +21,7 @@ import 'package:son_tecnico/services/sincronizacion.dart';
 import 'package:son_tecnico/theme/colores.dart';
 import 'package:son_tecnico/ui/componentes.dart';
 
+import 'package:son_tecnico/i18n/idioma.dart';
 export 'package:son_tecnico/theme/colores.dart';
 
 Future<void> main() async {
@@ -30,6 +32,9 @@ Future<void> main() async {
   final tema = await Almacen.leer('tema.json');
   if (tema == 'oscuro') controlTema.establecer(false, avisar: false);
   controlTema.alGuardar = (claro) => Almacen.escribir('tema.json', claro ? 'claro' : 'oscuro');
+  final idioma = await Almacen.leer('idioma.json');
+  if (idioma is String) controlIdioma.establecer(idioma, avisar: false);
+  controlIdioma.alGuardar = (codigo) => Almacen.escribir('idioma.json', codigo);
 
   Widget inicio = const PantallaLogin();
   if (await Sesion.restaurar()) {
@@ -59,13 +64,20 @@ class SonApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: controlTema,
+      listenable: Listenable.merge([controlTema, controlIdioma]),
       builder: (context, _) => MaterialApp(
         title: 'SON',
         debugShowCheckedModeBanner: false,
         theme: temaCon(paletaClara, Brightness.light),
         darkTheme: temaCon(paletaOscura, Brightness.dark),
         themeMode: controlTema.modo,
+        locale: controlIdioma.locale,
+        supportedLocales: idiomasSoportados,
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
         builder: (context, child) => RepintadoTema(child: child ?? const SizedBox.shrink()),
         home: inicio,
       ),
@@ -118,7 +130,7 @@ class _PantallaLoginState extends State<PantallaLogin> {
         );
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('¡Bienvenido, ${datosTecnico['nombre']}!'), backgroundColor: sonTarjetaAlta)
+          SnackBar(content: Tx('¡Bienvenido, ${datosTecnico['nombre']}!'), backgroundColor: sonTarjetaAlta)
         );
 
         Navigator.pushReplacement(
@@ -135,13 +147,13 @@ class _PantallaLoginState extends State<PantallaLogin> {
         final cuerpo = json.decode(respuesta.body);
         final texto = cuerpo is Map && cuerpo['error'] is String ? '${cuerpo['error']}' : 'Credenciales incorrectas';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(texto), backgroundColor: sonRojo)
+          SnackBar(content: Tx(texto), backgroundColor: sonRojo)
         );
       }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sin conexión. La primera vez necesitás internet.'), backgroundColor: sonRojo)
+        SnackBar(content: Tx('Sin conexión. La primera vez necesitás internet.'), backgroundColor: sonRojo)
       );
     } finally {
       if (mounted) setState(() => _cargando = false);
@@ -178,7 +190,7 @@ class _PantallaLoginState extends State<PantallaLogin> {
                         const SizedBox(height: AppSpacing.s32),
                         TextField(
                           controller: _emailController,
-                          decoration: const InputDecoration(labelText: 'Correo', prefixIcon: Icon(Icons.mail_outline_rounded)),
+                          decoration: InputDecoration(labelText: tr('Correo'), prefixIcon: Icon(Icons.mail_outline_rounded)),
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.next,
                           autofillHints: const [AutofillHints.email],
@@ -187,7 +199,7 @@ class _PantallaLoginState extends State<PantallaLogin> {
                         TextField(
                           controller: _passwordController,
                           obscureText: true,
-                          decoration: const InputDecoration(labelText: 'Contraseña', prefixIcon: Icon(Icons.lock_outline_rounded)),
+                          decoration: InputDecoration(labelText: tr('Contraseña'), prefixIcon: Icon(Icons.lock_outline_rounded)),
                           autofillHints: const [AutofillHints.password],
                           onSubmitted: (_) => _cargando ? null : _iniciarSesion(),
                         ),
@@ -209,7 +221,11 @@ class _PantallaLoginState extends State<PantallaLogin> {
                 ),
               ),
             ),
-            const Positioned(top: AppSpacing.s8, right: AppSpacing.s8, child: BotonTema()),
+            const Positioned(
+              top: AppSpacing.s8,
+              right: AppSpacing.s8,
+              child: Row(mainAxisSize: MainAxisSize.min, children: [SelectorIdioma(), SizedBox(width: AppSpacing.s4), BotonTema()]),
+            ),
           ],
         ),
         ),
@@ -367,7 +383,7 @@ class BarraPildora extends StatelessWidget {
                           child: i == indice
                               ? Padding(
                                   padding: const EdgeInsets.only(left: 8),
-                                  child: Text(destinos[i].$2, maxLines: 1, style: TextStyle(color: textoActivo, fontWeight: FontWeight.w600, fontSize: 14)),
+                                  child: Tx(destinos[i].$2, maxLines: 1, style: TextStyle(color: textoActivo, fontWeight: FontWeight.w600, fontSize: 14)),
                                 )
                               : const SizedBox.shrink(),
                         ),
@@ -428,7 +444,7 @@ class BannerSincronizacion extends StatelessWidget {
                             ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.superficie))
                             : Container(width: 10, height: 10, decoration: BoxDecoration(color: punto, shape: BoxShape.circle)),
                         const SizedBox(width: 12),
-                        Expanded(child: Text(texto, style: const TextStyle(color: AppColors.superficie, fontSize: 14, fontWeight: FontWeight.w500))),
+                        Expanded(child: Tx(texto, style: const TextStyle(color: AppColors.superficie, fontSize: 14, fontWeight: FontWeight.w500))),
                         if (estado.pendientes > 0 && !estado.sincronizando)
                           const Icon(Icons.refresh_rounded, color: AppColors.superficie, size: 20),
                       ],
@@ -622,7 +638,7 @@ class _TabDashboardState extends State<TabDashboard> {
                 ),
               ),
               const SizedBox(height: AppSpacing.s32),
-              Text('Próximas', style: Theme.of(context).textTheme.titleLarge),
+              Tx('Próximas', style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: AppSpacing.s12),
               if (activas.isEmpty)
                 const Padding(
@@ -696,7 +712,7 @@ class TarjetaOrdenSon extends StatelessWidget {
                     height: 40,
                     alignment: Alignment.center,
                     decoration: const BoxDecoration(color: AppColors.tinta, shape: BoxShape.circle),
-                    child: Text('$parada', style: const TextStyle(color: AppColors.superficie, fontWeight: FontWeight.w700, fontSize: 15)),
+                    child: Tx('$parada', style: const TextStyle(color: AppColors.superficie, fontWeight: FontWeight.w700, fontSize: 15)),
                   ),
                   const SizedBox(width: AppSpacing.s12),
                 ],
@@ -709,19 +725,19 @@ class TarjetaOrdenSon extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(color: colores.$1, borderRadius: AppRadius.rPildora),
-                            child: Text(estado, style: TextStyle(color: colores.$2, fontWeight: FontWeight.w600, fontSize: 12)),
+                            child: Tx(estado, style: TextStyle(color: colores.$2, fontWeight: FontWeight.w600, fontSize: 12)),
                           ),
                           if (hora.isNotEmpty) ...[
                             const SizedBox(width: 8),
-                            Flexible(child: Text(hora, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoSuave, fontSize: 13))),
+                            Flexible(child: Tx(hora, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoSuave, fontSize: 13))),
                           ],
                         ],
                       ),
                       const SizedBox(height: 10),
-                      Text(cliente, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontFamily: AppTypography.display, fontWeight: FontWeight.w700, fontSize: 17, color: sonTexto, letterSpacing: -0.3)),
+                      Tx(cliente, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontFamily: AppTypography.display, fontWeight: FontWeight.w700, fontSize: 17, color: sonTexto, letterSpacing: -0.3)),
                       if (direccion.trim().isNotEmpty) ...[
                         const SizedBox(height: 4),
-                        Text(direccion, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoSuave, fontSize: 14)),
+                        Tx(direccion, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoSuave, fontSize: 14)),
                       ],
                     ],
                   ),
@@ -870,7 +886,7 @@ class _TabOrdenesState extends State<TabOrdenes> {
     final ok = await _ordenarYRecargar();
     if (!mounted) return;
     if (!ok) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sin GPS o sin señal: se usa el orden que había.')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx('Sin GPS o sin señal: se usa el orden que había.')));
     }
     final deHoy = _ordenes
         .where((orden) => orden['fecha_iso'] == _hoyIso() && orden['estado'] != 'Completada' && orden['estado'] != 'Por asignar' && '${orden['direccion'] ?? ''}'.trim().isNotEmpty)
@@ -906,7 +922,7 @@ class _TabOrdenesState extends State<TabOrdenes> {
                         icon: _ordenando
                             ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.superficie))
                             : const Icon(Icons.route_rounded),
-                        label: Text(_ordenando ? 'Ordenando...' : 'Recorrido de hoy'),
+                        label: Tx(_ordenando ? 'Ordenando...' : 'Recorrido de hoy'),
                       ),
                     ),
                   ),
@@ -967,7 +983,7 @@ class _TabOrdenesState extends State<TabOrdenes> {
         ),
         floatingActionButton: FloatingActionButton.extended(
           icon: const Icon(Icons.add_rounded),
-          label: const Text('Pedir visita'),
+          label: const Tx('Pedir visita'),
           onPressed: _pedirVisita,
         ),
       ),
@@ -992,11 +1008,11 @@ class _TabOrdenesState extends State<TabOrdenes> {
               children: [
                 const TituloContraste(normal: 'Pedir', destacado: 'visita', tamano: 26),
                 const SizedBox(height: AppSpacing.s24),
-                TextField(controller: cliente, textInputAction: TextInputAction.next, decoration: const InputDecoration(labelText: 'Cliente')),
+                TextField(controller: cliente, textInputAction: TextInputAction.next, decoration: InputDecoration(labelText: tr('Cliente'))),
                 const SizedBox(height: AppSpacing.s12),
-                TextField(controller: direccion, textInputAction: TextInputAction.next, decoration: const InputDecoration(labelText: 'Dirección')),
+                TextField(controller: direccion, textInputAction: TextInputAction.next, decoration: InputDecoration(labelText: tr('Dirección'))),
                 const SizedBox(height: AppSpacing.s12),
-                TextField(controller: descripcion, maxLines: 3, decoration: const InputDecoration(labelText: 'Qué hay que hacer')),
+                TextField(controller: descripcion, maxLines: 3, decoration: InputDecoration(labelText: tr('Qué hay que hacer'))),
                 const SizedBox(height: AppSpacing.s12),
                 SizedBox(
                   height: 52,
@@ -1006,11 +1022,11 @@ class _TabOrdenesState extends State<TabOrdenes> {
                       if (elegida != null) actualizar(() => fecha = elegida);
                     },
                     icon: const Icon(Icons.event_outlined),
-                    label: Text('${fecha.day}/${fecha.month}/${fecha.year}'),
+                    label: Tx('${fecha.day}/${fecha.month}/${fecha.year}'),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.s24),
-                SizedBox(height: 56, child: ElevatedButton(onPressed: () => Navigator.pop(contexto, true), child: const Text('Pedir'))),
+                SizedBox(height: 56, child: ElevatedButton(onPressed: () => Navigator.pop(contexto, true), child: const Tx('Pedir'))),
               ],
             ),
           ),
@@ -1028,14 +1044,14 @@ class _TabOrdenesState extends State<TabOrdenes> {
         }));
         if (!mounted) return;
         if (respuesta.statusCode == 200) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Pedido enviado. Lo van a asignar desde el panel.')));
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx('Pedido enviado. Lo van a asignar desde el panel.')));
           _cargar();
         } else {
           final cuerpo = json.decode(respuesta.body);
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${cuerpo is Map ? cuerpo['error'] ?? 'No se pudo pedir' : 'No se pudo pedir'}')));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx('${cuerpo is Map ? cuerpo['error'] ?? 'No se pudo pedir' : 'No se pudo pedir'}')));
         }
       } catch (_) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sin conexión. Probá de nuevo cuando haya señal.')));
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx('Sin conexión. Probá de nuevo cuando haya señal.')));
       }
     }
     cliente.dispose();
@@ -1056,7 +1072,7 @@ class _TabOrdenesState extends State<TabOrdenes> {
         parada: (orden['orden_ruta'] as num?)?.toInt(),
         alTocar: () {
           if (orden['estado'] == 'Completada') {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Orden completada · el informe ya se generó')));
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx('Orden completada · el informe ya se generó')));
             return;
           }
           Navigator.push(
@@ -1073,7 +1089,7 @@ class _TabOrdenesState extends State<TabOrdenes> {
         },
         accion: puedeIr
             ? IconButton.filled(
-                tooltip: 'Ir con Google Maps',
+                tooltip: tr('Ir con Google Maps'),
                 constraints: const BoxConstraints.tightFor(width: 48, height: 48),
                 style: IconButton.styleFrom(backgroundColor: AppColors.acento, foregroundColor: AppColors.sobreAcento),
                 onPressed: () => irConGoogleMaps(orden),
@@ -1198,7 +1214,7 @@ class PantallaDetalle extends StatelessWidget {
       unawaited(enviarUbicacion());
       unawaited(Sincronizador.sincronizar());
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Check-in registrado')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx('Check-in registrado')));
 
       Navigator.pushReplacement(
         context,
@@ -1218,7 +1234,7 @@ class PantallaDetalle extends StatelessWidget {
       final mensaje = e.toString().replaceFirst('Exception: ', '');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(mensaje),
+          content: Tx(mensaje),
           backgroundColor: sonRojo,
           action: SnackBarAction(label: 'Reintentar', textColor: AppColors.superficie, onPressed: () => registrarCheckIn(context)),
         ),
@@ -1238,14 +1254,14 @@ class PantallaDetalle extends StatelessWidget {
             children: [
               IconoCircular(icono, tamano: 40),
               const SizedBox(width: AppSpacing.s12),
-              Expanded(child: Text(texto, style: TextStyle(fontSize: 15, color: sonTexto))),
+              Expanded(child: Tx(texto, style: TextStyle(fontSize: 15, color: sonTexto))),
             ],
           ),
         );
 
     return Scaffold(
       backgroundColor: sonFondo,
-      appBar: AppBar(title: Text('Orden #${orden['id']}')),
+      appBar: AppBar(title: Tx('Orden #${orden['id']}')),
       body: SafeArea(
         top: false,
         child: Padding(
@@ -1261,14 +1277,14 @@ class PantallaDetalle extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(color: colores.$1, borderRadius: AppRadius.rPildora),
-                          child: Text('${orden['estado'] ?? ''}', style: TextStyle(color: colores.$2, fontWeight: FontWeight.w600, fontSize: 13)),
+                          child: Tx('${orden['estado'] ?? ''}', style: TextStyle(color: colores.$2, fontWeight: FontWeight.w600, fontSize: 13)),
                         ),
                       ]),
                     ),
                     const SizedBox(height: AppSpacing.s16),
                     Aparecer(
                       orden: 1,
-                      child: Text(
+                      child: Tx(
                         '${orden['cliente'] ?? ''}',
                         style: const TextStyle(fontFamily: AppTypography.display, fontSize: 28, fontWeight: FontWeight.w700, letterSpacing: AppTypography.trackingTitulo, height: 1.15),
                       ),
@@ -1288,7 +1304,7 @@ class PantallaDetalle extends StatelessWidget {
                         child: OutlinedButton.icon(
                           onPressed: () => irConGoogleMaps(orden),
                           icon: const Icon(Icons.navigation_rounded),
-                          label: const Text('Ir con Google Maps'),
+                          label: const Tx('Ir con Google Maps'),
                         ),
                       ),
                     ],
@@ -1301,7 +1317,7 @@ class PantallaDetalle extends StatelessWidget {
                           children: [
                             const Eyebrow('Tarea'),
                             const SizedBox(height: AppSpacing.s12),
-                            Text('${orden['tarea']}', style: const TextStyle(fontSize: 16, height: 1.45)),
+                            Tx('${orden['tarea']}', style: const TextStyle(fontSize: 16, height: 1.45)),
                           ],
                         ),
                       ),
@@ -1364,7 +1380,7 @@ class _BotonOcupadoState extends State<BotonOcupado> {
         icon: _ocupado
             ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2.5, color: sonTextoSuave))
             : Icon(widget.icono),
-        label: Text(_ocupado ? widget.textoOcupado : widget.texto, style: const TextStyle(fontSize: 17)),
+        label: Tx(_ocupado ? widget.textoOcupado : widget.texto, style: const TextStyle(fontSize: 17)),
       ),
     );
   }
@@ -1526,8 +1542,8 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
                 formularioEmpezado(formulario, _respuestasFormularios['${formulario['id']}']) ? Icons.task_alt : Icons.fact_check_outlined,
                 color: formularioEmpezado(formulario, _respuestasFormularios['${formulario['id']}']) ? sonLightGreen : sonTextoSuave,
               ),
-              title: Text('${formulario['nombre']}', style: const TextStyle(fontWeight: FontWeight.w600)),
-              subtitle: Text(avanceDeFormulario(formulario, _respuestasFormularios['${formulario['id']}'])),
+              title: Tx('${formulario['nombre']}', style: const TextStyle(fontWeight: FontWeight.w600)),
+              subtitle: Tx(avanceDeFormulario(formulario, _respuestasFormularios['${formulario['id']}'])),
               minVerticalPadding: 14,
               trailing: Icon(Icons.chevron_right_rounded, color: sonTextoTenue),
             ),
@@ -1573,7 +1589,7 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No se pudo guardar la nota en el celular: $e'), backgroundColor: sonRojo),
+        SnackBar(content: Tx('No se pudo guardar la nota en el celular: $e'), backgroundColor: sonRojo),
       );
       return;
     }
@@ -1588,7 +1604,7 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
     if (!mounted) return;
     final enCola = _solicitudesPendientes.contains(id) || _solicitudesFallidas.contains(id);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(enCola ? 'Guardada en el celular · se envía con señal' : 'Nota enviada'), duration: const Duration(seconds: 3)),
+      SnackBar(content: Tx(enCola ? 'Guardada en el celular · se envía con señal' : 'Nota enviada'), duration: const Duration(seconds: 3)),
     );
   }
 
@@ -1642,7 +1658,7 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error al abrir la cámara')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx('Error al abrir la cámara')));
     }
   }
 
@@ -1655,11 +1671,11 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
       final seguir = await showDialog<bool>(
         context: context,
         builder: (dialogo) => AlertDialog(
-          title: const Text('Hay formularios sin completar'),
-          content: Text('${sinCompletar.join(', ')}.\n\n¿Finalizar igual? En el informe van a figurar sin completar.'),
+          title: const Tx('Hay formularios sin completar'),
+          content: Tx('${sinCompletar.join(', ')}.\n\n¿Finalizar igual? En el informe van a figurar sin completar.'),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogo, false), child: const Text('Volver')),
-            TextButton(onPressed: () => Navigator.pop(dialogo, true), child: const Text('Finalizar igual')),
+            TextButton(onPressed: () => Navigator.pop(dialogo, false), child: const Tx('Volver')),
+            TextButton(onPressed: () => Navigator.pop(dialogo, true), child: const Tx('Finalizar igual')),
           ],
         ),
       );
@@ -1692,7 +1708,7 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Informe guardado · se envía automáticamente'),
+          content: Tx('Informe guardado · se envía automáticamente'),
           duration: Duration(seconds: 5),
         ),
       );
@@ -1711,7 +1727,7 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
       if (!mounted) return;
       setState(() => _finalizando = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No se pudo guardar el informe en el celular: $e'), backgroundColor: sonRojo),
+        SnackBar(content: Tx('No se pudo guardar el informe en el celular: $e'), backgroundColor: sonRojo),
       );
     }
   }
@@ -1719,7 +1735,7 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
   // ---------- Piezas visuales del flujo ----------
   Widget _tituloSeccion(String texto) => Padding(
         padding: const EdgeInsets.only(bottom: AppSpacing.s12),
-        child: Text(texto, style: Theme.of(context).textTheme.titleLarge),
+        child: Tx(texto, style: Theme.of(context).textTheme.titleLarge),
       );
 
   Widget _botonSeccion(IconData icono, String texto, VoidCallback alTocar) => Padding(
@@ -1727,7 +1743,7 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
         child: SizedBox(
           width: double.infinity,
           height: 52,
-          child: OutlinedButton.icon(onPressed: alTocar, icon: Icon(icono), label: Text(texto)),
+          child: OutlinedButton.icon(onPressed: alTocar, icon: Icon(icono), label: Tx(texto)),
         ),
       );
 
@@ -1766,7 +1782,7 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    Text(
+                    Tx(
                       _pasos[i],
                       style: TextStyle(fontSize: 12, fontWeight: i == _paso ? FontWeight.w700 : FontWeight.w500, color: i == _paso ? sonTexto : sonTextoSuave),
                     ),
@@ -1790,7 +1806,7 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
             Expanded(child: _tituloSeccion('Checklist')),
             Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.s12),
-              child: Text('$hechas de ${microtareas.length}', style: TextStyle(color: sonTextoSuave, fontWeight: FontWeight.w600)),
+              child: Tx('$hechas de ${microtareas.length}', style: TextStyle(color: sonTextoSuave, fontWeight: FontWeight.w600)),
             ),
           ],
         ),
@@ -1799,7 +1815,7 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
             CheckboxListTile(
               minVerticalPadding: 14,
               controlAffinity: ListTileControlAffinity.leading,
-              title: Text(
+              title: Tx(
                 '${tarea['tarea']}',
                 style: TextStyle(fontSize: 15, decoration: tarea['hecho'] == true ? TextDecoration.lineThrough : null, color: tarea['hecho'] == true ? sonTextoSuave : sonTexto),
               ),
@@ -1853,12 +1869,12 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
                       child: OutlinedButton.icon(
                         onPressed: () => Navigator.pop(dialogo, true),
                         icon: Icon(Icons.delete_outline_rounded, color: sonRojo),
-                        label: Text('Borrar', style: TextStyle(color: sonRojo)),
+                        label: Tx('Borrar', style: TextStyle(color: sonRojo)),
                       ),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.s12),
-                  Expanded(child: SizedBox(height: 48, child: ElevatedButton(onPressed: () => Navigator.pop(dialogo, false), child: const Text('Listo')))),
+                  Expanded(child: SizedBox(height: 48, child: ElevatedButton(onPressed: () => Navigator.pop(dialogo, false), child: const Tx('Listo')))),
                 ],
               ),
             ),
@@ -1895,7 +1911,7 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
                   children: [
                     Icon(Icons.add_a_photo_rounded, color: AppColors.superficie, size: 28),
                     SizedBox(height: 6),
-                    Text('Agregar', style: TextStyle(color: AppColors.superficie, fontWeight: FontWeight.w600)),
+                    Tx('Agregar', style: TextStyle(color: AppColors.superficie, fontWeight: FontWeight.w600)),
                   ],
                 ),
               ),
@@ -1929,7 +1945,7 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
           controller: _comentariosController,
           maxLines: 5,
           minLines: 3,
-          decoration: const InputDecoration(hintText: 'Qué se hizo en la visita'),
+          decoration: InputDecoration(hintText: tr('Qué se hizo en la visita')),
         ),
         const SizedBox(height: AppSpacing.s32),
         _tituloSeccion('Vencimientos'),
@@ -1938,8 +1954,8 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
             for (final v in vencimientosAnotados)
               ListTile(
                 leading: IconoCircular(Icons.event_rounded, tamano: 40),
-                title: Text('${v['descripcion']}${((v['cantidad'] as num?) ?? 1) > 1 ? ' (x${v['cantidad']})' : ''}'),
-                subtitle: Text('Vence el ${fechaCorta('${v['vence']}')}'),
+                title: Tx('${v['descripcion']}${((v['cantidad'] as num?) ?? 1) > 1 ? ' (x${v['cantidad']})' : ''}'),
+                subtitle: Tx('Vence el ${fechaCorta('${v['vence']}')}'),
               ),
           ]),
         _botonSeccion(Icons.event_available_rounded, 'Anotar vencimiento', _anotarVencimiento),
@@ -1950,8 +1966,8 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
             for (final gasto in _gastos)
               ListTile(
                 leading: IconoCircular(gasto['tipo'] == 'Combustible' ? Icons.local_gas_station_rounded : Icons.receipt_long_rounded, tamano: 40),
-                title: Text(resumenDeGasto(gasto)),
-                subtitle: Text([
+                title: Tx(resumenDeGasto(gasto)),
+                subtitle: Tx([
                   if ('${gasto['vehiculo'] ?? ''}'.isNotEmpty) '${gasto['vehiculo']}',
                   if (gasto['conFoto'] == true) 'con ticket',
                 ].join(' · ')),
@@ -1970,9 +1986,9 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
         fullscreenDialog: true,
         builder: (pantalla) => Scaffold(
           appBar: AppBar(
-            title: Text(titulo),
+            title: Tx(titulo),
             actions: [
-              TextButton(onPressed: controlador.clear, child: Text('Borrar', style: TextStyle(color: sonRojo))),
+              TextButton(onPressed: controlador.clear, child: Tx('Borrar', style: TextStyle(color: sonRojo))),
               const SizedBox(width: AppSpacing.s8),
             ],
           ),
@@ -1992,7 +2008,7 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
                   SizedBox(
                     width: double.infinity,
                     height: 56,
-                    child: ElevatedButton(onPressed: () => Navigator.pop(pantalla), child: const Text('Listo')),
+                    child: ElevatedButton(onPressed: () => Navigator.pop(pantalla), child: const Tx('Listo')),
                   ),
                 ],
               ),
@@ -2027,7 +2043,7 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
                       children: [
                         Icon(Icons.draw_rounded, size: 32, color: AppColors.textoTenue),
                         const SizedBox(height: 6),
-                        const Text('Tocar para firmar', style: TextStyle(color: AppColors.textoSecundario, fontWeight: FontWeight.w600)),
+                        const Tx('Tocar para firmar', style: TextStyle(color: AppColors.textoSecundario, fontWeight: FontWeight.w600)),
                       ],
                     ),
                   )
@@ -2050,7 +2066,7 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
               children: [
                 const IconoCircular(Icons.verified_rounded, tamano: 40),
                 const SizedBox(width: AppSpacing.s12),
-                Expanded(child: Text('Tu firma y sello van solos', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600))),
+                Expanded(child: Tx('Tu firma y sello van solos', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600))),
               ],
             ),
           )
@@ -2069,7 +2085,7 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
     return Scaffold(
       backgroundColor: sonFondo,
       appBar: AppBar(
-        title: Text('${widget.orden['cliente'] ?? ''}', maxLines: 1, overflow: TextOverflow.ellipsis),
+        title: Tx('${widget.orden['cliente'] ?? ''}', maxLines: 1, overflow: TextOverflow.ellipsis),
         actions: [
           Container(
             margin: const EdgeInsets.only(right: AppSpacing.s16),
@@ -2080,7 +2096,7 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
               children: [
                 const Icon(Icons.timer_outlined, size: 16, color: AppColors.acento),
                 const SizedBox(width: 6),
-                Text(_tiempo, style: const TextStyle(color: AppColors.superficie, fontWeight: FontWeight.w600, fontFeatures: [FontFeature.tabularFigures()])),
+                Tx(_tiempo, style: const TextStyle(color: AppColors.superficie, fontWeight: FontWeight.w600, fontFeatures: [FontFeature.tabularFigures()])),
               ],
             ),
           ),
@@ -2132,13 +2148,13 @@ class _PantallaTrabajoProgresoState extends State<PantallaTrabajoProgreso> {
                           icon: _finalizando
                               ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2.5, color: sonTextoSuave))
                               : const Icon(Icons.check_rounded),
-                          label: Text(_finalizando ? 'Guardando...' : 'Finalizar', style: const TextStyle(fontSize: 17)),
+                          label: Tx(_finalizando ? 'Guardando...' : 'Finalizar', style: const TextStyle(fontSize: 17)),
                         )
                       : FilledButton.icon(
                           onPressed: () => _irAPaso(_paso + 1),
                           iconAlignment: IconAlignment.end,
                           icon: const Icon(Icons.arrow_forward_rounded),
-                          label: Text(_pasos[_paso + 1], style: const TextStyle(fontSize: 17)),
+                          label: Tx(_pasos[_paso + 1], style: const TextStyle(fontSize: 17)),
                         ),
                 ),
               ),
@@ -2164,7 +2180,7 @@ class TabMasPlaceholder extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: Text('Más opciones', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
+        title: Tx('Más opciones', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -2173,7 +2189,7 @@ class TabMasPlaceholder extends StatelessWidget {
         children: [
           ListTile(
             leading: Icon(Icons.person, color: sonTexto),
-            title: const Text('Perfil del Técnico'),
+            title: const Tx('Perfil del Técnico'),
             subtitle: FutureBuilder<Map<String, dynamic>?>(
               future: Sesion.tecnicoId == null ? Future.value(null) : PerfilTecnico.actualizar(Sesion.tecnicoId!),
               builder: (context, perfil) {
@@ -2183,52 +2199,57 @@ class TabMasPlaceholder extends StatelessWidget {
                   if (datos != null && '${datos['matricula'] ?? ''}'.isNotEmpty) 'Matrícula: ${datos['matricula']}',
                   if (datos != null) datos['tiene_firma'] == true ? 'Firma y sello cargados: el informe los lleva solos' : 'Sin firma cargada: pedile a la oficina que la suba',
                 ];
-                return Text(lineas.join('\n'));
+                return Tx(lineas.map(tr).join('\n'));
               },
             ),
           ),
           ListTile(
             leading: Icon(Icons.request_quote_outlined, color: sonTexto),
-            title: const Text('Mis pedidos de presupuesto'),
-            subtitle: const Text('Pedido, presupuestado, enviado o aprobado'),
+            title: const Tx('Mis pedidos de presupuesto'),
+            subtitle: const Tx('Pedido, presupuestado, enviado o aprobado'),
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PantallaMisPresupuestos())),
           ),
           ListTile(
             leading: Icon(Icons.event_busy_outlined, color: sonTexto),
-            title: const Text('Vencimientos de mis clientes'),
-            subtitle: const Text('Extintores, mediciones y habilitaciones por vencer'),
+            title: const Tx('Vencimientos de mis clientes'),
+            subtitle: const Tx('Extintores, mediciones y habilitaciones por vencer'),
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PantallaVencimientos())),
           ),
           ListTile(
             leading: Icon(Icons.local_gas_station_outlined, color: sonTexto),
-            title: const Text('Cargar gasto o kilometraje'),
-            subtitle: const Text('Fuera de una visita (por ejemplo, carga de combustible)'),
+            title: const Tx('Cargar gasto o kilometraje'),
+            subtitle: const Tx('Fuera de una visita (por ejemplo, carga de combustible)'),
             onTap: () => cargarGasto(context),
           ),
           ListTile(
             leading: Icon(controlTema.claro ? Icons.dark_mode_outlined : Icons.light_mode_outlined, color: sonTexto),
-            title: Text(controlTema.claro ? 'Usar tema oscuro' : 'Usar tema claro'),
-            subtitle: Text(controlTema.claro ? 'Fondo claro' : 'Fondo oscuro'),
+            title: Tx(controlTema.claro ? 'Usar tema oscuro' : 'Usar tema claro'),
+            subtitle: Tx(controlTema.claro ? 'Fondo claro' : 'Fondo oscuro'),
             onTap: controlTema.alternar,
+          ),
+          ListTile(
+            leading: Icon(Icons.translate_rounded, color: sonTexto),
+            title: const Tx('Idioma'),
+            trailing: const SelectorIdioma(),
           ),
           const Divider(),
           ListTile(
             leading: Icon(Icons.logout, color: sonRojo),
-            title: Text('Cerrar Sesión', style: TextStyle(color: sonRojo)),
+            title: Tx('Cerrar Sesión', style: TextStyle(color: sonRojo)),
             onTap: () async {
               final pendientes = Sincronizador.estado.value.pendientes;
               if (pendientes > 0) {
                 final confirmar = await showDialog<bool>(
                   context: context,
                   builder: (dialogo) => AlertDialog(
-                    title: const Text('Tenés envíos pendientes'),
-                    content: Text(
+                    title: const Tx('Tenés envíos pendientes'),
+                    content: Tx(
                       'Hay $pendientes envío(s) guardados en el celular que todavía no llegaron al servidor. '
                       'No se pierden, pero se enviarán cuando vuelvas a ingresar con internet.',
                     ),
                     actions: [
-                      TextButton(onPressed: () => Navigator.pop(dialogo, false), child: const Text('Cancelar')),
-                      TextButton(onPressed: () => Navigator.pop(dialogo, true), child: Text('Cerrar sesión', style: TextStyle(color: sonRojo))),
+                      TextButton(onPressed: () => Navigator.pop(dialogo, false), child: const Tx('Cancelar')),
+                      TextButton(onPressed: () => Navigator.pop(dialogo, true), child: Tx('Cerrar sesión', style: TextStyle(color: sonRojo))),
                     ],
                   ),
                 );

@@ -12,6 +12,7 @@ import 'package:son_admin/services/sesion.dart';
 import 'package:son_admin/theme/tema.dart';
 import 'package:son_admin/ui/componentes.dart';
 
+import 'package:son_admin/i18n/idioma.dart';
 const List<String> estadosPresupuesto = ['Borrador', 'Enviado', 'Negociando', 'Aceptado', 'Rechazado'];
 const List<String> prioridadesPresupuesto = ['baja', 'media', 'alta'];
 
@@ -120,10 +121,10 @@ class _PantallaPresupuestosState extends State<PantallaPresupuestos> with Single
       if (respuesta.statusCode == 200) {
         _cargar();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensajeError(respuesta, 'No se pudo mover'))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx(mensajeError(respuesta, 'No se pudo mover'))));
       }
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(mensajeSinConexion)));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx(mensajeSinConexion)));
     }
   }
 
@@ -150,19 +151,19 @@ class _PantallaPresupuestosState extends State<PantallaPresupuestos> with Single
           children: [
             Row(
               children: [
-                Text('Nº ${p['etiqueta']}', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 0.4)),
+                Tx('Nº ${p['etiqueta']}', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 0.4)),
                 const Spacer(),
                 EtiquetaEstado(texto: etiquetaDeColumna(estado), color: colorEstadoPresupuesto(estado)),
               ],
             ),
             const SizedBox(height: 10),
-            Text('${p['cliente']}', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold, fontSize: 17, height: 1.25)),
+            Tx('${p['cliente']}', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold, fontSize: 17, height: 1.25)),
             const SizedBox(height: 8),
             DatoConIcono(icono: Icons.event_outlined, texto: fechaDia('${p['fecha']}')),
             if ('${p['responsable'] ?? ''}'.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 4), child: DatoConIcono(icono: Icons.person_outline, texto: '${p['responsable']}')),
             const Spacer(),
-            if (mensual > 0) Text('Mensual ${pesos(mensual)}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600)),
-            if (unico > 0) Text('Pago único ${pesos(unico)}', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
+            if (mensual > 0) Tx('Mensual ${pesos(mensual)}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600)),
+            if (unico > 0) Tx('Pago único ${pesos(unico)}', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
             const SizedBox(height: 8),
             Wrap(spacing: 6, runSpacing: 6, children: [
               EtiquetaEstado(texto: textoDeMargen('${p['nivelMargen']}'), color: colorDeMargen('${p['nivelMargen']}')),
@@ -178,13 +179,13 @@ class _PantallaPresupuestosState extends State<PantallaPresupuestos> with Single
   Widget _cuerpoLista() {
     if (_cargando) return const Center(child: CircularProgressIndicator());
     if (_error != null) {
-      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text(_error!, style: TextStyle(color: sonRojo)), const SizedBox(height: 12), OutlinedButton.icon(onPressed: _cargar, icon: const Icon(Icons.refresh), label: const Text('Reintentar'))]));
+      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Tx(_error!, style: TextStyle(color: sonRojo)), const SizedBox(height: 12), OutlinedButton.icon(onPressed: _cargar, icon: const Icon(Icons.refresh), label: const Tx('Reintentar'))]));
     }
     if (_lista.isEmpty) {
-      return Center(child: Text('Todavía no hay presupuestos. Armá el primero con "Nuevo presupuesto".', style: TextStyle(color: sonTextoSuave)));
+      return Center(child: Tx('Todavía no hay presupuestos. Armá el primero con "Nuevo presupuesto".', style: TextStyle(color: sonTextoSuave)));
     }
     final visibles = _visibles;
-    if (visibles.isEmpty) return Center(child: Text('No hay presupuestos con ese filtro.', style: TextStyle(color: sonTextoSuave)));
+    if (visibles.isEmpty) return Center(child: Tx('No hay presupuestos con ese filtro.', style: TextStyle(color: sonTextoSuave)));
     return GridView.builder(
       padding: const EdgeInsets.only(bottom: 16),
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: 380, mainAxisExtent: 250, crossAxisSpacing: 18, mainAxisSpacing: 18),
@@ -207,9 +208,9 @@ class _PantallaPresupuestosState extends State<PantallaPresupuestos> with Single
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(titulo, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoSuave, fontSize: 12)),
+                Tx(titulo, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoSuave, fontSize: 12)),
                 const SizedBox(height: 4),
-                Text(valor, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 22)),
+                Tx(valor, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 22)),
               ],
             ),
         );
@@ -248,13 +249,13 @@ class _PantallaPresupuestosState extends State<PantallaPresupuestos> with Single
             children: [
               EtiquetaEstado(texto: etiquetaDeColumna(estado), color: colorEstadoPresupuesto(estado)),
               const Spacer(),
-              Text('${items.length}', style: TextStyle(color: sonTextoSuave, fontWeight: FontWeight.bold)),
+              Tx('${items.length}', style: TextStyle(color: sonTextoSuave, fontWeight: FontWeight.bold)),
             ],
           ),
           const SizedBox(height: 10),
           Expanded(
             child: items.isEmpty
-                ? Center(child: Text('Nada acá', style: TextStyle(color: sonTextoSuave, fontSize: 12.5)))
+                ? Center(child: Tx('Nada acá', style: TextStyle(color: sonTextoSuave, fontSize: 12.5)))
                 : ListView.separated(
                     itemCount: items.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 8),
@@ -288,30 +289,30 @@ class _PantallaPresupuestosState extends State<PantallaPresupuestos> with Single
               children: [
                 Container(width: 8, height: 8, decoration: BoxDecoration(color: colorDePrioridad('${p['prioridad']}'), shape: BoxShape.circle)),
                 const SizedBox(width: 8),
-                Expanded(child: Text('Nº ${p['etiqueta']}', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, fontSize: 12))),
+                Expanded(child: Tx('Nº ${p['etiqueta']}', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, fontSize: 12))),
                 PopupMenuButton<String>(
-                  tooltip: 'Mover',
+                  tooltip: tr('Mover'),
                   padding: EdgeInsets.zero,
                   onSelected: (estado) => _mover(p, estado),
                   itemBuilder: (_) => [
                     for (final e in estadosPresupuesto.where((e) => e != p['estado']))
-                      PopupMenuItem(value: e, child: Text('Pasar a ${etiquetaDeColumna(e)}')),
+                      PopupMenuItem(value: e, child: Tx('Pasar a ${etiquetaDeColumna(e)}')),
                   ],
                   child: Icon(Icons.more_vert, size: 18, color: sonTextoSuave),
                 ),
               ],
             ),
             const SizedBox(height: 6),
-            Text('${p['cliente']}', maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600, height: 1.25)),
+            Tx('${p['cliente']}', maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600, height: 1.25)),
             const SizedBox(height: 6),
-            if (mensual > 0) Text(pesos(mensual), style: const TextStyle(fontSize: 13)),
-            if (unico > 0 && mensual == 0) Text(pesos(unico), style: const TextStyle(fontSize: 13)),
+            if (mensual > 0) Tx(pesos(mensual), style: const TextStyle(fontSize: 13)),
+            if (unico > 0 && mensual == 0) Tx(pesos(unico), style: const TextStyle(fontSize: 13)),
             if ('${p['responsable'] ?? ''}'.isNotEmpty)
-              Padding(padding: const EdgeInsets.only(top: 4), child: Text('${p['responsable']}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoSuave, fontSize: 12))),
+              Padding(padding: const EdgeInsets.only(top: 4), child: Tx('${p['responsable']}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoSuave, fontSize: 12))),
             if ('${p['fechaLimite'] ?? ''}'.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 4),
-                child: Text(vencida ? 'Venció ${fechaDia('${p['fechaLimite']}')}' : 'Hasta ${fechaDia('${p['fechaLimite']}')}', style: TextStyle(color: vencida ? sonRojo : sonTextoSuave, fontSize: 12)),
+                child: Tx(vencida ? 'Venció ${fechaDia('${p['fechaLimite']}')}' : 'Hasta ${fechaDia('${p['fechaLimite']}')}', style: TextStyle(color: vencida ? sonRojo : sonTextoSuave, fontSize: 12)),
               ),
             if (p['facturado'] == true) Padding(padding: const EdgeInsets.only(top: 4), child: EtiquetaEstado(texto: 'Facturado', color: sonLightGreen)),
           ],
@@ -323,10 +324,10 @@ class _PantallaPresupuestosState extends State<PantallaPresupuestos> with Single
   Widget _tablero() {
     if (_cargando) return const Center(child: CircularProgressIndicator());
     if (_error != null) {
-      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text(_error!, style: TextStyle(color: sonRojo)), const SizedBox(height: 12), OutlinedButton.icon(onPressed: _cargar, icon: const Icon(Icons.refresh), label: const Text('Reintentar'))]));
+      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Tx(_error!, style: TextStyle(color: sonRojo)), const SizedBox(height: 12), OutlinedButton.icon(onPressed: _cargar, icon: const Icon(Icons.refresh), label: const Tx('Reintentar'))]));
     }
     if (_lista.isEmpty) {
-      return Center(child: Text('Todavía no hay presupuestos. Armá el primero con "Nuevo presupuesto".', style: TextStyle(color: sonTextoSuave)));
+      return Center(child: Tx('Todavía no hay presupuestos. Armá el primero con "Nuevo presupuesto".', style: TextStyle(color: sonTextoSuave)));
     }
     return Column(
       children: [
@@ -364,7 +365,7 @@ class _PantallaPresupuestosState extends State<PantallaPresupuestos> with Single
                       : ElevatedButton.icon(
                           key: const Key('nuevo_presupuesto'),
                           icon: const Icon(Icons.add),
-                          label: const Text('Nuevo presupuesto'),
+                          label: const Tx('Nuevo presupuesto'),
                           onPressed: () => _abrir(),
                         ),
                 ),
@@ -398,7 +399,7 @@ class _PantallaPresupuestosState extends State<PantallaPresupuestos> with Single
                     key: const Key('buscar_presupuesto'),
                     controller: _busqueda,
                     decoration: InputDecoration(
-                      hintText: 'Buscar por número, cliente o responsable...',
+                      hintText: tr('Buscar por número, cliente o responsable...'),
                       prefixIcon: const Icon(Icons.search, size: 20),
                       isDense: true,
                       suffixIcon: _busqueda.text.isEmpty ? null : IconButton(icon: const Icon(Icons.close, size: 18), onPressed: _busqueda.clear),
@@ -553,7 +554,7 @@ class _DialogoPresupuestoState extends State<_DialogoPresupuesto> {
           _llenar(Map<String, dynamic>.from(json.decode(respuesta.body) as Map));
           _ocupado = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Seguimiento guardado')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx('Seguimiento guardado')));
       } else {
         setState(() { _error = mensajeError(respuesta, 'No se pudo guardar el seguimiento'); _ocupado = false; });
       }
@@ -589,8 +590,8 @@ class _DialogoPresupuestoState extends State<_DialogoPresupuesto> {
     final todas = [...opciones, if (valor != null && valor.isNotEmpty && !opciones.contains(valor)) valor];
     return DropdownButtonFormField<String?>(
       initialValue: valor != null && valor.isNotEmpty ? valor : null,
-      decoration: InputDecoration(labelText: titulo, isDense: true),
-      items: [const DropdownMenuItem<String?>(value: null, child: Text('—')), ...todas.map((o) => DropdownMenuItem<String?>(value: o, child: Text(o)))],
+      decoration: InputDecoration(labelText: trn(titulo), isDense: true),
+      items: [const DropdownMenuItem<String?>(value: null, child: Tx('—')), ...todas.map((o) => DropdownMenuItem<String?>(value: o, child: Tx(o)))],
       onChanged: _ocupado ? null : alCambiar,
     );
   }
@@ -618,13 +619,13 @@ class _DialogoPresupuestoState extends State<_DialogoPresupuesto> {
     final d = _detalle;
     final calculo = d == null ? null : Map<String, dynamic>.from(d['calculo'] as Map? ?? {});
     return AlertDialog(
-      title: Text(d == null ? 'Presupuesto' : 'Presupuesto ${d['etiqueta']}'),
+      title: Tx(d == null ? 'Presupuesto' : 'Presupuesto ${d['etiqueta']}'),
       content: SizedBox(
         width: 560,
         child: _cargando
             ? const SizedBox(height: 120, child: Center(child: CircularProgressIndicator()))
             : d == null
-                ? Text(_error ?? 'No se pudo leer')
+                ? Tx(_error ?? 'No se pudo leer')
                 : SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -634,29 +635,29 @@ class _DialogoPresupuestoState extends State<_DialogoPresupuesto> {
                           EtiquetaEstado(texto: textoDeMargen('${calculo?['nivelMargen']}'), color: colorDeMargen('${calculo?['nivelMargen']}')),
                         ]),
                         const SizedBox(height: 12),
-                        Text('${(d['cliente'] as Map?)?['razonSocial'] ?? ''}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        Tx('${(d['cliente'] as Map?)?['razonSocial'] ?? ''}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                         const SizedBox(height: 8),
-                        if ((calculo?['totalMensual'] as num? ?? 0) > 0) Text('Total mensual ${pesos(calculo!['totalMensual'] as num)}', style: const TextStyle(fontSize: 15)),
-                        if ((calculo?['totalUnico'] as num? ?? 0) > 0) Text('Pago único ${pesos(calculo!['totalUnico'] as num)}'),
-                        if (d['bonificacion'] != 0) Text('Bonificación ${d['bonificacion']} %', style: TextStyle(color: sonTextoSuave)),
+                        if ((calculo?['totalMensual'] as num? ?? 0) > 0) Tx('Total mensual ${pesos(calculo!['totalMensual'] as num)}', style: const TextStyle(fontSize: 15)),
+                        if ((calculo?['totalUnico'] as num? ?? 0) > 0) Tx('Pago único ${pesos(calculo!['totalUnico'] as num)}'),
+                        if (d['bonificacion'] != 0) Tx('Bonificación ${d['bonificacion']} %', style: TextStyle(color: sonTextoSuave)),
                         const SizedBox(height: 16),
-                        Text('SEGUIMIENTO', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.1)),
+                        Tx('SEGUIMIENTO', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.1)),
                         const SizedBox(height: 10),
                         Row(children: [
                           Expanded(
                             child: DropdownButtonFormField<String>(
                               initialValue: _prioridad,
-                              decoration: const InputDecoration(labelText: 'Prioridad', isDense: true),
+                              decoration: InputDecoration(labelText: tr('Prioridad'), isDense: true),
                               items: const [
-                                DropdownMenuItem(value: 'baja', child: Text('Baja')),
-                                DropdownMenuItem(value: 'media', child: Text('Media')),
-                                DropdownMenuItem(value: 'alta', child: Text('Alta')),
+                                DropdownMenuItem(value: 'baja', child: Tx('Baja')),
+                                DropdownMenuItem(value: 'media', child: Tx('Media')),
+                                DropdownMenuItem(value: 'alta', child: Tx('Alta')),
                               ],
                               onChanged: _ocupado ? null : (v) => setState(() => _prioridad = v ?? 'media'),
                             ),
                           ),
                           const SizedBox(width: 10),
-                          Expanded(child: TextField(key: const Key('seguimiento_responsable'), controller: _responsable, enabled: !_ocupado, decoration: const InputDecoration(labelText: 'Responsable', isDense: true))),
+                          Expanded(child: TextField(key: const Key('seguimiento_responsable'), controller: _responsable, enabled: !_ocupado, decoration: InputDecoration(labelText: tr('Responsable'), isDense: true))),
                         ]),
                         const SizedBox(height: 10),
                         TextField(
@@ -664,9 +665,9 @@ class _DialogoPresupuestoState extends State<_DialogoPresupuesto> {
                           readOnly: true,
                           onTap: _ocupado ? null : _elegirFecha,
                           decoration: InputDecoration(
-                            labelText: 'Fecha límite',
+                            labelText: tr('Fecha límite'),
                             isDense: true,
-                            suffixIcon: IconButton(tooltip: 'Elegir fecha', onPressed: _ocupado ? null : _elegirFecha, icon: const Icon(Icons.event_outlined)),
+                            suffixIcon: IconButton(tooltip: tr('Elegir fecha'), onPressed: _ocupado ? null : _elegirFecha, icon: const Icon(Icons.event_outlined)),
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -677,49 +678,49 @@ class _DialogoPresupuestoState extends State<_DialogoPresupuesto> {
                         ],
                         SwitchListTile(
                           contentPadding: EdgeInsets.zero,
-                          title: const Text('Ya se facturó'),
+                          title: const Tx('Ya se facturó'),
                           value: _facturado,
                           onChanged: _ocupado ? null : (v) => setState(() => _facturado = v),
                         ),
-                        TextField(controller: _nota, enabled: !_ocupado, maxLines: 2, decoration: const InputDecoration(labelText: 'Nota de seguimiento')),
+                        TextField(controller: _nota, enabled: !_ocupado, maxLines: 2, decoration: InputDecoration(labelText: tr('Nota de seguimiento'))),
                         const SizedBox(height: 8),
                         Align(
                           alignment: Alignment.centerRight,
-                          child: OutlinedButton(onPressed: _ocupado ? null : _guardarSeguimiento, child: const Text('Guardar seguimiento')),
+                          child: OutlinedButton(onPressed: _ocupado ? null : _guardarSeguimiento, child: const Tx('Guardar seguimiento')),
                         ),
                         const SizedBox(height: 8),
                         for (final item in (d['items'] as List? ?? []))
                           Padding(
                             padding: const EdgeInsets.only(bottom: 6),
-                            child: Text('· ${item['descripcion']}', style: TextStyle(color: sonTextoSuave, height: 1.3)),
+                            child: Tx('· ${item['descripcion']}', style: TextStyle(color: sonTextoSuave, height: 1.3)),
                           ),
                         if ((calculo?['avisos'] as List? ?? []).isNotEmpty) ...[
                           const SizedBox(height: 8),
                           for (final aviso in (calculo!['avisos'] as List))
-                            Text('${aviso['mensaje']}', style: TextStyle(color: sonAmbar, fontSize: 13)),
+                            Tx('${aviso['mensaje']}', style: TextStyle(color: sonAmbar, fontSize: 13)),
                         ],
-                        if (_error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_error!, style: TextStyle(color: sonRojo))),
+                        if (_error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Tx(_error!, style: TextStyle(color: sonRojo))),
                       ],
                     ),
                   ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: Text('Cerrar', style: TextStyle(color: sonTextoSuave))),
-        if (d != null) TextButton.icon(onPressed: _pdf, icon: const Icon(Icons.picture_as_pdf_outlined), label: const Text('Ver PDF')),
+        TextButton(onPressed: () => Navigator.pop(context), child: Tx('Cerrar', style: TextStyle(color: sonTextoSuave))),
+        if (d != null) TextButton.icon(onPressed: _pdf, icon: const Icon(Icons.picture_as_pdf_outlined), label: const Tx('Ver PDF')),
         if (d != null && d['esUltimaVersion'] == true && !_ocupado)
           PopupMenuButton<String>(
-            tooltip: 'Cambiar estado',
+            tooltip: tr('Cambiar estado'),
             onSelected: _estado,
             itemBuilder: (_) => [
               for (final e in estadosPresupuesto.where((e) => e != d['estado'] && e != 'Borrador'))
-                PopupMenuItem(value: e, child: Text(etiquetaDeColumna(e))),
+                PopupMenuItem(value: e, child: Tx(etiquetaDeColumna(e))),
             ],
-            child: const Padding(padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8), child: Text('Estado')),
+            child: const Padding(padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8), child: Tx('Estado')),
           ),
         if (d != null && d['esUltimaVersion'] == true)
           ElevatedButton(
             onPressed: _ocupado ? null : () => _actualizar(repreciar: true),
-            child: const Text('Actualizar (act)'),
+            child: const Tx('Actualizar (act)'),
           ),
       ],
     );

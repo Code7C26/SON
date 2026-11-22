@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:son_admin/i18n/idioma.dart';
 // Formulario "igual al Excel": se dibuja la planilla tal cual (celdas, bordes, anchos) y el técnico
 // toca los casilleros vacíos para completarlos. Lo que carga se ve en azul, como en el informe.
 
@@ -123,7 +124,7 @@ class _TextoDeCelda extends StatelessWidget {
       final ancho = ((girado ? caja.maxHeight : caja.maxWidth) - 3).clamp(1, 4000).toDouble();
       Widget hijo = SizedBox(
         width: ancho,
-        child: Text(
+        child: Tx(
           contenido,
           textAlign: alineacion,
           style: TextStyle(color: color, fontSize: tamano, height: 1.1, fontWeight: celda['n'] == true ? FontWeight.bold : FontWeight.normal),
@@ -199,11 +200,11 @@ class _PantallaPlanillaExcelState extends State<PantallaPlanillaExcel> {
         final hoy = DateTime.now();
         final elegida = await showDatePicker(
           context: context,
-          helpText: '${campo['encabezado'] ?? 'Fecha'}'.toUpperCase(),
+          helpText: tr('${campo['encabezado'] ?? 'Fecha'}').toUpperCase(),
           initialDate: actual ?? hoy,
           firstDate: DateTime(hoy.year - 10),
           lastDate: DateTime(hoy.year + 15),
-          cancelText: _valores.containsKey(clave) ? 'Borrar' : 'Cancelar',
+          cancelText: _valores.containsKey(clave) ? tr('Borrar') : tr('Cancelar'),
         );
         if (!mounted) return;
         setState(() {
@@ -231,13 +232,13 @@ class _PantallaPlanillaExcelState extends State<PantallaPlanillaExcel> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${campo['encabezado'] ?? 'Casillero'}', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+            Tx('${campo['encabezado'] ?? 'Casillero'}', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             Wrap(
               spacing: 8,
               runSpacing: 6,
               children: _sugerencias
-                  .map((s) => ActionChip(label: Text(s, style: const TextStyle(fontWeight: FontWeight.bold)), onPressed: () => Navigator.pop(hoja, s)))
+                  .map((s) => ActionChip(label: Tx(s, style: const TextStyle(fontWeight: FontWeight.bold)), onPressed: () => Navigator.pop(hoja, s)))
                   .toList(),
             ),
             const SizedBox(height: 10),
@@ -246,14 +247,14 @@ class _PantallaPlanillaExcelState extends State<PantallaPlanillaExcel> {
               autofocus: true,
               textCapitalization: TextCapitalization.sentences,
               onSubmitted: (v) => Navigator.pop(hoja, v.trim()),
-              decoration: const InputDecoration(hintText: 'Escribí acá'),
+              decoration: InputDecoration(hintText: tr('Escribí acá')),
             ),
             const SizedBox(height: 12),
             Row(
               children: [
-                TextButton(onPressed: () => Navigator.pop(hoja, ''), child: const Text('Borrar')),
+                TextButton(onPressed: () => Navigator.pop(hoja, ''), child: const Tx('Borrar')),
                 const Spacer(),
-                ElevatedButton(onPressed: () => Navigator.pop(hoja, control.text.trim()), child: const Text('Guardar')),
+                ElevatedButton(onPressed: () => Navigator.pop(hoja, control.text.trim()), child: const Tx('Guardar')),
               ],
             ),
           ],
@@ -281,8 +282,8 @@ class _PantallaPlanillaExcelState extends State<PantallaPlanillaExcel> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text('${widget.formulario['nombre']}', style: const TextStyle(fontWeight: FontWeight.bold)),
-          actions: [TextButton(onPressed: _listo, child: const Text('Listo', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)))],
+          title: Tx('${widget.formulario['nombre']}', style: const TextStyle(fontWeight: FontWeight.bold)),
+          actions: [TextButton(onPressed: _listo, child: const Tx('Listo', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)))],
         ),
         body: Column(
           children: [
@@ -290,7 +291,7 @@ class _PantallaPlanillaExcelState extends State<PantallaPlanillaExcel> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               color: const Color(0x1FD99C13), // dorado de SON al 12 %
-              child: Text(
+              child: Tx(
                 'Tocá un casillero para completarlo. Con dos dedos agrandás. $cargados cargado${cargados == 1 ? '' : 's'}.',
                 style: const TextStyle(fontSize: 13),
               ),
@@ -315,11 +316,11 @@ class _PantallaPlanillaExcelState extends State<PantallaPlanillaExcel> {
                   Expanded(
                     child: TextField(
                       controller: _observacion,
-                      decoration: const InputDecoration(labelText: 'Observaciones del formulario (opcional)', isDense: true),
+                      decoration: InputDecoration(labelText: tr('Observaciones del formulario (opcional)'), isDense: true),
                     ),
                   ),
                   const SizedBox(width: 10),
-                  ElevatedButton(onPressed: _listo, child: const Text('Listo')),
+                  ElevatedButton(onPressed: _listo, child: const Tx('Listo')),
                 ],
               ),
             ),

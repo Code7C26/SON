@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/tema.dart';
 
+import 'package:son_tecnico/i18n/idioma.dart';
 /// Etiqueta suave en mayúsculas (eyebrow pill) que va sobre un titular.
 class Eyebrow extends StatelessWidget {
   final String texto;
@@ -22,7 +23,7 @@ class Eyebrow extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icono != null) ...[Icon(icono, size: 13, color: color), const SizedBox(width: 6)],
-          Text(texto.toUpperCase(), style: AppTypography.eyebrow(color).copyWith(fontSize: 11)),
+          Tx(texto.toUpperCase(), style: AppTypography.eyebrow(color).copyWith(fontSize: 11)),
         ],
       ),
     );
@@ -56,13 +57,14 @@ class TituloContraste extends StatelessWidget {
       color: color ?? sonTexto,
       fontWeight: FontWeight.w400,
     );
+    final (textoNormal, textoDestacado) = trPar(normal, destacado);
     return Text.rich(
       TextSpan(
         style: base,
         children: [
-          TextSpan(text: normal),
+          TextSpan(text: textoNormal),
           TextSpan(text: destacadoEnLineaNueva ? '\n' : ' '),
-          TextSpan(text: destacado, style: const TextStyle(fontWeight: FontWeight.w700)),
+          TextSpan(text: textoDestacado, style: const TextStyle(fontWeight: FontWeight.w700)),
         ],
       ),
     );
@@ -121,10 +123,10 @@ class KpiBloque extends StatelessWidget {
           duration: AppMotion.lenta,
           curve: AppMotion.curva,
           builder: (context, t, child) => Opacity(opacity: t, child: child),
-          child: Text(valor, style: AppTypography.kpi(colorValor ?? sonTexto, size: tamano)),
+          child: Tx(valor, style: AppTypography.kpi(colorValor ?? sonTexto, size: tamano)),
         ),
         const SizedBox(height: 4),
-        Text(etiqueta, style: AppTypography.kpiEtiqueta(colorEtiqueta ?? sonTextoSuave)),
+        Tx(etiqueta, style: AppTypography.kpiEtiqueta(colorEtiqueta ?? sonTextoSuave)),
       ],
     );
     if (alTocar == null) return contenido;
@@ -294,10 +296,10 @@ class EstadoVacio extends StatelessWidget {
           children: [
             IconoCircular(icono, tamano: 56),
             const SizedBox(height: AppSpacing.s16),
-            Text(mensaje, textAlign: TextAlign.center, style: TextStyle(fontSize: 15, color: sonTextoSuave)),
+            Tx(mensaje, textAlign: TextAlign.center, style: TextStyle(fontSize: 15, color: sonTextoSuave)),
             if (accion != null && alAccionar != null) ...[
               const SizedBox(height: AppSpacing.s16),
-              ElevatedButton(onPressed: alAccionar, child: Text(accion!)),
+              ElevatedButton(onPressed: alAccionar, child: Tx(accion!)),
             ],
           ],
         ),
@@ -322,9 +324,9 @@ class EstadoError extends StatelessWidget {
           children: [
             IconoCircular(Icons.cloud_off_rounded, tamano: 56, fondo: sonRojo.withValues(alpha: 0.12), color: sonRojo),
             const SizedBox(height: AppSpacing.s16),
-            Text(mensaje, textAlign: TextAlign.center, style: TextStyle(fontSize: 15, color: sonTexto)),
+            Tx(mensaje, textAlign: TextAlign.center, style: TextStyle(fontSize: 15, color: sonTexto)),
             const SizedBox(height: AppSpacing.s16),
-            OutlinedButton.icon(onPressed: alReintentar, icon: const Icon(Icons.refresh_rounded, size: 18), label: const Text('Reintentar')),
+            OutlinedButton.icon(onPressed: alReintentar, icon: const Icon(Icons.refresh_rounded, size: 18), label: const Tx('Reintentar')),
           ],
         ),
       ),
@@ -406,7 +408,7 @@ class _PildoraContadorState extends State<PildoraContador> {
                 Container(width: 8, height: 8, decoration: BoxDecoration(color: widget.punto, shape: BoxShape.circle)),
                 const SizedBox(width: 8),
               ],
-              Text(widget.texto, style: TextStyle(color: activa ? textoActivo : sonTexto, fontWeight: FontWeight.w600, fontSize: 13.5)),
+              Tx(widget.texto, style: TextStyle(color: activa ? textoActivo : sonTexto, fontWeight: FontWeight.w600, fontSize: 13.5)),
               const SizedBox(width: 8),
               Container(
                 constraints: const BoxConstraints(minWidth: 28),
@@ -417,7 +419,7 @@ class _PildoraContadorState extends State<PildoraContador> {
                   color: activa ? textoActivo.withValues(alpha: 0.16) : sonFondo,
                   borderRadius: AppRadius.rPildora,
                 ),
-                child: Text('${widget.cantidad}', style: TextStyle(color: activa ? textoActivo : sonTextoSuave, fontWeight: FontWeight.w600, fontSize: 12)),
+                child: Tx('${widget.cantidad}', style: TextStyle(color: activa ? textoActivo : sonTextoSuave, fontWeight: FontWeight.w600, fontSize: 12)),
               ),
             ],
           ),
@@ -443,7 +445,7 @@ class Buscador extends StatelessWidget {
         onChanged: alCambiar,
         textAlignVertical: TextAlignVertical.center,
         decoration: InputDecoration(
-          hintText: pista,
+          hintText: trn(pista),
           prefixIcon: const Icon(Icons.search_rounded, size: 20),
           filled: true,
           fillColor: sonTarjeta,
@@ -646,7 +648,7 @@ class _MicroBotonState extends State<MicroBoton> {
     // Área táctil mínima de 48dp aunque el círculo visible sea más chico.
     final area = widget.tamano < AppSpacing.tactilMinimo ? AppSpacing.tactilMinimo : widget.tamano;
     return Tooltip(
-      message: widget.tooltip,
+      message: trn(widget.tooltip),
       child: Semantics(
         button: true,
         label: widget.tooltip,
@@ -779,7 +781,7 @@ class EtiquetaConFlecha extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const SizedBox(width: AppSpacing.s8),
-        Flexible(child: Text(texto, overflow: TextOverflow.ellipsis)),
+        Flexible(child: Tx(texto, overflow: TextOverflow.ellipsis)),
         const SizedBox(width: AppSpacing.s12),
         Container(
           width: 32,

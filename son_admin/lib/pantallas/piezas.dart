@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:son_admin/theme/tema.dart';
 
+import 'package:son_admin/i18n/idioma.dart';
 /// Pasa a minúsculas y saca los acentos, para buscar sin importar cómo se escribió.
 String sinAcentos(String texto) {
   const con = 'áàäâéèëêíìïîóòöôúùüûñ';
@@ -56,7 +57,7 @@ class PildoraFiltro extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: activo ? color : sonBorde),
         ),
-        child: Text(texto, style: TextStyle(color: activo ? color : sonTextoSuave, fontWeight: FontWeight.w600)),
+        child: Tx(texto, style: TextStyle(color: activo ? color : sonTextoSuave, fontWeight: FontWeight.w600)),
       ),
     );
   }
@@ -74,7 +75,7 @@ class EtiquetaEstado extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(color: color.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(20)),
-      child: Text(texto, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12.5)),
+      child: Tx(texto, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12.5)),
     );
   }
 }
@@ -145,7 +146,7 @@ class DatoConIcono extends StatelessWidget {
       children: [
         Padding(padding: const EdgeInsets.only(top: 1), child: Icon(icono, size: 15, color: tinta)),
         const SizedBox(width: 6),
-        Flexible(child: Text(texto, maxLines: lineas, overflow: TextOverflow.ellipsis, style: TextStyle(color: tinta, fontSize: 13, height: 1.25))),
+        Flexible(child: Tx(texto, maxLines: lineas, overflow: TextOverflow.ellipsis, style: TextStyle(color: tinta, fontSize: 13, height: 1.25))),
       ],
     );
   }

@@ -4,6 +4,7 @@ import 'app_colors.dart';
 import 'app_spacing.dart';
 import 'app_typography.dart';
 
+import 'package:son_tecnico/i18n/idioma.dart';
 export 'app_colors.dart';
 export 'app_motion.dart';
 export 'app_spacing.dart';
@@ -417,7 +418,7 @@ class BotonTema extends StatelessWidget {
   Widget build(BuildContext context) {
     final claro = controlTema.claro;
     return IconButton(
-      tooltip: claro ? 'Tema oscuro' : 'Tema claro',
+      tooltip: claro ? tr('Tema oscuro') : tr('Tema claro'),
       onPressed: controlTema.alternar,
       icon: Icon(claro ? Icons.dark_mode_outlined : Icons.light_mode_outlined, color: sonTexto),
     );
@@ -440,11 +441,13 @@ class _RepintadoTemaState extends State<RepintadoTema> {
   void initState() {
     super.initState();
     controlTema.addListener(_repintar);
+    controlIdioma.addListener(_repintar);
   }
 
   @override
   void dispose() {
     controlTema.removeListener(_repintar);
+    controlIdioma.removeListener(_repintar);
     super.dispose();
   }
 

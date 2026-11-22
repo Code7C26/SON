@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:son_admin/config/api_config.dart';
 import 'package:son_admin/pantallas/analisis.dart';
 import 'package:son_admin/pantallas/clientes.dart';
@@ -19,10 +20,13 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/services.dart';
 
+import 'package:son_admin/i18n/idioma.dart';
 void main() {
   final guardado = leerAlmacen('son_admin_tema');
   if (guardado == 'oscuro') controlTema.establecer(false, avisar: false);
   controlTema.alGuardar = (claro) => escribirAlmacen('son_admin_tema', claro ? 'claro' : 'oscuro');
+  controlIdioma.establecer(leerAlmacen('son_admin_idioma') ?? 'es', avisar: false);
+  controlIdioma.alGuardar = (codigo) => escribirAlmacen('son_admin_idioma', codigo);
   runApp(const SonAdmin());
 }
 
@@ -32,13 +36,20 @@ class SonAdmin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: controlTema,
+      listenable: Listenable.merge([controlTema, controlIdioma]),
       builder: (context, _) => MaterialApp(
         title: 'SON Admin',
         debugShowCheckedModeBanner: false,
         theme: temaCon(paletaClara, Brightness.light),
         darkTheme: temaCon(paletaOscura, Brightness.dark),
         themeMode: controlTema.modo,
+        locale: controlIdioma.locale,
+        supportedLocales: idiomasSoportados,
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
         builder: (context, child) => RepintadoTema(child: child ?? const SizedBox.shrink()),
         home: const PantallaInicio(),
       ),
@@ -167,7 +178,7 @@ class _PantallaLoginState extends State<PantallaLogin> {
         const SizedBox(height: AppSpacing.s32),
         TextField(
           controller: _emailController,
-          decoration: const InputDecoration(labelText: 'Correo', prefixIcon: Icon(Icons.mail_outline_rounded)),
+          decoration: InputDecoration(labelText: tr('Correo'), prefixIcon: Icon(Icons.mail_outline_rounded)),
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
           autofillHints: const [AutofillHints.email],
@@ -176,10 +187,10 @@ class _PantallaLoginState extends State<PantallaLogin> {
         TextField(
           controller: _passwordController,
           decoration: InputDecoration(
-            labelText: 'Contraseña',
+            labelText: tr('Contraseña'),
             prefixIcon: const Icon(Icons.lock_outline_rounded),
             suffixIcon: IconButton(
-              tooltip: _verPassword ? 'Ocultar' : 'Mostrar',
+              tooltip: _verPassword ? tr('Ocultar') : tr('Mostrar'),
               icon: Icon(_verPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined),
               onPressed: () => setState(() => _verPassword = !_verPassword),
             ),
@@ -202,7 +213,7 @@ class _PantallaLoginState extends State<PantallaLogin> {
                       children: [
                         Icon(Icons.error_outline_rounded, color: sonRojo, size: 18),
                         const SizedBox(width: 8),
-                        Expanded(child: Text(_mensajeError, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600, fontSize: 13))),
+                        Expanded(child: Tx(_mensajeError, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600, fontSize: 13))),
                       ],
                     ),
                   ),
@@ -261,7 +272,11 @@ class _PantallaLoginState extends State<PantallaLogin> {
                     Expanded(child: columnaForm),
                   ],
                 ),
-              const Positioned(top: AppSpacing.s16, right: AppSpacing.s16, child: BotonTema()),
+              const Positioned(
+                top: AppSpacing.s16,
+                right: AppSpacing.s16,
+                child: Row(mainAxisSize: MainAxisSize.min, children: [SelectorIdioma(), SizedBox(width: AppSpacing.s8), BotonTema()]),
+              ),
             ],
           );
         }),
@@ -293,7 +308,7 @@ class _BloqueMarcaLogin extends StatelessWidget {
                 child: Image.asset('assets/images/logo_son_icono.png'),
               ),
               const SizedBox(width: 12),
-              const Text(
+              const Tx(
                 'SON',
                 style: TextStyle(fontFamily: AppTypography.display, fontWeight: FontWeight.w700, fontSize: 22, letterSpacing: AppTypography.trackingTitulo, color: AppColors.superficie),
               ),
@@ -422,7 +437,7 @@ class _LayoutAdministradorState extends State<LayoutAdministrador> {
       builder: (context) {
         return StatefulBuilder(builder: (context, setStateDialogo) {
           return AlertDialog(
-            title: const Text('Mi perfil'),
+            title: const Tx('Mi perfil'),
             content: SizedBox(
               width: 400,
               child: Column(
@@ -430,24 +445,24 @@ class _LayoutAdministradorState extends State<LayoutAdministrador> {
                 children: [
                   TextField(
                     controller: nombreController,
-                    decoration: const InputDecoration(labelText: 'Nombre completo'),
+                    decoration: InputDecoration(labelText: tr('Nombre completo')),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: emailController,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(labelText: 'Correo electrónico (con este ingresás al panel)'),
+                    decoration: InputDecoration(labelText: tr('Correo electrónico (con este ingresás al panel)')),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: passwordController,
-                    decoration: const InputDecoration(labelText: 'Nueva contraseña (dejar en blanco para no cambiar)'),
+                    decoration: InputDecoration(labelText: tr('Nueva contraseña (dejar en blanco para no cambiar)')),
                     obscureText: true,
                   ),
                   if (error != null)
                     Padding(
                       padding: const EdgeInsets.only(top: 14),
-                      child: Text(error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600)),
+                      child: Tx(error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600)),
                     ),
                 ],
               ),
@@ -455,7 +470,7 @@ class _LayoutAdministradorState extends State<LayoutAdministrador> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text('Cancelar', style: TextStyle(color: sonTextoSuave)),
+                child: Tx('Cancelar', style: TextStyle(color: sonTextoSuave)),
               ),
               ElevatedButton(
                 onPressed: () async {
@@ -478,7 +493,7 @@ class _LayoutAdministradorState extends State<LayoutAdministrador> {
                       if (!context.mounted) return;
                       Navigator.of(context).pop();
                       ScaffoldMessenger.of(this.context).showSnackBar(
-                        const SnackBar(content: Text('Perfil actualizado con éxito')),
+                        const SnackBar(content: Tx('Perfil actualizado con éxito')),
                       );
                     } else {
                       setStateDialogo(() => error = mensajeError(res, 'No se pudo actualizar el perfil'));
@@ -487,7 +502,7 @@ class _LayoutAdministradorState extends State<LayoutAdministrador> {
                     setStateDialogo(() => error = mensajeSinConexion);
                   }
                 },
-                child: const Text('Guardar cambios'),
+                child: const Tx('Guardar cambios'),
               ),
             ],
           );
@@ -655,7 +670,7 @@ class _LayoutAdministradorState extends State<LayoutAdministrador> {
 
     final botonPlegar = puedeAbrirse
         ? Tooltip(
-            message: compacto ? 'Mostrar menú' : 'Ocultar menú',
+            message: compacto ? tr('Mostrar menú') : tr('Ocultar menú'),
             child: InkResponse(
               onTap: _alternarMenu,
               radius: 22,
@@ -702,7 +717,7 @@ class _LayoutAdministradorState extends State<LayoutAdministrador> {
                         logo,
                         const SizedBox(width: 12),
                         Expanded(
-                          child: Text(
+                          child: Tx(
                             'SON',
                             style: TextStyle(
                               fontFamily: AppTypography.display,
@@ -729,47 +744,64 @@ class _LayoutAdministradorState extends State<LayoutAdministrador> {
                   ? Column(
                       children: [
                         Tooltip(
-                          message: 'Mi perfil',
+                          message: tr('Mi perfil'),
                           child: InkResponse(
                             onTap: _mostrarPerfil,
-                            child: CircleAvatar(radius: 18, backgroundColor: sonAcento, child: Text(inicial, style: TextStyle(color: sonSobreAcento, fontWeight: FontWeight.w700))),
+                            child: CircleAvatar(radius: 18, backgroundColor: sonAcento, child: Tx(inicial, style: TextStyle(color: sonSobreAcento, fontWeight: FontWeight.w700))),
                           ),
                         ),
                         const SizedBox(height: 4),
+                        const SelectorIdioma(compacto: true),
                         const BotonTema(),
-                        IconButton(tooltip: 'Cerrar sesión', onPressed: _cerrarSesion, icon: Icon(Icons.logout_rounded, color: sonTextoSuave, size: 20)),
+                        IconButton(tooltip: tr('Cerrar sesión'), onPressed: _cerrarSesion, icon: Icon(Icons.logout_rounded, color: sonTextoSuave, size: 20)),
                       ],
                     )
-                  : Container(
-                      padding: const EdgeInsets.fromLTRB(8, 8, 4, 8),
-                      decoration: BoxDecoration(color: sonTarjeta.withValues(alpha: 0.7), borderRadius: AppRadius.rPildora, border: Border.all(color: sonBorde.withValues(alpha: 0.6))),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: InkWell(
-                              borderRadius: AppRadius.rChico,
-                              onTap: _mostrarPerfil,
-                              child: Row(
-                                children: [
-                                  CircleAvatar(radius: 17, backgroundColor: sonAcento, child: Text(inicial, style: TextStyle(color: sonSobreAcento, fontWeight: FontWeight.w700))),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(nombre, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600, fontSize: 13)),
-                                        Text(email, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoTenue, fontSize: 11)),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: AppSpacing.s8, bottom: AppSpacing.s8),
+                          child: Row(
+                            children: [
+                              Icon(Icons.translate_rounded, size: 18, color: sonTextoSuave),
+                              const SizedBox(width: AppSpacing.s8),
+                              Expanded(child: Tx('Idioma', style: TextStyle(color: sonTextoSuave, fontSize: 13, fontWeight: FontWeight.w500))),
+                              const SelectorIdioma(),
+                            ],
                           ),
-                          const BotonTema(),
-                          IconButton(tooltip: 'Cerrar sesión', onPressed: _cerrarSesion, icon: Icon(Icons.logout_rounded, color: sonTextoSuave, size: 20)),
-                        ],
-                      ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(8, 8, 4, 8),
+                          decoration: BoxDecoration(color: sonTarjeta.withValues(alpha: 0.7), borderRadius: AppRadius.rPildora, border: Border.all(color: sonBorde.withValues(alpha: 0.6))),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: InkWell(
+                                  borderRadius: AppRadius.rChico,
+                                  onTap: _mostrarPerfil,
+                                  child: Row(
+                                    children: [
+                                      CircleAvatar(radius: 17, backgroundColor: sonAcento, child: Tx(inicial, style: TextStyle(color: sonSobreAcento, fontWeight: FontWeight.w700))),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Tx(nombre, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600, fontSize: 13)),
+                                            Tx(email, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoTenue, fontSize: 11)),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const BotonTema(),
+                              IconButton(tooltip: tr('Cerrar sesión'), onPressed: _cerrarSesion, icon: Icon(Icons.logout_rounded, color: sonTextoSuave, size: 20)),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
             ),
           ],
@@ -813,7 +845,7 @@ class _CabeceraGrupoState extends State<_CabeceraGrupo> {
             child: Row(
               children: [
                 Expanded(
-                  child: Text(widget.texto.toUpperCase(), style: AppTypography.eyebrow(color).copyWith(fontSize: 11)),
+                  child: Tx(widget.texto.toUpperCase(), style: AppTypography.eyebrow(color).copyWith(fontSize: 11)),
                 ),
                 if (widget.insignia > 0)
                   Container(
@@ -878,12 +910,12 @@ class _ItemMenuState extends State<_ItemMenu> {
         children: [
           // Con el menú angosto el número va como una chapita sobre el ícono.
           widget.compacto && widget.insignia > 0
-              ? Badge(label: Text(widget.insignia > 99 ? '99+' : '${widget.insignia}'), backgroundColor: sonAmbar, textColor: AppColors.sobreOro, child: Icon(widget.icono, color: color, size: 20))
+              ? Badge(label: Tx(widget.insignia > 99 ? '99+' : '${widget.insignia}'), backgroundColor: sonAmbar, textColor: AppColors.sobreOro, child: Icon(widget.icono, color: color, size: 20))
               : Icon(widget.icono, color: color, size: 20),
           if (!widget.compacto) ...[
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
+              child: Tx(
                 widget.texto,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -895,7 +927,7 @@ class _ItemMenuState extends State<_ItemMenu> {
                 key: const Key('insignia_menu'),
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(color: sonAmbar, borderRadius: AppRadius.rPildora),
-                child: Text(widget.insignia > 99 ? '99+' : '${widget.insignia}', style: const TextStyle(color: AppColors.sobreOro, fontWeight: FontWeight.bold, fontSize: 12)),
+                child: Tx(widget.insignia > 99 ? '99+' : '${widget.insignia}', style: const TextStyle(color: AppColors.sobreOro, fontWeight: FontWeight.bold, fontSize: 12)),
               ),
           ],
         ],
@@ -908,7 +940,7 @@ class _ItemMenuState extends State<_ItemMenu> {
       child: GestureDetector(
         onTap: widget.alTocar,
         behavior: HitTestBehavior.opaque,
-        child: widget.compacto ? Tooltip(message: widget.texto, waitDuration: const Duration(milliseconds: 300), child: contenido) : contenido,
+        child: widget.compacto ? Tooltip(message: trn(widget.texto), waitDuration: const Duration(milliseconds: 300), child: contenido) : contenido,
       ),
     );
   }
@@ -1127,7 +1159,7 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
           controller: controlador,
           focusNode: foco,
           decoration: InputDecoration(
-            labelText: 'Empresa / Cliente',
+            labelText: tr('Empresa / Cliente'),
             suffixIcon: _clientesConocidos.isEmpty ? null : const Icon(Icons.arrow_drop_down),
           ),
         ),
@@ -1144,7 +1176,7 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
                 itemCount: opciones.length,
                 itemBuilder: (context, indice) {
                   final opcion = opciones.elementAt(indice);
-                  return ListTile(dense: true, title: Text(opcion), onTap: () => alElegir(opcion));
+                  return ListTile(dense: true, title: Tx(opcion), onTap: () => alElegir(opcion));
                 },
               ),
             ),
@@ -1171,14 +1203,14 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
       if (_direccionController.text.trim().isEmpty && '${datos['direccion'] ?? ''}'.isNotEmpty) _direccionController.text = '${datos['direccion']}';
       if (_emailClienteCtrl.text.trim().isEmpty && '${datos['email'] ?? ''}'.isNotEmpty) _emailClienteCtrl.text = '${datos['email']}';
       if (forzarTareas && tareas.isEmpty && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Esta empresa todavía no tiene tareas fijas.')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx('Esta empresa todavía no tiene tareas fijas.')));
       }
     } catch (_) {}
   }
 
   Future<void> _guardarOrden({int? idAEditar}) async {
     if (_tecnicoSeleccionado == null || _clienteController.text.isEmpty || _direccionController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Completá técnico, cliente y dirección')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx('Completá técnico, cliente y dirección')));
       return;
     }
 
@@ -1215,10 +1247,10 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
         setState(() => _cargando = true);
         _obtenerDatos();
       } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensajeError(respuesta, 'No se pudo guardar la orden'))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx(mensajeError(respuesta, 'No se pudo guardar la orden'))));
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(mensajeSinConexion)));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx(mensajeSinConexion)));
     }
   }
 
@@ -1226,11 +1258,11 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
     bool confirmar = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Eliminar Orden'),
-        content: const Text('¿Estás seguro de eliminar esta orden de trabajo?'),
+        title: const Tx('Eliminar Orden'),
+        content: const Tx('¿Estás seguro de eliminar esta orden de trabajo?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: Text('Eliminar', style: TextStyle(color: sonRojo))),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Tx('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: Tx('Eliminar', style: TextStyle(color: sonRojo))),
         ],
       ),
     );
@@ -1293,7 +1325,7 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
           builder: (context, setStateModal) {
             _redibujarOrden = setStateModal;
             return AlertDialog(
-              title: Text(ordenAEditar == null ? 'Crear Nueva Orden' : 'Editar Orden', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
+              title: Tx(ordenAEditar == null ? 'Crear Nueva Orden' : 'Editar Orden', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
               content: SizedBox(
                 width: 500,
                 child: SingleChildScrollView(
@@ -1302,21 +1334,21 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       DropdownButtonFormField<int>(
-                        decoration: const InputDecoration(labelText: 'Técnico asignado'),
+                        decoration: InputDecoration(labelText: tr('Técnico asignado')),
                         value: _tecnicoSeleccionado,
-                        items: _tecnicos.map<DropdownMenuItem<int>>((t) => DropdownMenuItem(value: t['id'], child: Text(t['nombre']))).toList(),
+                        items: _tecnicos.map<DropdownMenuItem<int>>((t) => DropdownMenuItem(value: t['id'], child: Tx(t['nombre']))).toList(),
                         onChanged: (valor) => setStateModal(() => _tecnicoSeleccionado = valor),
                       ),
                       const SizedBox(height: 12),
                       _campoCliente(),
                       const SizedBox(height: 12),
-                      TextField(controller: _direccionController, decoration: const InputDecoration(labelText: 'Dirección exacta del trabajo')),
+                      TextField(controller: _direccionController, decoration: InputDecoration(labelText: tr('Dirección exacta del trabajo'))),
                       const SizedBox(height: 12),
                       Row(
                         children: [
-                          Expanded(child: TextField(controller: _emailClienteCtrl, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Correo del cliente'))),
+                          Expanded(child: TextField(controller: _emailClienteCtrl, keyboardType: TextInputType.emailAddress, decoration: InputDecoration(labelText: tr('Correo del cliente')))),
                           const SizedBox(width: 12),
-                          Expanded(child: TextField(controller: _whatsappCtrl, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'WhatsApp'))),
+                          Expanded(child: TextField(controller: _whatsappCtrl, keyboardType: TextInputType.phone, decoration: InputDecoration(labelText: tr('WhatsApp')))),
                         ],
                       ),
                       const SizedBox(height: 12),
@@ -1334,25 +1366,25 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
                                 if (elegida != null) setStateModal(() => _fechaOrden = elegida);
                               },
                               icon: const Icon(Icons.event_outlined),
-                              label: Text('${_fechaOrden.day}/${_fechaOrden.month}/${_fechaOrden.year}'),
+                              label: Tx('${_fechaOrden.day}/${_fechaOrden.month}/${_fechaOrden.year}'),
                             ),
                           ),
                           const SizedBox(width: 12),
-                          SizedBox(width: 90, child: TextField(controller: _horaCtrl, decoration: const InputDecoration(labelText: 'Desde'))),
+                          SizedBox(width: 90, child: TextField(controller: _horaCtrl, decoration: InputDecoration(labelText: tr('Desde')))),
                           const SizedBox(width: 8),
-                          SizedBox(width: 90, child: TextField(controller: _horaHastaCtrl, decoration: const InputDecoration(labelText: 'Hasta', hintText: 'sin límite'))),
+                          SizedBox(width: 90, child: TextField(controller: _horaHastaCtrl, decoration: InputDecoration(labelText: tr('Hasta'), hintText: tr('sin límite')))),
                         ],
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
-                        child: Text('Franja horaria: el técnico va cuando le queda mejor dentro del rango.', style: TextStyle(color: sonTextoSuave, fontSize: 12)),
+                        child: Tx('Franja horaria: el técnico va cuando le queda mejor dentro del rango.', style: TextStyle(color: sonTextoSuave, fontSize: 12)),
                       ),
                       const SizedBox(height: 12),
                       TextField(
                         controller: _puntosCtrl,
-                        decoration: const InputDecoration(
-                          labelText: 'Checklist de la visita (una tarea por renglón)',
-                          helperText: 'Al elegir el cliente se cargan solas sus tareas fijas. Se pueden cambiar.',
+                        decoration: InputDecoration(
+                          labelText: tr('Checklist de la visita (una tarea por renglón)'),
+                          helperText: tr('Al elegir el cliente se cargan solas sus tareas fijas. Se pueden cambiar.'),
                         ),
                         maxLines: 5,
                       ),
@@ -1365,12 +1397,12 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
                               controlAffinity: ListTileControlAffinity.leading,
                               value: _guardarTareasFijas,
                               onChanged: (valor) => setStateModal(() => _guardarTareasFijas = valor ?? false),
-                              title: const Text('Guardar checklist y formularios como fijos de la empresa (todos los meses)'),
+                              title: const Tx('Guardar checklist y formularios como fijos de la empresa (todos los meses)'),
                             ),
                           ),
                           TextButton(
                             onPressed: _clienteController.text.trim().isEmpty ? null : () => _cargarDatosDeEmpresa(_clienteController.text.trim(), forzarTareas: true),
-                            child: const Text('Cargar los fijos'),
+                            child: const Tx('Cargar los fijos'),
                           ),
                         ],
                       ),
@@ -1385,13 +1417,13 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
                         },
                       ),
                       const SizedBox(height: 12),
-                      TextField(controller: _tareaController, decoration: const InputDecoration(labelText: 'Notas de la visita'), maxLines: 3),
+                      TextField(controller: _tareaController, decoration: InputDecoration(labelText: tr('Notas de la visita')), maxLines: 3),
                       const SizedBox(height: 20),
                       
                       // --- SECCIÓN GOOGLE CALENDAR ---
                       if (true) ...[
                         SwitchListTile(
-                          title: const Text('Se repite', style: TextStyle(fontWeight: FontWeight.bold)),
+                          title: const Tx('Se repite', style: TextStyle(fontWeight: FontWeight.bold)),
                           activeColor: sonLightGreen,
                           value: _esRecurrente,
                           onChanged: (val) => setStateModal(() => _esRecurrente = val),
@@ -1402,7 +1434,7 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Se repite cada', style: TextStyle(color: sonTextoSuave)),
+                              Tx('Se repite cada', style: TextStyle(color: sonTextoSuave)),
                               const SizedBox(height: 8),
                               Row(
                                 children: [
@@ -1413,27 +1445,27 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
                                   const SizedBox(width: 16),
                                   DropdownButton<String>(
                                     value: _recurrenciaTipo,
-                                    items: ['día', 'semana', 'mes', 'año'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                                    items: ['día', 'semana', 'mes', 'año'].map((e) => DropdownMenuItem(value: e, child: Tx(e))).toList(),
                                     onChanged: (v) => setStateModal(() => _recurrenciaTipo = v!),
                                   ),
                                 ],
                               ),
                               const SizedBox(height: 16),
-                              Text('Termina', style: TextStyle(color: sonTextoSuave)),
+                              Tx('Termina', style: TextStyle(color: sonTextoSuave)),
                               RadioListTile(
-                                title: const Text('Nunca'), value: 'Nunca', groupValue: _terminaCondicion,
+                                title: const Tx('Nunca'), value: 'Nunca', groupValue: _terminaCondicion,
                                 onChanged: (v) => setStateModal(() => _terminaCondicion = v.toString()),
                               ),
                               RadioListTile(
                                 title: Row(
                                   children: [
-                                    const Text('El '),
+                                    const Tx('El '),
                                     TextButton(
                                       onPressed: () async {
                                         DateTime? fecha = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime(2030));
                                         if (fecha != null) setStateModal(() { _terminaFecha = fecha; _terminaCondicion = 'Fecha'; });
                                       },
-                                      child: Text(_terminaFecha == null ? 'Seleccionar fecha' : _terminaFecha.toString().split(' ')[0])
+                                      child: Tx(_terminaFecha == null ? 'Seleccionar fecha' : _terminaFecha.toString().split(' ')[0])
                                     )
                                   ],
                                 ),
@@ -1443,9 +1475,9 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
                               RadioListTile(
                                 title: Row(
                                   children: [
-                                    const Text('Después de '),
+                                    const Tx('Después de '),
                                     SizedBox(width: 50, child: TextField(controller: _terminaRepeticionesCtrl, textAlign: TextAlign.center)),
-                                    const Text(' repeticiones'),
+                                    const Tx(' repeticiones'),
                                   ],
                                 ),
                                 value: 'Repeticiones', groupValue: _terminaCondicion,
@@ -1460,10 +1492,10 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
                 ),
               ),
               actions: [
-                TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancelar', style: TextStyle(color: sonTextoSuave))),
+                TextButton(onPressed: () => Navigator.pop(context), child: Tx('Cancelar', style: TextStyle(color: sonTextoSuave))),
                 ElevatedButton(
                   onPressed: () => _guardarOrden(idAEditar: ordenAEditar?['id']),
-                  child: Text(ordenAEditar == null ? 'Asignar Trabajo' : 'Guardar Cambios', style: TextStyle(color: sonDarkGreen, fontWeight: FontWeight.bold)),
+                  child: Tx(ordenAEditar == null ? 'Asignar Trabajo' : 'Guardar Cambios', style: TextStyle(color: sonDarkGreen, fontWeight: FontWeight.bold)),
                 ),
               ],
             );
@@ -1546,7 +1578,7 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
       children: [
         Icon(icono, size: 16, color: sonTextoSuave),
         const SizedBox(width: 8),
-        Expanded(child: Text(texto, maxLines: lineas, overflow: TextOverflow.ellipsis, style: TextStyle(color: tinta, fontSize: 13.5, height: 1.3))),
+        Expanded(child: Tx(texto, maxLines: lineas, overflow: TextOverflow.ellipsis, style: TextStyle(color: tinta, fontSize: 13.5, height: 1.3))),
       ],
     );
   }
@@ -1578,18 +1610,18 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
                 children: [
                   Row(
                     children: [
-                      Text('#${orden['id']}', style: TextStyle(color: sonTextoSuave, fontWeight: FontWeight.bold)),
+                      Tx('#${orden['id']}', style: TextStyle(color: sonTextoSuave, fontWeight: FontWeight.bold)),
                       const Spacer(),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                         decoration: BoxDecoration(color: color.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(20)),
-                        child: Text(estado, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12.5)),
+                        child: Tx(estado, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12.5)),
                       ),
                       const SizedBox(width: 8),
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Text(
+                  Tx(
                     (orden['cliente'] ?? 'Desconocido').toString(),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -1609,32 +1641,32 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
                     children: [
                       Icon(Icons.person_outline, size: 17, color: sonLightGreen),
                       const SizedBox(width: 6),
-                      Expanded(child: Text(tecnico, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTexto, fontSize: 13.5, fontWeight: FontWeight.w600))),
+                      Expanded(child: Tx(tecnico, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTexto, fontSize: 13.5, fontWeight: FontWeight.w600))),
                       if (hora.isNotEmpty) ...[
                         Icon(Icons.schedule, size: 15, color: sonTextoSuave),
                         const SizedBox(width: 4),
-                        Text(hora, style: TextStyle(color: sonTextoSuave, fontSize: 12.5)),
+                        Tx(hora, style: TextStyle(color: sonTextoSuave, fontSize: 12.5)),
                       ],
                       if (recurrente)
                         Padding(
                           padding: const EdgeInsets.only(left: 8),
-                          child: Tooltip(message: 'Orden recurrente', child: Icon(Icons.repeat, size: 16, color: sonTextoSuave)),
+                          child: Tooltip(message: tr('Orden recurrente'), child: Icon(Icons.repeat, size: 16, color: sonTextoSuave)),
                         ),
                       if (estado == 'Pendiente' || estado == 'En progreso')
                         IconButton(
-                          tooltip: 'Avisar al cliente',
+                          tooltip: tr('Avisar al cliente'),
                           visualDensity: VisualDensity.compact,
                           icon: Icon(Icons.outgoing_mail, size: 20, color: sonLightGreen),
                           onPressed: () => _avisar(orden),
                         ),
                       IconButton(
-                        tooltip: 'Editar',
+                        tooltip: tr('Editar'),
                         visualDensity: VisualDensity.compact,
                         icon: Icon(Icons.edit, size: 20, color: sonAzul),
                         onPressed: () => _mostrarDialogoOrden(ordenAEditar: orden),
                       ),
                       IconButton(
-                        tooltip: 'Eliminar',
+                        tooltip: tr('Eliminar'),
                         visualDensity: VisualDensity.compact,
                         icon: Icon(Icons.delete, size: 20, color: sonRojo),
                         onPressed: () => _eliminarOrden(orden['id']),
@@ -1655,12 +1687,12 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
       final respuesta = await apiSend('POST', '/api/ordenes/${orden['id']}/avisar', '{}');
       if (!mounted) return;
       if (respuesta.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Aviso enviado por correo')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx('Aviso enviado por correo')));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensajeError(respuesta, 'No se pudo avisar al cliente'))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx(mensajeError(respuesta, 'No se pudo avisar al cliente'))));
       }
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(mensajeSinConexion)));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx(mensajeSinConexion)));
     }
   }
 
@@ -1675,10 +1707,10 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
       children: [
         Row(
           children: [
-            IconButton(tooltip: 'Semana anterior', onPressed: () => setState(() => _lunes = _lunes.subtract(const Duration(days: 7))), icon: const Icon(Icons.chevron_left)),
-            Text(rango, style: const TextStyle(fontWeight: FontWeight.bold)),
-            IconButton(tooltip: 'Semana siguiente', onPressed: () => setState(() => _lunes = _lunes.add(const Duration(days: 7))), icon: const Icon(Icons.chevron_right)),
-            TextButton(onPressed: () => setState(() => _lunes = _lunesDe(DateTime.now())), child: const Text('Esta semana')),
+            IconButton(tooltip: tr('Semana anterior'), onPressed: () => setState(() => _lunes = _lunes.subtract(const Duration(days: 7))), icon: const Icon(Icons.chevron_left)),
+            Tx(rango, style: const TextStyle(fontWeight: FontWeight.bold)),
+            IconButton(tooltip: tr('Semana siguiente'), onPressed: () => setState(() => _lunes = _lunes.add(const Duration(days: 7))), icon: const Icon(Icons.chevron_right)),
+            TextButton(onPressed: () => setState(() => _lunes = _lunesDe(DateTime.now())), child: const Tx('Esta semana')),
           ],
         ),
         const SizedBox(height: 8),
@@ -1713,11 +1745,11 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('$nombre ${dia.day}', style: TextStyle(fontWeight: FontWeight.bold, color: esHoy ? sonLightGreen : sonTexto)),
+          Tx('$nombre ${dia.day}', style: TextStyle(fontWeight: FontWeight.bold, color: esHoy ? sonLightGreen : sonTexto)),
           const SizedBox(height: 8),
           Expanded(
             child: ordenes.isEmpty
-                ? Text('—', style: TextStyle(color: sonTextoSuave))
+                ? Tx('—', style: TextStyle(color: sonTextoSuave))
                 : ListView.separated(
                     itemCount: ordenes.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 8),
@@ -1745,10 +1777,10 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${orden['cliente'] ?? 'Sin cliente'}', maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+            Tx('${orden['cliente'] ?? 'Sin cliente'}', maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
             const SizedBox(height: 4),
-            Text('$hora · $tecnico', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoSuave, fontSize: 12)),
-            Text(orden['orden_ruta'] == null ? estado : 'Parada ${orden['orden_ruta']} · $estado', style: TextStyle(color: _colorEstado(estado), fontSize: 11, fontWeight: FontWeight.bold)),
+            Tx('$hora · $tecnico', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTextoSuave, fontSize: 12)),
+            Tx(orden['orden_ruta'] == null ? estado : 'Parada ${orden['orden_ruta']} · $estado', style: TextStyle(color: _colorEstado(estado), fontSize: 11, fontWeight: FontWeight.bold)),
           ],
         ),
       ),
@@ -1777,7 +1809,7 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
               destacado: 'trabajo',
               accion: ElevatedButton.icon(
                 icon: const Icon(Icons.add_rounded),
-                label: const Text('Nueva orden'),
+                label: const Tx('Nueva orden'),
                 onPressed: () => _mostrarDialogoOrden(),
               ),
             ),
@@ -1792,8 +1824,8 @@ class _PantallaOrdenesState extends State<PantallaOrdenes> {
               SegmentedButton<String>(
                 showSelectedIcon: false,
                 segments: const [
-                  ButtonSegment(value: 'semana', icon: Icon(Icons.calendar_view_week_rounded, size: 18), label: Text('Semana')),
-                  ButtonSegment(value: 'lista', icon: Icon(Icons.grid_view_rounded, size: 18), label: Text('Tarjetas')),
+                  ButtonSegment(value: 'semana', icon: Icon(Icons.calendar_view_week_rounded, size: 18), label: Tx('Semana')),
+                  ButtonSegment(value: 'lista', icon: Icon(Icons.grid_view_rounded, size: 18), label: Tx('Tarjetas')),
                 ],
                 selected: {_vista},
                 onSelectionChanged: (v) => setState(() => _vista = v.first),
@@ -1882,18 +1914,18 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
     Widget contenido;
     final firma = _firma;
     if (firma == null) {
-      contenido = Text('Sin firma cargada: el técnico firma en el celular en cada visita.', textAlign: TextAlign.center, style: TextStyle(color: sonTextoSuave));
+      contenido = Tx('Sin firma cargada: el técnico firma en el celular en cada visita.', textAlign: TextAlign.center, style: TextStyle(color: sonTextoSuave));
     } else {
       try {
         contenido = Image.memory(base64Decode(firma.substring(firma.indexOf(',') + 1)), fit: BoxFit.contain);
       } catch (_) {
-        contenido = Text('No se puede mostrar la imagen', style: TextStyle(color: sonRojo));
+        contenido = Tx('No se puede mostrar la imagen', style: TextStyle(color: sonRojo));
       }
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Firma y sello (va sola en cada informe)', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
+        Tx('Firma y sello (va sola en cada informe)', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
         const SizedBox(height: 6),
         Container(
           height: 110,
@@ -1904,7 +1936,7 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
         ),
         Row(
           children: [
-            TextButton.icon(onPressed: _elegirFirma, icon: const Icon(Icons.upload_file), label: Text(firma == null ? 'Subir imagen' : 'Cambiar imagen')),
+            TextButton.icon(onPressed: _elegirFirma, icon: const Icon(Icons.upload_file), label: Tx(firma == null ? 'Subir imagen' : 'Cambiar imagen')),
             if (firma != null)
               TextButton.icon(
                 onPressed: () => _redibujarDialogo?.call(() {
@@ -1912,7 +1944,7 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
                   _firmaCambiada = true;
                 }),
                 icon: Icon(Icons.delete_outline, color: sonRojo),
-                label: Text('Quitar', style: TextStyle(color: sonRojo)),
+                label: Tx('Quitar', style: TextStyle(color: sonRojo)),
               ),
           ],
         ),
@@ -1996,42 +2028,42 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
         return StatefulBuilder(builder: (context, setStateDialogo) {
           _redibujarDialogo = setStateDialogo;
           return AlertDialog(
-            title: Text(tecnico == null ? 'Registrar Nuevo Técnico' : 'Editar Técnico', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
+            title: Tx(tecnico == null ? 'Registrar Nuevo Técnico' : 'Editar Técnico', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
             content: SizedBox(
               width: 440,
               child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextField(controller: _nombreController, decoration: const InputDecoration(labelText: 'Nombre completo')),
+                  TextField(controller: _nombreController, decoration: InputDecoration(labelText: tr('Nombre completo'))),
                   const SizedBox(height: 12),
                   TextField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(labelText: 'Correo electrónico'),
+                    decoration: InputDecoration(labelText: tr('Correo electrónico')),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: _passwordController,
-                    decoration: InputDecoration(labelText: tecnico == null ? 'Contraseña (mínimo 6 caracteres)' : 'Nueva contraseña (vacío = no cambiar)'),
+                    decoration: InputDecoration(labelText: tecnico == null ? tr('Contraseña (mínimo 6 caracteres)') : tr('Nueva contraseña (vacío = no cambiar)')),
                     obscureText: true,
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: _salidaController,
-                    decoration: const InputDecoration(
-                      labelText: 'Sale desde (dirección o localidad)',
-                      helperText: 'Ordena sus visitas desde ahí. Ej: Villa María, Córdoba',
+                    decoration: InputDecoration(
+                      labelText: tr('Sale desde (dirección o localidad)'),
+                      helperText: tr('Ordena sus visitas desde ahí. Ej: Villa María, Córdoba'),
                     ),
                   ),
                   const SizedBox(height: 12),
-                  TextField(controller: _matriculaController, decoration: const InputDecoration(labelText: 'Matrícula profesional')),
+                  TextField(controller: _matriculaController, decoration: InputDecoration(labelText: tr('Matrícula profesional'))),
                   const SizedBox(height: 16),
                   _vistaFirma(),
                   if (_errorDialogo != null)
                     Padding(
                       padding: const EdgeInsets.only(top: 14),
-                      child: Text(_errorDialogo!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600)),
+                      child: Tx(_errorDialogo!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600)),
                     ),
                 ],
               ),
@@ -2040,11 +2072,11 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text('Cancelar', style: TextStyle(color: sonTextoSuave))
+                child: Tx('Cancelar', style: TextStyle(color: sonTextoSuave))
               ),
               ElevatedButton(
                 onPressed: () => tecnico == null ? _registrarTecnico() : _guardarTecnico(tecnico['id']),
-                child: const Text('Guardar'),
+                child: const Tx('Guardar'),
               ),
             ],
           );
@@ -2084,18 +2116,18 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (dialogo) => AlertDialog(
-        title: Text('Eliminar técnico', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
-        content: Text(
+        title: Tx('Eliminar técnico', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
+        content: Tx(
           '¿Eliminar a ${tecnico['nombre']} (${tecnico['email']})?\n\n'
           'Ya no va a poder ingresar a la app. Sus órdenes no se borran: quedan sin técnico para que las reasignes. '
           'Los informes ya generados se conservan.',
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogo, false), child: Text('Cancelar', style: TextStyle(color: sonTextoSuave))),
+          TextButton(onPressed: () => Navigator.pop(dialogo, false), child: Tx('Cancelar', style: TextStyle(color: sonTextoSuave))),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: sonRojo),
             onPressed: () => Navigator.pop(dialogo, true),
-            child: const Text('Eliminar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: const Tx('Eliminar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -2119,7 +2151,7 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
       mensaje = mensajeSinConexion;
     }
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensaje)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx(mensaje)));
   }
 
   @override
@@ -2140,7 +2172,7 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
               ),
               ElevatedButton.icon(
                 icon: const Icon(Icons.person_add),
-                label: const Text('Nuevo técnico'),
+                label: const Tx('Nuevo técnico'),
                 onPressed: _mostrarDialogoNuevoTecnico, 
               )
             ],
@@ -2162,8 +2194,8 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
                             final tecnico = _tecnicos[index];
                             return ListTile(
                               leading: CircleAvatar(backgroundColor: sonTarjetaAlta, child: Icon(Icons.person, color: sonLightGreen)),
-                              title: Text(tecnico['nombre'] ?? 'Sin Nombre', style: const TextStyle(fontWeight: FontWeight.bold)),
-                              subtitle: Text([
+                              title: Tx(tecnico['nombre'] ?? 'Sin Nombre', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              subtitle: Tx([
                                 '${tecnico['email'] ?? 'Sin correo'}',
                                 if ('${tecnico['salida_direccion'] ?? ''}'.isNotEmpty) 'Sale desde ${tecnico['salida_direccion']}',
                                 if ('${tecnico['matricula'] ?? ''}'.isNotEmpty) 'Mat. ${tecnico['matricula']}',
@@ -2174,11 +2206,11 @@ class _PantallaTecnicosState extends State<PantallaTecnicos> {
                                 children: [
                                   OutlinedButton(
                                     onPressed: () => _mostrarDialogoTecnico(tecnico),
-                                    child: Text('Editar', style: TextStyle(color: sonTexto)),
+                                    child: Tx('Editar', style: TextStyle(color: sonTexto)),
                                   ),
                                   const SizedBox(width: 8),
                                   IconButton(
-                                    tooltip: 'Eliminar técnico',
+                                    tooltip: tr('Eliminar técnico'),
                                     icon: Icon(Icons.delete_outline, color: sonRojo),
                                     onPressed: () => _eliminarTecnico(Map<String, dynamic>.from(tecnico as Map)),
                                   ),
@@ -2252,47 +2284,47 @@ class _PantallaAdministradoresState extends State<PantallaAdministradores> {
       builder: (context) {
         return StatefulBuilder(builder: (context, setStateDialogo) {
           return AlertDialog(
-            title: const Text('Nuevo usuario'),
+            title: const Tx('Nuevo usuario'),
             content: SizedBox(
               width: 400,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextField(controller: nombre, decoration: const InputDecoration(labelText: 'Nombre completo')),
+                  TextField(controller: nombre, decoration: InputDecoration(labelText: tr('Nombre completo'))),
                   const SizedBox(height: 12),
                   TextField(
                     controller: email,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(labelText: 'Correo electrónico'),
+                    decoration: InputDecoration(labelText: tr('Correo electrónico')),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: password,
                     obscureText: true,
-                    decoration: const InputDecoration(labelText: 'Contraseña (mínimo 6 caracteres)'),
+                    decoration: InputDecoration(labelText: tr('Contraseña (mínimo 6 caracteres)')),
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     key: const Key('tipo_usuario'),
                     initialValue: rol,
                     isExpanded: true,
-                    decoration: const InputDecoration(labelText: 'Tipo de usuario'),
+                    decoration: InputDecoration(labelText: tr('Tipo de usuario')),
                     items: const [
-                      DropdownMenuItem(value: 'admin', child: Text('Administración (solo el área técnica)')),
-                      DropdownMenuItem(value: 'comercial', child: Text('Comercial (acceso total)')),
+                      DropdownMenuItem(value: 'admin', child: Tx('Administración (solo el área técnica)')),
+                      DropdownMenuItem(value: 'comercial', child: Tx('Comercial (acceso total)')),
                     ],
                     onChanged: (nuevo) => rol = nuevo ?? 'admin',
                   ),
                   if (error != null)
                     Padding(
                       padding: const EdgeInsets.only(top: 14),
-                      child: Text(error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600)),
+                      child: Tx(error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600)),
                     ),
                 ],
               ),
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('Cancelar', style: TextStyle(color: sonTextoSuave))),
+              TextButton(onPressed: () => Navigator.of(context).pop(), child: Tx('Cancelar', style: TextStyle(color: sonTextoSuave))),
               ElevatedButton(
                 onPressed: () async {
                   try {
@@ -2306,7 +2338,7 @@ class _PantallaAdministradoresState extends State<PantallaAdministradores> {
                       Navigator.of(context).pop();
                       _obtener();
                       if (!mounted) return;
-                      ScaffoldMessenger.of(this.context).showSnackBar(const SnackBar(content: Text('Usuario creado')));
+                      ScaffoldMessenger.of(this.context).showSnackBar(const SnackBar(content: Tx('Usuario creado')));
                     } else {
                       setStateDialogo(() => error = mensajeError(respuesta, 'No se pudo crear el usuario'));
                     }
@@ -2314,7 +2346,7 @@ class _PantallaAdministradoresState extends State<PantallaAdministradores> {
                     setStateDialogo(() => error = mensajeSinConexion);
                   }
                 },
-                child: const Text('Crear'),
+                child: const Tx('Crear'),
               ),
             ],
           );
@@ -2339,21 +2371,21 @@ class _PantallaAdministradoresState extends State<PantallaAdministradores> {
       mensaje = mensajeSinConexion;
     }
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensaje)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx(mensaje)));
   }
 
   Future<void> _eliminar(Map admin) async {
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (dialogo) => AlertDialog(
-        title: Text('Eliminar usuario', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
-        content: Text('¿Eliminar a ${admin['nombre']} (${admin['email']})? Ya no va a poder ingresar al panel.'),
+        title: Tx('Eliminar usuario', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
+        content: Tx('¿Eliminar a ${admin['nombre']} (${admin['email']})? Ya no va a poder ingresar al panel.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogo, false), child: Text('Cancelar', style: TextStyle(color: sonTextoSuave))),
+          TextButton(onPressed: () => Navigator.pop(dialogo, false), child: Tx('Cancelar', style: TextStyle(color: sonTextoSuave))),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: sonRojo),
             onPressed: () => Navigator.pop(dialogo, true),
-            child: const Text('Eliminar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: const Tx('Eliminar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -2373,7 +2405,7 @@ class _PantallaAdministradoresState extends State<PantallaAdministradores> {
       mensaje = mensajeSinConexion;
     }
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensaje)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx(mensaje)));
   }
 
   @override
@@ -2397,7 +2429,7 @@ class _PantallaAdministradoresState extends State<PantallaAdministradores> {
               ElevatedButton.icon(
                 key: const Key('nuevo_usuario'),
                 icon: const Icon(Icons.person_add),
-                label: const Text('Nuevo usuario'),
+                label: const Tx('Nuevo usuario'),
                 onPressed: _dialogoNuevoAdmin,
               ),
             ],
@@ -2410,7 +2442,7 @@ class _PantallaAdministradoresState extends State<PantallaAdministradores> {
               child: _cargando
                   ? const Center(child: CircularProgressIndicator())
                   : _errorLista != null
-                      ? Center(child: Text(_errorLista!, style: TextStyle(color: sonRojo)))
+                      ? Center(child: Tx(_errorLista!, style: TextStyle(color: sonRojo)))
                       : ListView.separated(
                           padding: const EdgeInsets.all(20),
                           itemCount: _admins.length,
@@ -2425,8 +2457,8 @@ class _PantallaAdministradoresState extends State<PantallaAdministradores> {
                                 backgroundColor: sonTarjetaAlta,
                                 child: Icon(comercial ? Icons.storefront_outlined : Icons.admin_panel_settings, color: colorRol),
                               ),
-                              title: Text('${admin['nombre']}${esYo ? '  (vos)' : ''}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                              subtitle: Text('${admin['email']}'),
+                              title: Tx('${admin['nombre']}${esYo ? '  (vos)' : ''}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              subtitle: Tx('${admin['email']}'),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -2434,21 +2466,21 @@ class _PantallaAdministradoresState extends State<PantallaAdministradores> {
                                     key: Key('rol_${admin['id']}'),
                                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                                     decoration: BoxDecoration(color: colorRol.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(20)),
-                                    child: Text(comercial ? 'Comercial' : 'Administración', style: TextStyle(color: colorRol, fontWeight: FontWeight.bold, fontSize: 12.5)),
+                                    child: Tx(comercial ? 'Comercial' : 'Administración', style: TextStyle(color: colorRol, fontWeight: FontWeight.bold, fontSize: 12.5)),
                                   ),
                                   if (!esYo) ...[
                                     PopupMenuButton<String>(
                                       key: Key('cambiar_rol_${admin['id']}'),
-                                      tooltip: 'Cambiar tipo de usuario',
+                                      tooltip: tr('Cambiar tipo de usuario'),
                                       icon: Icon(Icons.swap_horiz, color: sonTextoSuave),
                                       onSelected: (rol) => _cambiarRol(admin, rol),
                                       itemBuilder: (_) => [
-                                        if (comercial) const PopupMenuItem(value: 'admin', child: Text('Pasar a Administración (solo el área técnica)')),
-                                        if (!comercial) const PopupMenuItem(value: 'comercial', child: Text('Pasar a Comercial (acceso total)')),
+                                        if (comercial) const PopupMenuItem(value: 'admin', child: Tx('Pasar a Administración (solo el área técnica)')),
+                                        if (!comercial) const PopupMenuItem(value: 'comercial', child: Tx('Pasar a Comercial (acceso total)')),
                                       ],
                                     ),
                                     IconButton(
-                                      tooltip: 'Eliminar usuario',
+                                      tooltip: tr('Eliminar usuario'),
                                       icon: Icon(Icons.delete_outline, color: sonRojo),
                                       onPressed: () => _eliminar(admin),
                                     ),
@@ -2553,14 +2585,14 @@ class _PantallaInformesState extends State<PantallaInformes> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Informes esperando copiarse', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
+          title: Tx('Informes esperando copiarse', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
           content: SizedBox(
             width: 460,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                Tx(
                   'Ya están generados y guardados en el servidor. Se copian solos a la carpeta de cada cliente apenas esté disponible. Mientras tanto se pueden abrir desde acá.',
                   style: TextStyle(color: sonTextoSuave),
                 ),
@@ -2569,8 +2601,8 @@ class _PantallaInformesState extends State<PantallaInformes> {
                   return ListTile(
                     dense: true,
                     leading: Icon(Icons.picture_as_pdf, color: sonRojo),
-                    title: Text('${p['carpeta']}'),
-                    subtitle: Text('${p['archivo']}'),
+                    title: Tx('${p['carpeta']}'),
+                    subtitle: Tx('${p['archivo']}'),
                     trailing: const Icon(Icons.open_in_new),
                     onTap: () {
                       final url = '$apiBaseUrl/api/informes/pendientes/${Uri.encodeComponent('${p['carpeta']}')}/${Uri.encodeComponent('${p['archivo']}')}?token=${SesionAdmin.token}';
@@ -2581,7 +2613,7 @@ class _PantallaInformesState extends State<PantallaInformes> {
               ],
             ),
           ),
-          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cerrar'))],
+          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Tx('Cerrar'))],
         );
       },
     );
@@ -2594,13 +2626,13 @@ class _PantallaInformesState extends State<PantallaInformes> {
       final respuesta = await apiGet('/api/clientes/portal-por-nombre?nombre=${Uri.encodeQueryComponent(nombre)}');
       if (!mounted) return;
       if (respuesta.statusCode != 200) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensajeError(respuesta, 'No se encontró el cliente'))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx(mensajeError(respuesta, 'No se encontró el cliente'))));
         return;
       }
       final datos = json.decode(respuesta.body) as Map;
       await abrirAccesoCliente(context, (datos['id'] as num).toInt(), '${datos['empresa'] ?? nombre}');
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(mensajeSinConexion)));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx(mensajeSinConexion)));
     }
   }
 
@@ -2608,7 +2640,7 @@ class _PantallaInformesState extends State<PantallaInformes> {
     final respuesta = await apiGet('/api/informes/carpetas/${Uri.encodeComponent('${carpeta['carpeta']}')}');
     if (!mounted) return;
     if (respuesta.statusCode != 200) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensajeError(respuesta, 'No se pudo abrir la carpeta'))));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx(mensajeError(respuesta, 'No se pudo abrir la carpeta'))));
       return;
     }
     final archivos = json.decode(respuesta.body) as List;
@@ -2616,27 +2648,27 @@ class _PantallaInformesState extends State<PantallaInformes> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(carpeta['empresa'] ?? 'Informes', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
+          title: Tx(carpeta['empresa'] ?? 'Informes', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
           content: SizedBox(
             width: 420,
             child: archivos.isEmpty
-                ? const Text('Esta carpeta no tiene PDFs.')
+                ? const Tx('Esta carpeta no tiene PDFs.')
                 : Column(
                     mainAxisSize: MainAxisSize.min,
                     children: archivos.map((archivo) {
                       final nombre = '${archivo['nombre']}';
                       return ListTile(
                         leading: Icon(Icons.picture_as_pdf, color: sonRojo),
-                        title: Text(nombre),
+                        title: Tx(nombre),
                         subtitle: archivo['entregado'] == false
-                            ? Text('En espera de llegar a la carpeta del cliente', style: TextStyle(color: sonAmbar, fontSize: 12))
+                            ? Tx('En espera de llegar a la carpeta del cliente', style: TextStyle(color: sonAmbar, fontSize: 12))
                             : null,
                         trailing: const Icon(Icons.open_in_new),
                         onTap: () {
                           final url = '$apiBaseUrl/api/informes/archivo/${Uri.encodeComponent('${carpeta['carpeta']}')}/${Uri.encodeComponent(nombre)}?token=${SesionAdmin.token}';
                           if (_modoAgente && archivo['entregado'] != false) {
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                              content: Text('Buscando el informe en el disco de la empresa… puede tardar unos segundos.'),
+                              content: Tx('Buscando el informe en el disco de la empresa… puede tardar unos segundos.'),
                             ));
                           }
                           abrirInforme(url);
@@ -2649,9 +2681,9 @@ class _PantallaInformesState extends State<PantallaInformes> {
             TextButton.icon(
               onPressed: () => _accesoDelCliente(carpeta),
               icon: const Icon(Icons.link),
-              label: const Text('Acceso del cliente'),
+              label: const Tx('Acceso del cliente'),
             ),
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cerrar')),
+            TextButton(onPressed: () => Navigator.pop(context), child: const Tx('Cerrar')),
           ],
         );
       },
@@ -2675,10 +2707,10 @@ class _PantallaInformesState extends State<PantallaInformes> {
                     OutlinedButton.icon(
                       onPressed: () => showDialog(context: context, builder: (_) => const _DialogoAgente()),
                       icon: Icon(Icons.computer, color: sonTexto),
-                      label: Text('Conectar agente', style: TextStyle(color: sonTexto)),
+                      label: Tx('Conectar agente', style: TextStyle(color: sonTexto)),
                     ),
                   IconButton(
-                    tooltip: 'Actualizar',
+                    tooltip: tr('Actualizar'),
                     icon: Icon(Icons.refresh, color: sonTexto),
                     onPressed: _obtenerCarpetasDiscoK,
                   ),
@@ -2688,7 +2720,7 @@ class _PantallaInformesState extends State<PantallaInformes> {
           ),
           if (_textoEstadoCarpetas().isNotEmpty) ...[
             const SizedBox(height: 8),
-            Text(_textoEstadoCarpetas(), style: TextStyle(color: _modoAgente && !_agenteConectado ? sonAmbar : sonTextoSuave, fontSize: 16)),
+            Tx(_textoEstadoCarpetas(), style: TextStyle(color: _modoAgente && !_agenteConectado ? sonAmbar : sonTextoSuave, fontSize: 16)),
           ],
           if (_pendientes.isNotEmpty) ...[
             const SizedBox(height: 16),
@@ -2701,14 +2733,14 @@ class _PantallaInformesState extends State<PantallaInformes> {
                   Icon(Icons.schedule, color: sonAmbar),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Text(
+                    child: Tx(
                       _modoAgente
                           ? '${_pendientes.length} informe(s) generado(s) esperando que el agente de la oficina los copie a la carpeta de clientes. No se pierden: se entregan solos cuando la PC del agente esté prendida y conectada al disco.'
                           : '${_pendientes.length} informe(s) generado(s) esperando copiarse a la carpeta de clientes. No se pierden: se copian solos cuando el servidor de archivos esté disponible.',
                       style: TextStyle(color: sonAmbar),
                     ),
                   ),
-                  TextButton(onPressed: _verPendientes, child: const Text('Ver')),
+                  TextButton(onPressed: _verPendientes, child: const Tx('Ver')),
                 ],
               ),
             ),
@@ -2723,7 +2755,7 @@ class _PantallaInformesState extends State<PantallaInformes> {
                     ? Center(
                         child: ConstrainedBox(
                           constraints: const BoxConstraints(maxWidth: 480),
-                          child: Text(
+                          child: Tx(
                             'Todavía no hay carpetas de clientes. Cuando se cierre la primera visita, el informe queda guardado acá.',
                             textAlign: TextAlign.center,
                             style: TextStyle(color: sonTextoSuave, fontSize: 18, height: 1.4),
@@ -2751,7 +2783,7 @@ class _PantallaInformesState extends State<PantallaInformes> {
                                 top: 4,
                                 right: 4,
                                 child: IconButton(
-                                  tooltip: 'Acceso del cliente (enlace para ver sus informes)',
+                                  tooltip: tr('Acceso del cliente (enlace para ver sus informes)'),
                                   icon: Icon(Icons.link, color: sonTextoSuave, size: 20),
                                   onPressed: () => _accesoDelCliente(carpeta),
                                 ),
@@ -2774,8 +2806,8 @@ class _PantallaInformesState extends State<PantallaInformes> {
         children: [
           Icon(Icons.folder, size: 60, color: sonAmbar),
           const SizedBox(height: 12),
-          Text(empresa, style: TextStyle(fontWeight: FontWeight.bold, color: sonTexto), textAlign: TextAlign.center),
-          Text(subtitulo, style: TextStyle(color: sonTextoSuave, fontSize: 12)),
+          Tx(empresa, style: TextStyle(fontWeight: FontWeight.bold, color: sonTexto), textAlign: TextAlign.center),
+          Tx(subtitulo, style: TextStyle(color: sonTextoSuave, fontSize: 12)),
         ],
       ),
     );
@@ -2875,11 +2907,11 @@ class _DialogoAgenteState extends State<_DialogoAgente> {
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('¿Desvincular este agente?'),
-        content: Text('"${agente['nombre']}" va a dejar de recibir informes. Los informes pendientes quedan guardados en el servidor.'),
+        title: const Tx('¿Desvincular este agente?'),
+        content: Tx('"${agente['nombre']}" va a dejar de recibir informes. Los informes pendientes quedan guardados en el servidor.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: Text('Desvincular', style: TextStyle(color: sonRojo))),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Tx('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: Tx('Desvincular', style: TextStyle(color: sonRojo))),
         ],
       ),
     );
@@ -2914,9 +2946,9 @@ class _DialogoAgenteState extends State<_DialogoAgente> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(radius: 11, backgroundColor: sonTarjetaAlta, child: Text(numero, style: TextStyle(color: sonTexto, fontSize: 12))),
+          CircleAvatar(radius: 11, backgroundColor: sonTarjetaAlta, child: Tx(numero, style: TextStyle(color: sonTexto, fontSize: 12))),
           const SizedBox(width: 10),
-          Expanded(child: Text(texto)),
+          Expanded(child: Tx(texto)),
         ],
       ),
     );
@@ -2925,7 +2957,7 @@ class _DialogoAgenteState extends State<_DialogoAgente> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Conectar agente de la oficina', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
+      title: Tx('Conectar agente de la oficina', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
       content: SizedBox(
         width: 520,
         child: _cargando
@@ -2935,7 +2967,7 @@ class _DialogoAgenteState extends State<_DialogoAgente> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    Tx(
                       'El agente es un programa que conecta el disco K (la carpeta de clientes) con este servidor. '
                       'Se instala UNA sola vez en la máquina que tiene el disco y queda prendido siempre: '
                       'arranca solo con Windows (aunque nadie inicie sesión) y se actualiza solo. '
@@ -2954,12 +2986,12 @@ class _DialogoAgenteState extends State<_DialogoAgente> {
                         ElevatedButton.icon(
                           onPressed: _descargaDisponible ? () => abrirInforme('$apiBaseUrl/api/agentes/descargar?token=${SesionAdmin.token}') : null,
                           icon: const Icon(Icons.download),
-                          label: Text(_descargaDisponible ? 'Descargar agente' : 'Programa no disponible en este servidor'),
+                          label: Tx(_descargaDisponible ? 'Descargar agente' : 'Programa no disponible en este servidor'),
                         ),
                         OutlinedButton.icon(
                           onPressed: _generarCodigo,
                           icon: Icon(Icons.vpn_key, color: sonTexto),
-                          label: Text('Generar código', style: TextStyle(color: sonTexto)),
+                          label: Tx('Generar código', style: TextStyle(color: sonTexto)),
                         ),
                       ],
                     ),
@@ -2977,16 +3009,16 @@ class _DialogoAgenteState extends State<_DialogoAgente> {
                                 children: [
                                   SelectableText(_codigoDeConexion, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: sonTexto)),
                                   const SizedBox(height: 4),
-                                  Text('Sirve una sola vez y vence en $_venceEnMinutos minutos.', style: TextStyle(color: sonTextoSuave, fontSize: 12)),
+                                  Tx('Sirve una sola vez y vence en $_venceEnMinutos minutos.', style: TextStyle(color: sonTextoSuave, fontSize: 12)),
                                 ],
                               ),
                             ),
                             IconButton(
-                              tooltip: 'Copiar',
+                              tooltip: tr('Copiar'),
                               icon: Icon(Icons.copy, color: sonTexto),
                               onPressed: () {
                                 Clipboard.setData(ClipboardData(text: _codigoDeConexion));
-                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Código copiado')));
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx('Código copiado')));
                               },
                             ),
                           ],
@@ -2996,15 +3028,15 @@ class _DialogoAgenteState extends State<_DialogoAgente> {
                       TextField(
                         controller: _carpeta,
                         onChanged: (_) => setState(() {}),
-                        decoration: const InputDecoration(
-                          labelText: 'Carpeta de clientes vista desde el servidor',
-                          hintText: r'Ej: D:\HIGIENE Y SEGURIDAD\00. CLIENTES',
-                          helperText: 'En el servidor conviene la ruta local (D:\\...), no la K: ni \\\\sa-server: el agente corre como servicio.',
+                        decoration: InputDecoration(
+                          labelText: tr('Carpeta de clientes vista desde el servidor'),
+                          hintText: tr(r'Ej: D:\HIGIENE Y SEGURIDAD\00. CLIENTES'),
+                          helperText: tr('En el servidor conviene la ruta local (D:\\...), no la K: ni \\\\sa-server: el agente corre como servicio.'),
                           helperMaxLines: 2,
                         ),
                       ),
                       const SizedBox(height: 10),
-                      Text('Comando para instalarlo en el servidor (una sola vez):', style: TextStyle(fontWeight: FontWeight.w600, color: sonTexto)),
+                      Tx('Comando para instalarlo en el servidor (una sola vez):', style: TextStyle(fontWeight: FontWeight.w600, color: sonTexto)),
                       const SizedBox(height: 6),
                       Container(
                         width: double.infinity,
@@ -3014,18 +3046,18 @@ class _DialogoAgenteState extends State<_DialogoAgente> {
                           children: [
                             Expanded(child: SelectableText(_comandoServidor, style: TextStyle(fontFamily: 'monospace', fontSize: 12.5, color: sonTexto))),
                             IconButton(
-                              tooltip: 'Copiar comando',
+                              tooltip: tr('Copiar comando'),
                               icon: Icon(Icons.copy, color: sonTexto),
                               onPressed: () {
                                 Clipboard.setData(ClipboardData(text: _comandoServidor));
-                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Comando copiado')));
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx('Comando copiado')));
                               },
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(height: 6),
-                      Text(
+                      Tx(
                         'Si preferís instalarlo en una PC común, abrí el programa con doble clic y pegá el código: '
                         'funciona igual, pero solo mientras esa PC esté prendida.',
                         style: TextStyle(color: sonTextoSuave, fontSize: 12),
@@ -3033,14 +3065,14 @@ class _DialogoAgenteState extends State<_DialogoAgente> {
                     ],
                     if (_error != null) ...[
                       const SizedBox(height: 12),
-                      Text(_error!, style: TextStyle(color: sonRojo)),
+                      Tx(_error!, style: TextStyle(color: sonRojo)),
                     ],
                     const SizedBox(height: 20),
-                    Text('Agentes conectados', style: TextStyle(fontWeight: FontWeight.bold, color: sonTexto)),
+                    Tx('Agentes conectados', style: TextStyle(fontWeight: FontWeight.bold, color: sonTexto)),
                     if (_agentes.isEmpty)
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
-                        child: Text('Todavía no hay ningún agente vinculado.', style: TextStyle(color: sonTextoSuave)),
+                        child: Tx('Todavía no hay ningún agente vinculado.', style: TextStyle(color: sonTextoSuave)),
                       ),
                     ..._agentes.map((agente) {
                       final activo = agente['activo'] == true;
@@ -3048,10 +3080,10 @@ class _DialogoAgenteState extends State<_DialogoAgente> {
                         dense: true,
                         contentPadding: EdgeInsets.zero,
                         leading: Icon(Icons.circle, size: 14, color: activo ? sonLightGreen : sonAmbar),
-                        title: Text('${agente['nombre']}'),
-                        subtitle: Text(_visto(agente['vistoEn'])),
+                        title: Tx('${agente['nombre']}'),
+                        subtitle: Tx(_visto(agente['vistoEn'])),
                         trailing: IconButton(
-                          tooltip: 'Desvincular',
+                          tooltip: tr('Desvincular'),
                           icon: Icon(Icons.link_off, color: sonRojo),
                           onPressed: () => _desvincular(agente as Map),
                         ),
@@ -3062,8 +3094,8 @@ class _DialogoAgenteState extends State<_DialogoAgente> {
               ),
       ),
       actions: [
-        TextButton(onPressed: _cargar, child: const Text('Actualizar')),
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cerrar')),
+        TextButton(onPressed: _cargar, child: const Tx('Actualizar')),
+        TextButton(onPressed: () => Navigator.pop(context), child: const Tx('Cerrar')),
       ],
     );
   }

@@ -6,6 +6,7 @@ import 'package:son_admin/services/elegir_imagen.dart';
 import 'package:son_admin/pantallas/planilla_excel.dart';
 import 'package:son_admin/theme/tema.dart';
 
+import 'package:son_admin/i18n/idioma.dart';
 // Formularios de control (tableros, extintores, almacenaje...): se suben desde el Excel que ya usan,
 // se revisan acá y después se eligen en cada orden. El técnico los completa en la app y salen en el
 // informe como tareas realizadas.
@@ -31,14 +32,14 @@ String resumenDeFormulario(Map definicion) {
 }
 
 void _avisar(BuildContext context, String texto) {
-  if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(texto)));
+  if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx(texto)));
 }
 
 /// Sube el Excel, lo convierte y abre el editor para revisarlo. Devuelve el formulario guardado (o null).
 Future<Map<String, dynamic>?> importarFormularioDesdeExcel(BuildContext context) async {
   final archivo = await elegirArchivo(aceptar: '.xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   if (archivo == null || !context.mounted) return null;
-  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Leyendo el Excel...'), duration: Duration(seconds: 2)));
+  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx('Leyendo el Excel...'), duration: Duration(seconds: 2)));
   try {
     final respuesta = await apiSend('POST', '/api/formularios/importar', json.encode({'archivo': archivo.nombre, 'contenido': archivo.datos}));
     if (!context.mounted) return null;
@@ -181,11 +182,11 @@ class _EditorFormularioState extends State<_EditorFormulario> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (dialogo) => AlertDialog(
-        title: Text('¿Borrar "${_nombre.text}"?'),
-        content: const Text('Deja de aparecer para elegir en las órdenes nuevas. Las órdenes que ya lo tienen lo conservan.'),
+        title: Tx('¿Borrar "${_nombre.text}"?'),
+        content: const Tx('Deja de aparecer para elegir en las órdenes nuevas. Las órdenes que ya lo tienen lo conservan.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogo, false), child: const Text('Cancelar')),
-          TextButton(onPressed: () => Navigator.pop(dialogo, true), child: Text('Borrar', style: TextStyle(color: sonRojo))),
+          TextButton(onPressed: () => Navigator.pop(dialogo, false), child: const Tx('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(dialogo, true), child: Tx('Borrar', style: TextStyle(color: sonRojo))),
         ],
       ),
     );
@@ -211,13 +212,13 @@ class _EditorFormularioState extends State<_EditorFormulario> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(width: 24, child: Padding(padding: const EdgeInsets.only(top: 14), child: Text('${i + 1}.', style: TextStyle(color: sonTextoSuave)))),
+          SizedBox(width: 24, child: Padding(padding: const EdgeInsets.only(top: 14), child: Tx('${i + 1}.', style: TextStyle(color: sonTextoSuave)))),
           Expanded(
             flex: 5,
             child: TextField(
               controller: campo.etiqueta,
               maxLines: null,
-              decoration: InputDecoration(isDense: true, labelText: i == 0 ? 'Qué identifica cada fila' : 'Pregunta o dato'),
+              decoration: InputDecoration(isDense: true, labelText: i == 0 ? tr('Qué identifica cada fila') : tr('Pregunta o dato')),
             ),
           ),
           const SizedBox(width: 8),
@@ -226,8 +227,8 @@ class _EditorFormularioState extends State<_EditorFormulario> {
             child: DropdownButtonFormField<String>(
               initialValue: tiposDeCampo.any((t) => t.$1 == campo.tipo) ? campo.tipo : 'texto',
               isDense: true,
-              decoration: const InputDecoration(isDense: true, labelText: 'Tipo'),
-              items: tiposDeCampo.map((t) => DropdownMenuItem(value: t.$1, child: Text(t.$2))).toList(),
+              decoration: InputDecoration(isDense: true, labelText: tr('Tipo')),
+              items: tiposDeCampo.map((t) => DropdownMenuItem(value: t.$1, child: Tx(t.$2))).toList(),
               onChanged: (valor) => setState(() => campo.tipo = valor ?? 'texto'),
             ),
           ),
@@ -235,19 +236,19 @@ class _EditorFormularioState extends State<_EditorFormulario> {
             const SizedBox(width: 8),
             SizedBox(
               width: 130,
-              child: TextField(controller: campo.opciones, decoration: const InputDecoration(isDense: true, labelText: 'Opciones', hintText: 'las generales')),
+              child: TextField(controller: campo.opciones, decoration: InputDecoration(isDense: true, labelText: tr('Opciones'), hintText: tr('las generales'))),
             ),
           ],
           Column(
             children: [
               IconButton(
-                tooltip: 'Subir',
+                tooltip: tr('Subir'),
                 visualDensity: VisualDensity.compact,
                 icon: const Icon(Icons.arrow_upward, size: 18),
                 onPressed: i == 0 ? null : () => setState(() => _campos.insert(i - 1, _campos.removeAt(i))),
               ),
               IconButton(
-                tooltip: 'Quitar',
+                tooltip: tr('Quitar'),
                 visualDensity: VisualDensity.compact,
                 icon: Icon(Icons.close, size: 18, color: sonRojo),
                 onPressed: () => setState(() => _campos.removeAt(i)),
@@ -272,9 +273,9 @@ class _EditorFormularioState extends State<_EditorFormulario> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextField(controller: _nombre, decoration: const InputDecoration(labelText: 'Nombre del formulario')),
+        TextField(controller: _nombre, decoration: InputDecoration(labelText: tr('Nombre del formulario'))),
         const SizedBox(height: 12),
-        Text(
+        Tx(
           'Se usa igual que el Excel. El técnico toca los casilleros para completarlos: '
           '${cuenta['marca'] ?? 0} para marcar con X (SI / NO / NC), ${cuenta['fecha'] ?? 0} de fecha y ${cuenta['texto'] ?? 0} para escribir. '
           'Las fechas de "vencimiento" pasan solas a Vencimientos.',
@@ -302,24 +303,24 @@ class _EditorFormularioState extends State<_EditorFormulario> {
   Widget build(BuildContext context) {
     if (_esExcel) {
       return AlertDialog(
-        title: Text(widget.id == null ? 'Así queda el formulario' : 'Formulario'),
+        title: Tx(widget.id == null ? 'Así queda el formulario' : 'Formulario'),
         content: SizedBox(
           width: 820,
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (widget.archivo != null) Text('De ${widget.archivo}', style: TextStyle(color: sonTextoSuave)),
+                if (widget.archivo != null) Tx('De ${widget.archivo}', style: TextStyle(color: sonTextoSuave)),
                 for (final aviso in widget.avisos)
                   Container(
                     margin: const EdgeInsets.only(top: 8),
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(color: sonAmbar.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8), border: Border.all(color: sonAmbar.withValues(alpha: 0.5))),
-                    child: Row(children: [Icon(Icons.info_outline, color: sonAmbar, size: 18), const SizedBox(width: 8), Expanded(child: Text(aviso))]),
+                    child: Row(children: [Icon(Icons.info_outline, color: sonAmbar, size: 18), const SizedBox(width: 8), Expanded(child: Tx(aviso))]),
                   ),
                 const SizedBox(height: 12),
                 _vistaExcel(),
-                if (_error != null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600))),
+                if (_error != null) Padding(padding: const EdgeInsets.only(top: 10), child: Tx(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600))),
               ],
             ),
           ),
@@ -329,38 +330,38 @@ class _EditorFormularioState extends State<_EditorFormulario> {
             TextButton.icon(
               onPressed: _ocupado ? null : _borrar,
               icon: Icon(Icons.delete_outline, color: sonRojo),
-              label: Text('Borrar formulario', style: TextStyle(color: sonRojo)),
+              label: Tx('Borrar formulario', style: TextStyle(color: sonRojo)),
             ),
-          TextButton(onPressed: _ocupado ? null : () => Navigator.pop(context), child: const Text('Cancelar')),
-          ElevatedButton(onPressed: _ocupado ? null : _guardar, child: Text(widget.id == null ? 'Guardar formulario' : 'Guardar')),
+          TextButton(onPressed: _ocupado ? null : () => Navigator.pop(context), child: const Tx('Cancelar')),
+          ElevatedButton(onPressed: _ocupado ? null : _guardar, child: Tx(widget.id == null ? 'Guardar formulario' : 'Guardar')),
         ],
       );
     }
     return AlertDialog(
-      title: Text(widget.id == null ? (widget.archivo == null ? 'Nuevo formulario' : 'Revisá el formulario convertido') : 'Editar formulario'),
+      title: Tx(widget.id == null ? (widget.archivo == null ? 'Nuevo formulario' : 'Revisá el formulario convertido') : 'Editar formulario'),
       content: SizedBox(
         width: 820,
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (widget.archivo != null) Text('Convertido de ${widget.archivo}', style: TextStyle(color: sonTextoSuave)),
+              if (widget.archivo != null) Tx('Convertido de ${widget.archivo}', style: TextStyle(color: sonTextoSuave)),
               for (final aviso in widget.avisos)
                 Container(
                   margin: const EdgeInsets.only(top: 8),
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(color: sonAmbar.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8), border: Border.all(color: sonAmbar.withValues(alpha: 0.5))),
-                  child: Row(children: [Icon(Icons.info_outline, color: sonAmbar, size: 18), const SizedBox(width: 8), Expanded(child: Text(aviso))]),
+                  child: Row(children: [Icon(Icons.info_outline, color: sonAmbar, size: 18), const SizedBox(width: 8), Expanded(child: Tx(aviso))]),
                 ),
               const SizedBox(height: 12),
-              TextField(controller: _nombre, decoration: const InputDecoration(labelText: 'Nombre del formulario')),
+              TextField(controller: _nombre, decoration: InputDecoration(labelText: tr('Nombre del formulario'))),
               const SizedBox(height: 14),
-              Text('¿Cómo se completa?', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
+              Tx('¿Cómo se completa?', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
               const SizedBox(height: 6),
               SegmentedButton<String>(
                 segments: const [
-                  ButtonSegment(value: 'lista', icon: Icon(Icons.checklist), label: Text('Lista de preguntas fijas')),
-                  ButtonSegment(value: 'planilla', icon: Icon(Icons.table_rows_outlined), label: Text('Planilla: una fila por cada cosa revisada')),
+                  ButtonSegment(value: 'lista', icon: Icon(Icons.checklist), label: Tx('Lista de preguntas fijas')),
+                  ButtonSegment(value: 'planilla', icon: Icon(Icons.table_rows_outlined), label: Tx('Planilla: una fila por cada cosa revisada')),
                 ],
                 selected: {_tipo},
                 onSelectionChanged: (valor) => setState(() => _tipo = valor.first),
@@ -368,15 +369,15 @@ class _EditorFormularioState extends State<_EditorFormulario> {
               const SizedBox(height: 14),
               TextField(
                 controller: _opciones,
-                decoration: const InputDecoration(labelText: 'Opciones de respuesta', helperText: 'Separadas por comas. Ej: SI, NO, NC  ·  BIEN, MAL  ·  S, I'),
+                decoration: InputDecoration(labelText: tr('Opciones de respuesta'), helperText: tr('Separadas por comas. Ej: SI, NO, NC  ·  BIEN, MAL  ·  S, I')),
               ),
               const SizedBox(height: 14),
               if (_tipo == 'lista') ...[
                 TextField(
                   controller: _columnas,
-                  decoration: const InputDecoration(
-                    labelText: 'Columnas (opcional)',
-                    helperText: 'Si cada pregunta se contesta para varios lugares. Ej: Baño M, Baño H, Vestuario, Comedor. Vacío = una sola respuesta.',
+                  decoration: InputDecoration(
+                    labelText: tr('Columnas (opcional)'),
+                    helperText: tr('Si cada pregunta se contesta para varios lugares. Ej: Baño M, Baño H, Vestuario, Comedor. Vacío = una sola respuesta.'),
                     helperMaxLines: 2,
                   ),
                 ),
@@ -385,29 +386,29 @@ class _EditorFormularioState extends State<_EditorFormulario> {
                   controller: _preguntas,
                   minLines: 8,
                   maxLines: 18,
-                  decoration: const InputDecoration(
-                    labelText: 'Preguntas (una por renglón)',
+                  decoration: InputDecoration(
+                    labelText: tr('Preguntas (una por renglón)'),
                     alignLabelWithHint: true,
-                    helperText: 'Un renglón que empieza con # es un título de sección. Ej: # Luces',
+                    helperText: tr('Un renglón que empieza con # es un título de sección. Ej: # Luces'),
                   ),
                 ),
               ] else ...[
                 TextField(
                   controller: _elemento,
-                  decoration: const InputDecoration(labelText: 'Cada fila es un...', helperText: 'Ej: Tablero, Extintor, Máquina. La app muestra "Agregar tablero".'),
+                  decoration: InputDecoration(labelText: tr('Cada fila es un...'), helperText: tr('Ej: Tablero, Extintor, Máquina. La app muestra "Agregar tablero".')),
                 ),
                 const SizedBox(height: 16),
-                Text('Campos de cada fila', style: TextStyle(fontWeight: FontWeight.bold, color: sonTexto)),
-                Text('El primero identifica cada fila (por ejemplo, la ubicación del tablero). Las fechas que dicen "vencimiento" se cargan solas en Vencimientos.', style: TextStyle(color: sonTextoSuave, fontSize: 12.5)),
+                Tx('Campos de cada fila', style: TextStyle(fontWeight: FontWeight.bold, color: sonTexto)),
+                Tx('El primero identifica cada fila (por ejemplo, la ubicación del tablero). Las fechas que dicen "vencimiento" se cargan solas en Vencimientos.', style: TextStyle(color: sonTextoSuave, fontSize: 12.5)),
                 const SizedBox(height: 10),
                 for (var i = 0; i < _campos.length; i++) _filaCampo(i),
                 TextButton.icon(
                   onPressed: () => setState(() => _campos.add(_Campo('', 'opciones', ''))),
                   icon: const Icon(Icons.add),
-                  label: const Text('Agregar campo'),
+                  label: const Tx('Agregar campo'),
                 ),
               ],
-              if (_error != null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600))),
+              if (_error != null) Padding(padding: const EdgeInsets.only(top: 10), child: Tx(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600))),
             ],
           ),
         ),
@@ -417,10 +418,10 @@ class _EditorFormularioState extends State<_EditorFormulario> {
           TextButton.icon(
             onPressed: _ocupado ? null : _borrar,
             icon: Icon(Icons.delete_outline, color: sonRojo),
-            label: Text('Borrar formulario', style: TextStyle(color: sonRojo)),
+            label: Tx('Borrar formulario', style: TextStyle(color: sonRojo)),
           ),
-        TextButton(onPressed: _ocupado ? null : () => Navigator.pop(context), child: const Text('Cancelar')),
-        ElevatedButton(onPressed: _ocupado ? null : _guardar, child: const Text('Guardar formulario')),
+        TextButton(onPressed: _ocupado ? null : () => Navigator.pop(context), child: const Tx('Cancelar')),
+        ElevatedButton(onPressed: _ocupado ? null : _guardar, child: const Tx('Guardar formulario')),
       ],
     );
   }
@@ -487,7 +488,7 @@ class SelectorFormularios extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Formularios de control', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
+        Tx('Formularios de control', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
         const SizedBox(height: 6),
         Wrap(
           spacing: 8,
@@ -496,24 +497,24 @@ class SelectorFormularios extends StatelessWidget {
           children: [
             for (final id in elegidos)
               InputChip(
-                label: Text(nombres[id] ?? 'Formulario #$id'),
+                label: Tx(nombres[id] ?? 'Formulario #$id'),
                 avatar: const Icon(Icons.fact_check_outlined, size: 18),
-                tooltip: 'Tocá para ver o corregir el formulario',
+                tooltip: tr('Tocá para ver o corregir el formulario'),
                 onPressed: () => _editar(context, id),
                 onDeleted: () => alCambiar(elegidos.where((e) => e != id).toList()),
               ),
             PopupMenuButton<int>(
-              tooltip: 'Agregar formulario',
+              tooltip: tr('Agregar formulario'),
               onSelected: (opcion) => _agregar(context, opcion),
               itemBuilder: (_) => [
                 // Primero subir o crear (siempre a la vista), después los ya guardados.
                 const PopupMenuItem<int>(
                   value: _subirExcel,
-                  child: ListTile(dense: true, contentPadding: EdgeInsets.zero, leading: Icon(Icons.upload_file), title: Text('Subir un Excel'), subtitle: Text('Se convierte solo y lo revisás')),
+                  child: ListTile(dense: true, contentPadding: EdgeInsets.zero, leading: Icon(Icons.upload_file), title: Tx('Subir un Excel'), subtitle: Tx('Se convierte solo y lo revisás')),
                 ),
                 const PopupMenuItem<int>(
                   value: _aMano,
-                  child: ListTile(dense: true, contentPadding: EdgeInsets.zero, leading: Icon(Icons.edit_note), title: Text('Crear uno a mano')),
+                  child: ListTile(dense: true, contentPadding: EdgeInsets.zero, leading: Icon(Icons.edit_note), title: Tx('Crear uno a mano')),
                 ),
                 if (faltan.isNotEmpty) const PopupMenuDivider(),
                 for (final f in faltan)
@@ -523,12 +524,12 @@ class SelectorFormularios extends StatelessWidget {
                       dense: true,
                       contentPadding: EdgeInsets.zero,
                       leading: const Icon(Icons.fact_check_outlined),
-                      title: Text('${f['nombre']}'),
-                      subtitle: Text(resumenDeFormulario(Map<String, dynamic>.from(f['definicion'] as Map? ?? {})), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      title: Tx('${f['nombre']}'),
+                      subtitle: Tx(resumenDeFormulario(Map<String, dynamic>.from(f['definicion'] as Map? ?? {})), maxLines: 1, overflow: TextOverflow.ellipsis),
                     ),
                   ),
               ],
-              child: const Chip(avatar: Icon(Icons.add, size: 18), label: Text('Agregar formulario')),
+              child: const Chip(avatar: Icon(Icons.add, size: 18), label: Tx('Agregar formulario')),
             ),
           ],
         ),

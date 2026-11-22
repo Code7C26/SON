@@ -6,6 +6,7 @@ import 'package:son_admin/services/api.dart';
 import 'package:son_admin/theme/tema.dart';
 import 'package:son_admin/ui/componentes.dart';
 
+import 'package:son_admin/i18n/idioma.dart';
 /// Tarifario, costos internos, inflación y parámetros del presupuestador.
 class PantallaPrecios extends StatefulWidget {
   const PantallaPrecios({super.key});
@@ -118,7 +119,7 @@ class _PestanaTarifasState extends State<_PestanaTarifas> {
   Future<void> _abrir([Map<String, dynamic>? tarifa]) async {
     final guardado = await showDialog<bool>(context: context, builder: (_) => _DialogoTarifa(tarifa: tarifa, familias: _familias));
     if (guardado == true && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tarifa == null ? 'Tarifa creada' : 'Tarifa actualizada')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx(tarifa == null ? 'Tarifa creada' : 'Tarifa actualizada')));
       _cargar();
     }
   }
@@ -127,11 +128,11 @@ class _PestanaTarifasState extends State<_PestanaTarifas> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Borrar tarifa'),
-        content: Text('¿Borrar "${tarifa['servicio']}"? Los presupuestos ya armados no se tocan.'),
+        title: const Tx('Borrar tarifa'),
+        content: Tx('¿Borrar "${tarifa['servicio']}"? Los presupuestos ya armados no se tocan.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-          ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Borrar')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Tx('Cancelar')),
+          ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Tx('Borrar')),
         ],
       ),
     );
@@ -140,13 +141,13 @@ class _PestanaTarifasState extends State<_PestanaTarifas> {
       final respuesta = await apiSend('DELETE', '/api/tarifas/${tarifa['id']}');
       if (!mounted) return;
       if (respuesta.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tarifa borrada')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx('Tarifa borrada')));
         _cargar();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensajeError(respuesta, 'No se pudo borrar'))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx(mensajeError(respuesta, 'No se pudo borrar'))));
       }
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(mensajeSinConexion)));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx(mensajeSinConexion)));
     }
   }
 
@@ -162,7 +163,7 @@ class _PestanaTarifasState extends State<_PestanaTarifas> {
   Widget build(BuildContext context) {
     if (_cargando) return const Center(child: CircularProgressIndicator());
     if (_error != null) {
-      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text(_error!, style: TextStyle(color: sonRojo)), const SizedBox(height: 12), OutlinedButton.icon(onPressed: _cargar, icon: const Icon(Icons.refresh), label: const Text('Reintentar'))]));
+      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Tx(_error!, style: TextStyle(color: sonRojo)), const SizedBox(height: 12), OutlinedButton.icon(onPressed: _cargar, icon: const Icon(Icons.refresh), label: const Tx('Reintentar'))]));
     }
     final visibles = _visibles;
     return Column(
@@ -175,7 +176,7 @@ class _PestanaTarifasState extends State<_PestanaTarifas> {
                 key: const Key('buscar_tarifa'),
                 controller: _busqueda,
                 decoration: InputDecoration(
-                  hintText: 'Buscar servicio o tramo...',
+                  hintText: tr('Buscar servicio o tramo...'),
                   prefixIcon: const Icon(Icons.search, size: 20),
                   isDense: true,
                   suffixIcon: _busqueda.text.isEmpty ? null : IconButton(icon: const Icon(Icons.close, size: 18), onPressed: _busqueda.clear),
@@ -189,29 +190,29 @@ class _PestanaTarifasState extends State<_PestanaTarifas> {
                 key: const Key('filtro_familia'),
                 initialValue: _familia,
                 isExpanded: true,
-                decoration: const InputDecoration(isDense: true, labelText: 'Familia'),
+                decoration: InputDecoration(isDense: true, labelText: tr('Familia')),
                 items: [
-                  const DropdownMenuItem(value: '', child: Text('Todas')),
-                  for (final f in _familias) DropdownMenuItem(value: f, child: Text(f, overflow: TextOverflow.ellipsis)),
+                  const DropdownMenuItem(value: '', child: Tx('Todas')),
+                  for (final f in _familias) DropdownMenuItem(value: f, child: Tx(f, overflow: TextOverflow.ellipsis)),
                 ],
                 onChanged: (v) => setState(() => _familia = v ?? ''),
               ),
             ),
             const SizedBox(width: 12),
-            Text('${visibles.length} tarifas', style: TextStyle(color: sonTextoSuave)),
+            Tx('${visibles.length} tarifas', style: TextStyle(color: sonTextoSuave)),
             const Spacer(),
             ElevatedButton.icon(
               key: const Key('nueva_tarifa'),
               onPressed: () => _abrir(),
               icon: const Icon(Icons.add),
-              label: const Text('Nueva tarifa'),
+              label: const Tx('Nueva tarifa'),
             ),
           ],
         ),
         const SizedBox(height: 16),
         Expanded(
           child: visibles.isEmpty
-              ? Center(child: Text('No hay tarifas con esa búsqueda.', style: TextStyle(color: sonTextoSuave)))
+              ? Center(child: Tx('No hay tarifas con esa búsqueda.', style: TextStyle(color: sonTextoSuave)))
               : ListView.separated(
                   itemCount: visibles.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 8),
@@ -231,9 +232,9 @@ class _PestanaTarifasState extends State<_PestanaTarifas> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('${t['servicio']}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600, fontSize: 15)),
+                                  Tx('${t['servicio']}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600, fontSize: 15)),
                                   const SizedBox(height: 4),
-                                  Text(
+                                  Tx(
                                     [t['familia'], t['tramo'], t['detalle']].where((x) => '$x'.trim().isNotEmpty).join(' · '),
                                     style: TextStyle(color: sonTextoSuave, fontSize: 12.5),
                                   ),
@@ -241,12 +242,12 @@ class _PestanaTarifasState extends State<_PestanaTarifas> {
                               ),
                             ),
                             if (t['indexa'] == true && t['modulos'] == null)
-                              Padding(padding: const EdgeInsets.only(right: 12), child: Tooltip(message: 'Se actualiza por inflación', child: Icon(Icons.trending_up, size: 18, color: sonAzul))),
-                            Text(
+                              Padding(padding: const EdgeInsets.only(right: 12), child: Tooltip(message: tr('Se actualiza por inflación'), child: Icon(Icons.trending_up, size: 18, color: sonAzul))),
+                            Tx(
                               sinValor ? 'Sin valor' : pesos(t['valorActual'] as num?),
                               style: TextStyle(color: sinValor ? sonAmbar : sonTexto, fontWeight: FontWeight.bold, fontSize: 16),
                             ),
-                            IconButton(tooltip: 'Borrar', onPressed: () => _borrar(t), icon: Icon(Icons.delete_outline, color: sonTextoSuave)),
+                            IconButton(tooltip: tr('Borrar'), onPressed: () => _borrar(t), icon: Icon(Icons.delete_outline, color: sonTextoSuave)),
                           ],
                         ),
                       ),
@@ -320,48 +321,48 @@ class _DialogoTarifaState extends State<_DialogoTarifa> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.tarifa == null ? 'Nueva tarifa' : 'Editar tarifa'),
+      title: Tx(widget.tarifa == null ? 'Nueva tarifa' : 'Editar tarifa'),
       content: SizedBox(
         width: 520,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: _familia, decoration: InputDecoration(labelText: 'Familia (CIEC, Colegio de Geólogos...)', suffixIcon: PopupMenuButton<String>(
+              TextField(controller: _familia, decoration: InputDecoration(labelText: tr('Familia (CIEC, Colegio de Geólogos...)'), suffixIcon: PopupMenuButton<String>(
                 icon: const Icon(Icons.arrow_drop_down),
                 onSelected: (v) => _familia.text = v,
-                itemBuilder: (_) => [for (final f in widget.familias) PopupMenuItem(value: f, child: Text(f))],
+                itemBuilder: (_) => [for (final f in widget.familias) PopupMenuItem(value: f, child: Tx(f))],
               ))),
               const SizedBox(height: 12),
-              TextField(controller: _servicio, decoration: const InputDecoration(labelText: 'Servicio *')),
+              TextField(controller: _servicio, decoration: InputDecoration(labelText: tr('Servicio *'))),
               const SizedBox(height: 12),
-              TextField(controller: _tramo, decoration: const InputDecoration(labelText: 'Tramo (1 a 15 trabajadores...)')),
+              TextField(controller: _tramo, decoration: InputDecoration(labelText: tr('Tramo (1 a 15 trabajadores...)'))),
               const SizedBox(height: 12),
-              TextField(controller: _detalle, decoration: const InputDecoration(labelText: 'Detalle')),
+              TextField(controller: _detalle, decoration: InputDecoration(labelText: tr('Detalle'))),
               const SizedBox(height: 12),
               Row(children: [
-                Expanded(child: TextField(controller: _valor, decoration: const InputDecoration(labelText: 'Valor de lista (pesos)'))),
+                Expanded(child: TextField(controller: _valor, decoration: InputDecoration(labelText: tr('Valor de lista (pesos)')))),
                 const SizedBox(width: 12),
-                Expanded(child: TextField(controller: _mes, decoration: const InputDecoration(labelText: 'Mes del valor (AAAA-MM)'))),
+                Expanded(child: TextField(controller: _mes, decoration: InputDecoration(labelText: tr('Mes del valor (AAAA-MM)')))),
               ]),
               const SizedBox(height: 12),
-              TextField(controller: _modulos, decoration: const InputDecoration(labelText: 'Módulos (si se cobra por módulo, en vez del valor)')),
+              TextField(controller: _modulos, decoration: InputDecoration(labelText: tr('Módulos (si se cobra por módulo, en vez del valor)'))),
               const SizedBox(height: 12),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Se actualiza por inflación (IPC)'),
+                title: const Tx('Se actualiza por inflación (IPC)'),
                 value: _indexa,
                 onChanged: (v) => setState(() => _indexa = v),
               ),
-              TextField(controller: _alcance, maxLines: 4, decoration: const InputDecoration(labelText: 'Alcance (sale en el PDF, hoja aparte)')),
-              if (_error != null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600))),
+              TextField(controller: _alcance, maxLines: 4, decoration: InputDecoration(labelText: tr('Alcance (sale en el PDF, hoja aparte)'))),
+              if (_error != null) Padding(padding: const EdgeInsets.only(top: 10), child: Tx(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600))),
             ],
           ),
         ),
       ),
       actions: [
-        TextButton(onPressed: _guardando ? null : () => Navigator.pop(context, false), child: Text('Cancelar', style: TextStyle(color: sonTextoSuave))),
-        ElevatedButton(onPressed: _guardando ? null : _guardar, child: Text(widget.tarifa == null ? 'Crear' : 'Guardar')),
+        TextButton(onPressed: _guardando ? null : () => Navigator.pop(context, false), child: Tx('Cancelar', style: TextStyle(color: sonTextoSuave))),
+        ElevatedButton(onPressed: _guardando ? null : _guardar, child: Tx(widget.tarifa == null ? 'Crear' : 'Guardar')),
       ],
     );
   }
@@ -410,7 +411,7 @@ class _PestanaCostosState extends State<_PestanaCostos> {
   Future<void> _abrir([Map<String, dynamic>? costo]) async {
     final guardado = await showDialog<bool>(context: context, builder: (_) => _DialogoCosto(costo: costo));
     if (guardado == true && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(costo == null ? 'Costo creado' : 'Costo actualizado')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx(costo == null ? 'Costo creado' : 'Costo actualizado')));
       _cargar();
     }
   }
@@ -419,11 +420,11 @@ class _PestanaCostosState extends State<_PestanaCostos> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Borrar costo'),
-        content: Text('¿Borrar "${costo['concepto']}"?'),
+        title: const Tx('Borrar costo'),
+        content: Tx('¿Borrar "${costo['concepto']}"?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-          ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Borrar')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Tx('Cancelar')),
+          ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Tx('Borrar')),
         ],
       ),
     );
@@ -432,13 +433,13 @@ class _PestanaCostosState extends State<_PestanaCostos> {
       final respuesta = await apiSend('DELETE', '/api/costos/${costo['id']}');
       if (!mounted) return;
       if (respuesta.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Costo borrado')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx('Costo borrado')));
         _cargar();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensajeError(respuesta, 'No se pudo borrar'))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx(mensajeError(respuesta, 'No se pudo borrar'))));
       }
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(mensajeSinConexion)));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx(mensajeSinConexion)));
     }
   }
 
@@ -446,7 +447,7 @@ class _PestanaCostosState extends State<_PestanaCostos> {
   Widget build(BuildContext context) {
     if (_cargando) return const Center(child: CircularProgressIndicator());
     if (_error != null) {
-      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text(_error!, style: TextStyle(color: sonRojo)), const SizedBox(height: 12), OutlinedButton.icon(onPressed: _cargar, icon: const Icon(Icons.refresh), label: const Text('Reintentar'))]));
+      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Tx(_error!, style: TextStyle(color: sonRojo)), const SizedBox(height: 12), OutlinedButton.icon(onPressed: _cargar, icon: const Icon(Icons.refresh), label: const Tx('Reintentar'))]));
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -458,14 +459,14 @@ class _PestanaCostosState extends State<_PestanaCostos> {
               key: const Key('nuevo_costo'),
               onPressed: () => _abrir(),
               icon: const Icon(Icons.add),
-              label: const Text('Nuevo costo'),
+              label: const Tx('Nuevo costo'),
             ),
           ],
         ),
         const SizedBox(height: 16),
         Expanded(
           child: _costos.isEmpty
-              ? Center(child: Text('Todavía no hay costos. Cargá la hora del técnico, viáticos, hotel...', style: TextStyle(color: sonTextoSuave)))
+              ? Center(child: Tx('Todavía no hay costos. Cargá la hora del técnico, viáticos, hotel...', style: TextStyle(color: sonTextoSuave)))
               : ListView.separated(
                   itemCount: _costos.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 8),
@@ -481,11 +482,11 @@ class _PestanaCostosState extends State<_PestanaCostos> {
                         decoration: decoracionTarjeta(),
                         child: Row(
                           children: [
-                            Expanded(child: Text('${c['concepto']}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600, fontSize: 15))),
-                            Text('${c['unidad'] ?? ''}', style: TextStyle(color: sonTextoSuave)),
+                            Expanded(child: Tx('${c['concepto']}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600, fontSize: 15))),
+                            Tx('${c['unidad'] ?? ''}', style: TextStyle(color: sonTextoSuave)),
                             const SizedBox(width: 16),
-                            Text(sinValor ? 'Sin valor' : pesos(c['valorActual'] as num?), style: TextStyle(color: sinValor ? sonAmbar : sonTexto, fontWeight: FontWeight.bold, fontSize: 16)),
-                            IconButton(tooltip: 'Borrar', onPressed: () => _borrar(c), icon: Icon(Icons.delete_outline, color: sonTextoSuave)),
+                            Tx(sinValor ? 'Sin valor' : pesos(c['valorActual'] as num?), style: TextStyle(color: sinValor ? sonAmbar : sonTexto, fontWeight: FontWeight.bold, fontSize: 16)),
+                            IconButton(tooltip: tr('Borrar'), onPressed: () => _borrar(c), icon: Icon(Icons.delete_outline, color: sonTextoSuave)),
                           ],
                         ),
                       ),
@@ -549,27 +550,27 @@ class _DialogoCostoState extends State<_DialogoCosto> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.costo == null ? 'Nuevo costo' : 'Editar costo'),
+      title: Tx(widget.costo == null ? 'Nuevo costo' : 'Editar costo'),
       content: SizedBox(
         width: 420,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: _concepto, decoration: const InputDecoration(labelText: 'Nombre (Hora Técnico, Viáticos...)')),
+            TextField(controller: _concepto, decoration: InputDecoration(labelText: tr('Nombre (Hora Técnico, Viáticos...)'))),
             const SizedBox(height: 12),
-            TextField(controller: _unidad, decoration: const InputDecoration(labelText: 'Unidad (hora, km, noche...)')),
+            TextField(controller: _unidad, decoration: InputDecoration(labelText: tr('Unidad (hora, km, noche...)'))),
             const SizedBox(height: 12),
-            TextField(controller: _valor, decoration: const InputDecoration(labelText: 'Valor (pesos). Dejalo vacío si todavía no lo tienen.')),
+            TextField(controller: _valor, decoration: InputDecoration(labelText: tr('Valor (pesos). Dejalo vacío si todavía no lo tienen.'))),
             const SizedBox(height: 12),
-            TextField(controller: _mes, decoration: const InputDecoration(labelText: 'Mes del valor (AAAA-MM)')),
-            SwitchListTile(contentPadding: EdgeInsets.zero, title: const Text('Se actualiza por inflación'), value: _indexa, onChanged: (v) => setState(() => _indexa = v)),
-            if (_error != null) Text(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600)),
+            TextField(controller: _mes, decoration: InputDecoration(labelText: tr('Mes del valor (AAAA-MM)'))),
+            SwitchListTile(contentPadding: EdgeInsets.zero, title: const Tx('Se actualiza por inflación'), value: _indexa, onChanged: (v) => setState(() => _indexa = v)),
+            if (_error != null) Tx(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600)),
           ],
         ),
       ),
       actions: [
-        TextButton(onPressed: _guardando ? null : () => Navigator.pop(context, false), child: Text('Cancelar', style: TextStyle(color: sonTextoSuave))),
-        ElevatedButton(onPressed: _guardando ? null : _guardar, child: const Text('Guardar')),
+        TextButton(onPressed: _guardando ? null : () => Navigator.pop(context, false), child: Tx('Cancelar', style: TextStyle(color: sonTextoSuave))),
+        ElevatedButton(onPressed: _guardando ? null : _guardar, child: const Tx('Guardar')),
       ],
     );
   }
@@ -625,13 +626,13 @@ class _PestanaInflacionState extends State<_PestanaInflacion> {
       if (!mounted) return;
       if (respuesta.statusCode == 200) {
         final datos = json.decode(respuesta.body) as Map;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('INDEC: ${datos['nuevos']} meses nuevos, ${datos['actualizados']} actualizados. Último: ${datos['ultimoMes'] ?? '—'}.')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx('INDEC: ${datos['nuevos']} meses nuevos, ${datos['actualizados']} actualizados. Último: ${datos['ultimoMes'] ?? '—'}.')));
         await _cargar();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensajeError(respuesta, 'No se pudo consultar al INDEC'))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx(mensajeError(respuesta, 'No se pudo consultar al INDEC'))));
       }
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(mensajeSinConexion)));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx(mensajeSinConexion)));
     } finally {
       if (mounted) setState(() => _buscando = false);
     }
@@ -643,21 +644,21 @@ class _PestanaInflacionState extends State<_PestanaInflacion> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Cargar un mes a mano'),
+        title: const Tx('Cargar un mes a mano'),
         content: SizedBox(
           width: 360,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: mes, decoration: const InputDecoration(labelText: 'Mes (AAAA-MM)', hintText: '2026-08')),
+              TextField(controller: mes, decoration: InputDecoration(labelText: tr('Mes (AAAA-MM)'), hintText: tr('2026-08'))),
               const SizedBox(height: 12),
-              TextField(controller: porcentaje, decoration: const InputDecoration(labelText: 'Inflación de ese mes (%)', hintText: '1,7')),
+              TextField(controller: porcentaje, decoration: InputDecoration(labelText: tr('Inflación de ese mes (%)'), hintText: tr('1,7'))),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
-          ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Guardar')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Tx('Cancelar')),
+          ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: const Tx('Guardar')),
         ],
       ),
     );
@@ -666,13 +667,13 @@ class _PestanaInflacionState extends State<_PestanaInflacion> {
       final respuesta = await apiSend('PUT', '/api/ipc/${mes.text.trim()}', json.encode({'porcentaje': porcentaje.text}));
       if (!mounted) return;
       if (respuesta.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mes guardado (no lo pisa la búsqueda del INDEC)')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx('Mes guardado (no lo pisa la búsqueda del INDEC)')));
         _cargar();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensajeError(respuesta, 'No se pudo guardar'))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx(mensajeError(respuesta, 'No se pudo guardar'))));
       }
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(mensajeSinConexion)));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx(mensajeSinConexion)));
     }
   }
 
@@ -683,10 +684,10 @@ class _PestanaInflacionState extends State<_PestanaInflacion> {
       if (respuesta.statusCode == 200) {
         _cargar();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensajeError(respuesta, 'No se pudo borrar'))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx(mensajeError(respuesta, 'No se pudo borrar'))));
       }
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(mensajeSinConexion)));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx(mensajeSinConexion)));
     }
   }
 
@@ -694,7 +695,7 @@ class _PestanaInflacionState extends State<_PestanaInflacion> {
   Widget build(BuildContext context) {
     if (_cargando) return const Center(child: CircularProgressIndicator());
     if (_error != null) {
-      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text(_error!, style: TextStyle(color: sonRojo)), const SizedBox(height: 12), OutlinedButton.icon(onPressed: _cargar, icon: const Icon(Icons.refresh), label: const Text('Reintentar'))]));
+      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Tx(_error!, style: TextStyle(color: sonRojo)), const SizedBox(height: 12), OutlinedButton.icon(onPressed: _cargar, icon: const Icon(Icons.refresh), label: const Tx('Reintentar'))]));
     }
     final aviso = _busqueda != null && _busqueda!['ok'] == false ? '${_busqueda!['error'] ?? ''}' : '';
     return Column(
@@ -702,21 +703,21 @@ class _PestanaInflacionState extends State<_PestanaInflacion> {
       children: [
         Row(
           children: [
-            Expanded(child: Text(aviso.isEmpty ? 'Se busca sola en el INDEC. Lo que cargues a mano no se pisa.' : 'Última búsqueda falló: $aviso', style: TextStyle(color: aviso.isEmpty ? sonTextoSuave : sonAmbar))),
-            OutlinedButton.icon(onPressed: _buscando ? null : _cargarAMano, icon: const Icon(Icons.edit_outlined), label: const Text('Cargar a mano')),
+            Expanded(child: Tx(aviso.isEmpty ? 'Se busca sola en el INDEC. Lo que cargues a mano no se pisa.' : 'Última búsqueda falló: $aviso', style: TextStyle(color: aviso.isEmpty ? sonTextoSuave : sonAmbar))),
+            OutlinedButton.icon(onPressed: _buscando ? null : _cargarAMano, icon: const Icon(Icons.edit_outlined), label: const Tx('Cargar a mano')),
             const SizedBox(width: 8),
             ElevatedButton.icon(
               key: const Key('buscar_indec'),
               onPressed: _buscando ? null : _sincronizar,
               icon: _buscando ? const SizedBox(width: 16, height: 16, child: const CircularProgressIndicator(strokeWidth: 2)) : Icon(Icons.cloud_download_outlined, color: sonDarkGreen),
-              label: const Text('Buscar en INDEC'),
+              label: const Tx('Buscar en INDEC'),
             ),
           ],
         ),
         const SizedBox(height: 16),
         Expanded(
           child: _meses.isEmpty
-              ? Center(child: Text('Todavía no hay meses cargados. Tocá "Buscar en INDEC".', style: TextStyle(color: sonTextoSuave)))
+              ? Center(child: Tx('Todavía no hay meses cargados. Tocá "Buscar en INDEC".', style: TextStyle(color: sonTextoSuave)))
               : ListView.separated(
                   itemCount: _meses.length,
                   separatorBuilder: (_, _) => const Divider(height: 1),
@@ -725,14 +726,14 @@ class _PestanaInflacionState extends State<_PestanaInflacion> {
                     final manual = m['fuente'] == 'Manual';
                     return ListTile(
                       dense: true,
-                      title: Text('${m['mes']}', style: const TextStyle(fontWeight: FontWeight.w600)),
+                      title: Tx('${m['mes']}', style: const TextStyle(fontWeight: FontWeight.w600)),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text('${m['porcentaje']} %', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          Tx('${m['porcentaje']} %', style: const TextStyle(fontWeight: FontWeight.bold)),
                           const SizedBox(width: 12),
                           EtiquetaEstado(texto: manual ? 'Manual' : 'INDEC', color: manual ? sonAmbar : sonAzul),
-                          IconButton(tooltip: 'Borrar', onPressed: () => _borrar('${m['mes']}'), icon: Icon(Icons.delete_outline, size: 18, color: sonTextoSuave)),
+                          IconButton(tooltip: tr('Borrar'), onPressed: () => _borrar('${m['mes']}'), icon: Icon(Icons.delete_outline, size: 18, color: sonTextoSuave)),
                         ],
                       ),
                     );
@@ -854,7 +855,7 @@ class _PestanaParametrosState extends State<_PestanaParametros> {
       if (!mounted) return;
       if (respuesta.statusCode == 200) {
         setState(() => _guardando = false);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Parámetros guardados')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx('Parámetros guardados')));
       } else {
         setState(() { _error = mensajeError(respuesta, 'No se pudo guardar'); _guardando = false; });
       }
@@ -865,7 +866,7 @@ class _PestanaParametrosState extends State<_PestanaParametros> {
 
   Widget _campo(String etiqueta, TextEditingController c, {int lineas = 1}) => Padding(
         padding: const EdgeInsets.only(bottom: 12),
-        child: TextField(controller: c, maxLines: lineas, decoration: InputDecoration(labelText: etiqueta)),
+        child: TextField(controller: c, maxLines: lineas, decoration: InputDecoration(labelText: trn(etiqueta))),
       );
 
   @override
@@ -876,7 +877,7 @@ class _PestanaParametrosState extends State<_PestanaParametros> {
         Expanded(
           child: ListView(
             children: [
-              Text('Márgenes y números', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, letterSpacing: 1)),
+              Tx('Márgenes y números', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, letterSpacing: 1)),
               const SizedBox(height: 10),
               Row(children: [
                 Expanded(child: _campo('Margen mínimo (%)', _margenMin)),
@@ -891,7 +892,7 @@ class _PestanaParametrosState extends State<_PestanaParametros> {
                 Expanded(child: _campo('Próximo número de presupuesto', _proximo)),
               ]),
               const SizedBox(height: 8),
-              Text('Datos de la empresa en el presupuesto', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, letterSpacing: 1)),
+              Tx('Datos de la empresa en el presupuesto', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, letterSpacing: 1)),
               const SizedBox(height: 10),
               _campo('Título', _titulo),
               Row(children: [Expanded(child: _campo('Razón social', _razon)), const SizedBox(width: 12), Expanded(child: _campo('CUIT', _cuit))]),
@@ -899,16 +900,16 @@ class _PestanaParametrosState extends State<_PestanaParametros> {
               Row(children: [Expanded(child: _campo('Teléfonos', _telefonos)), const SizedBox(width: 12), Expanded(child: _campo('Celular', _celular))]),
               Row(children: [Expanded(child: _campo('IVA', _ivaCond)), const SizedBox(width: 12), Expanded(child: _campo('Correo', _email))]),
               _campo('Página web', _web),
-              Text('Firma', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, letterSpacing: 1)),
+              Tx('Firma', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, letterSpacing: 1)),
               const SizedBox(height: 10),
               Row(children: [Expanded(child: _campo('Nombre', _firmaNombre)), const SizedBox(width: 12), Expanded(child: _campo('Cargo', _firmaCargo)), const SizedBox(width: 12), Expanded(child: _campo('Empresa', _firmaEmpresa))]),
-              Text('Textos por defecto del presupuesto', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, letterSpacing: 1)),
+              Tx('Textos por defecto del presupuesto', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, letterSpacing: 1)),
               const SizedBox(height: 10),
               _campo('Forma de pago', _formaPago),
               _campo('Plazo de entrega', _plazo),
               _campo('Validez de la oferta', _validez, lineas: 2),
               _campo('Código del formulario', _codigo),
-              if (_error != null) Text(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600)),
+              if (_error != null) Tx(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600)),
             ],
           ),
         ),
@@ -917,7 +918,7 @@ class _PestanaParametrosState extends State<_PestanaParametros> {
           child: ElevatedButton(
             key: const Key('guardar_parametros'),
             onPressed: _guardando ? null : _guardar,
-            child: const Text('Guardar parámetros'),
+            child: const Tx('Guardar parámetros'),
           ),
         ),
       ],

@@ -9,6 +9,7 @@ import 'package:son_admin/services/api.dart';
 import 'package:son_admin/services/sesion.dart';
 import 'package:son_admin/theme/tema.dart';
 
+import 'package:son_admin/i18n/idioma.dart';
 /// Pantalla para armar o editar un presupuesto (borrador).
 class PantallaArmarPresupuesto extends StatefulWidget {
   final int? presupuestoId;
@@ -323,7 +324,7 @@ class _PantallaArmarPresupuestoState extends State<PantallaArmarPresupuesto> {
         _editable = false;
       }
       setState(() => _guardando = false);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(enviar ? 'Presupuesto ${_etiqueta ?? ''} enviado' : 'Borrador guardado')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx(enviar ? 'Presupuesto ${_etiqueta ?? ''} enviado' : 'Borrador guardado')));
       return true;
     } catch (_) {
       if (mounted) setState(() { _error = mensajeSinConexion; _guardando = false; });
@@ -339,11 +340,11 @@ class _PantallaArmarPresupuestoState extends State<PantallaArmarPresupuesto> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Borrar borrador'),
-        content: const Text('¿Borrar este borrador? No se puede deshacer.'),
+        title: const Tx('Borrar borrador'),
+        content: const Tx('¿Borrar este borrador? No se puede deshacer.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-          ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Borrar')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Tx('Cancelar')),
+          ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Tx('Borrar')),
         ],
       ),
     );
@@ -375,34 +376,34 @@ class _PantallaArmarPresupuestoState extends State<PantallaArmarPresupuesto> {
         children: [
           Row(
             children: [
-              CircleAvatar(radius: 12, backgroundColor: sonTarjetaAlta, child: Text('${i + 1}', style: TextStyle(fontSize: 12, color: sonLightGreen))),
+              CircleAvatar(radius: 12, backgroundColor: sonTarjetaAlta, child: Tx('${i + 1}', style: TextStyle(fontSize: 12, color: sonLightGreen))),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(
+                child: Tx(
                   linea.tarifaNombre ?? (linea.tarifaId == null ? 'Ítem suelto' : 'Del tarifario'),
                   style: TextStyle(color: sonTextoSuave, fontSize: 12.5),
                 ),
               ),
               if (_editable) ...[
-                TextButton(onPressed: () => _elegirTarifa(linea), child: const Text('Del tarifario')),
-                IconButton(tooltip: 'Sacar ítem', onPressed: _lineas.length == 1 ? null : () => _sacarLinea(i), icon: Icon(Icons.close, size: 18, color: sonTextoSuave)),
+                TextButton(onPressed: () => _elegirTarifa(linea), child: const Tx('Del tarifario')),
+                IconButton(tooltip: tr('Sacar ítem'), onPressed: _lineas.length == 1 ? null : () => _sacarLinea(i), icon: Icon(Icons.close, size: 18, color: sonTextoSuave)),
               ],
             ],
           ),
           const SizedBox(height: 8),
-          TextField(controller: linea.descripcion, enabled: _editable, maxLines: 2, decoration: const InputDecoration(labelText: 'Descripción')),
+          TextField(controller: linea.descripcion, enabled: _editable, maxLines: 2, decoration: InputDecoration(labelText: tr('Descripción'))),
           const SizedBox(height: 8),
           Row(
             children: [
-              SizedBox(width: 90, child: TextField(controller: linea.cantidad, enabled: _editable, decoration: const InputDecoration(labelText: 'Cant.'))),
+              SizedBox(width: 90, child: TextField(controller: linea.cantidad, enabled: _editable, decoration: InputDecoration(labelText: tr('Cant.')))),
               const SizedBox(width: 10),
               Expanded(
                 child: TextField(
                   controller: linea.precio,
                   enabled: _editable,
                   decoration: InputDecoration(
-                    labelText: 'Precio a mano (opcional)',
-                    hintText: precioTarifa == null ? null : 'Tarifa: ${pesos(precioTarifa as num)}',
+                    labelText: tr('Precio a mano (opcional)'),
+                    hintText: precioTarifa == null ? null : tr('Tarifa: ${pesos(precioTarifa as num)}'),
                   ),
                 ),
               ),
@@ -412,10 +413,10 @@ class _PantallaArmarPresupuestoState extends State<PantallaArmarPresupuesto> {
                 child: DropdownButtonFormField<String>(
                   initialValue: linea.periodicidad,
                   isExpanded: true,
-                  decoration: const InputDecoration(labelText: 'Cómo se cobra'),
+                  decoration: InputDecoration(labelText: tr('Cómo se cobra')),
                   items: const [
-                    DropdownMenuItem(value: 'mensual', child: Text('Por mes')),
-                    DropdownMenuItem(value: 'unico', child: Text('Pago único')),
+                    DropdownMenuItem(value: 'mensual', child: Tx('Por mes')),
+                    DropdownMenuItem(value: 'unico', child: Tx('Pago único')),
                   ],
                   onChanged: !_editable ? null : (v) {
                     setState(() => linea.periodicidad = v ?? 'mensual');
@@ -427,13 +428,13 @@ class _PantallaArmarPresupuestoState extends State<PantallaArmarPresupuesto> {
           ),
           if (linea.periodicidad == 'unico') ...[
             const SizedBox(height: 8),
-            SizedBox(width: 220, child: TextField(controller: linea.cuotas, enabled: _editable, decoration: const InputDecoration(labelText: 'Prorratear en N meses (vacío = no)'))),
+            SizedBox(width: 220, child: TextField(controller: linea.cuotas, enabled: _editable, decoration: InputDecoration(labelText: tr('Prorratear en N meses (vacío = no)')))),
           ],
           const SizedBox(height: 4),
           Row(
             children: [
               FilterChip(
-                label: const Text('Aplica bonificación'),
+                label: const Tx('Aplica bonificación'),
                 selected: linea.bonificable,
                 onSelected: !_editable ? null : (v) {
                   setState(() => linea.bonificable = v);
@@ -446,10 +447,10 @@ class _PantallaArmarPresupuestoState extends State<PantallaArmarPresupuesto> {
                 child: DropdownButtonFormField<int?>(
                   initialValue: linea.costoId,
                   isExpanded: true,
-                  decoration: const InputDecoration(labelText: 'Costo interno', isDense: true),
+                  decoration: InputDecoration(labelText: tr('Costo interno'), isDense: true),
                   items: [
-                    const DropdownMenuItem<int?>(value: null, child: Text('Sin costo')),
-                    for (final c in _costos) DropdownMenuItem<int?>(value: (c['id'] as num).toInt(), child: Text('${c['concepto']}', overflow: TextOverflow.ellipsis)),
+                    const DropdownMenuItem<int?>(value: null, child: Tx('Sin costo')),
+                    for (final c in _costos) DropdownMenuItem<int?>(value: (c['id'] as num).toInt(), child: Tx('${c['concepto']}', overflow: TextOverflow.ellipsis)),
                   ],
                   onChanged: !_editable ? null : (v) {
                     setState(() => linea.costoId = v);
@@ -458,10 +459,10 @@ class _PantallaArmarPresupuestoState extends State<PantallaArmarPresupuesto> {
                 ),
               ),
               const SizedBox(width: 10),
-              SizedBox(width: 110, child: TextField(controller: linea.horas, enabled: _editable, decoration: const InputDecoration(labelText: 'Cant. costo'))),
+              SizedBox(width: 110, child: TextField(controller: linea.horas, enabled: _editable, decoration: InputDecoration(labelText: tr('Cant. costo')))),
               const Spacer(),
               if (lineaCalc != null)
-                Text(pesos(lineaCalc['neto'] as num?), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Tx(pesos(lineaCalc['neto'] as num?), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             ],
           ),
         ],
@@ -479,7 +480,7 @@ class _PantallaArmarPresupuestoState extends State<PantallaArmarPresupuesto> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Cuentas', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const Tx('Cuentas', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 14),
           _filaResumen('Mensual', pesos(c?['totalMensual'] as num?)),
           _filaResumen('Pago único', pesos(c?['totalUnico'] as num?)),
@@ -489,13 +490,13 @@ class _PantallaArmarPresupuestoState extends State<PantallaArmarPresupuesto> {
           _filaResumen('IVA pago único', pesos(c?['ivaUnico'] as num?)),
           const SizedBox(height: 8),
           EtiquetaEstado(texto: textoDeMargen('${c?['nivelMargen']}'), color: colorDeMargen('${c?['nivelMargen']}')),
-          if (c?['margen'] != null) Padding(padding: const EdgeInsets.only(top: 6), child: Text('Margen ${c!['margen']} %', style: TextStyle(color: sonTextoSuave, fontSize: 13))),
+          if (c?['margen'] != null) Padding(padding: const EdgeInsets.only(top: 6), child: Tx('Margen ${c!['margen']} %', style: TextStyle(color: sonTextoSuave, fontSize: 13))),
           if (avisos.isNotEmpty) ...[
             const SizedBox(height: 16),
             for (final aviso in avisos)
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
-                child: Text('${aviso['mensaje']}', style: TextStyle(color: sonAmbar, fontSize: 12.5, height: 1.3)),
+                child: Tx('${aviso['mensaje']}', style: TextStyle(color: sonAmbar, fontSize: 12.5, height: 1.3)),
               ),
           ],
         ],
@@ -505,7 +506,7 @@ class _PantallaArmarPresupuestoState extends State<PantallaArmarPresupuesto> {
 
   Widget _filaResumen(String rotulo, String valor) => Padding(
         padding: const EdgeInsets.only(bottom: 8),
-        child: Row(children: [Expanded(child: Text(rotulo, style: TextStyle(color: sonTextoSuave))), Text(valor, style: const TextStyle(fontWeight: FontWeight.w600))]),
+        child: Row(children: [Expanded(child: Tx(rotulo, style: TextStyle(color: sonTextoSuave))), Tx(valor, style: const TextStyle(fontWeight: FontWeight.w600))]),
       );
 
   @override
@@ -513,23 +514,23 @@ class _PantallaArmarPresupuestoState extends State<PantallaArmarPresupuesto> {
     return Scaffold(
       backgroundColor: sonFondo,
       appBar: AppBar(
-        title: Text(_etiqueta == null ? 'Nuevo presupuesto' : 'Presupuesto $_etiqueta'),
+        title: Tx(_etiqueta == null ? 'Nuevo presupuesto' : 'Presupuesto $_etiqueta'),
         leading: IconButton(
-          tooltip: 'Volver',
+          tooltip: tr('Volver'),
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context, _id != null),
         ),
         actions: [
-          if (_id != null) TextButton.icon(onPressed: () => abrirInforme('$apiBaseUrl/api/presupuestos/$_id/pdf?token=${SesionAdmin.token}'), icon: const Icon(Icons.picture_as_pdf_outlined), label: const Text('PDF')),
-          if (_editable && _id != null) TextButton(onPressed: _guardando ? null : _borrar, child: const Text('Borrar')),
-          if (_editable) TextButton(onPressed: _guardando ? null : () async { if (await _guardar() && context.mounted) Navigator.pop(context, true); }, child: const Text('Guardar borrador')),
+          if (_id != null) TextButton.icon(onPressed: () => abrirInforme('$apiBaseUrl/api/presupuestos/$_id/pdf?token=${SesionAdmin.token}'), icon: const Icon(Icons.picture_as_pdf_outlined), label: const Tx('PDF')),
+          if (_editable && _id != null) TextButton(onPressed: _guardando ? null : _borrar, child: const Tx('Borrar')),
+          if (_editable) TextButton(onPressed: _guardando ? null : () async { if (await _guardar() && context.mounted) Navigator.pop(context, true); }, child: const Tx('Guardar borrador')),
           if (_editable)
             Padding(
               padding: const EdgeInsets.only(right: 12),
               child: ElevatedButton(
                 key: const Key('enviar_presupuesto'),
                 onPressed: _guardando ? null : () async { if (await _guardar(enviar: true) && context.mounted) Navigator.pop(context, true); },
-                child: const Text('Guardar y enviar'),
+                child: const Tx('Guardar y enviar'),
               ),
             ),
         ],
@@ -544,7 +545,7 @@ class _PantallaArmarPresupuestoState extends State<PantallaArmarPresupuesto> {
                   Expanded(
                     child: ListView(
                       children: [
-                        if (_error != null) Padding(padding: const EdgeInsets.only(bottom: 12), child: Text(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600))),
+                        if (_error != null) Padding(padding: const EdgeInsets.only(bottom: 12), child: Tx(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600))),
                         if (!_editable) Padding(padding: const EdgeInsets.only(bottom: 12), child: EtiquetaEstado(texto: 'Estado: $_estado. Para cambiarlo, creá una versión actualizada ("act") desde la lista.', color: sonAzul)),
                         Wrap(
                           spacing: 12,
@@ -572,7 +573,7 @@ class _PantallaArmarPresupuestoState extends State<PantallaArmarPresupuesto> {
                                   controller: controlador,
                                   focusNode: foco,
                                   enabled: _editable,
-                                  decoration: const InputDecoration(labelText: 'Cliente *', hintText: 'Elegí de la lista o escribí el nombre'),
+                                  decoration: InputDecoration(labelText: tr('Cliente *'), hintText: tr('Elegí de la lista o escribí el nombre')),
                                 ),
                                 optionsViewBuilder: (context, alElegir, opciones) => Align(
                                   alignment: Alignment.topLeft,
@@ -582,33 +583,33 @@ class _PantallaArmarPresupuestoState extends State<PantallaArmarPresupuesto> {
                                     child: ConstrainedBox(
                                       constraints: const BoxConstraints(maxHeight: 240, maxWidth: 360),
                                       child: ListView(padding: EdgeInsets.zero, shrinkWrap: true, children: [
-                                        for (final c in opciones) ListTile(dense: true, title: Text('${c['razon_social']}'), onTap: () => alElegir(c)),
+                                        for (final c in opciones) ListTile(dense: true, title: Tx('${c['razon_social']}'), onTap: () => alElegir(c)),
                                       ]),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                            SizedBox(width: 220, child: TextField(controller: _atencion, enabled: _editable, decoration: const InputDecoration(labelText: 'Atención'))),
-                            SizedBox(width: 140, child: TextField(controller: _bonificacion, enabled: _editable, decoration: const InputDecoration(labelText: 'Bonificación %'))),
+                            SizedBox(width: 220, child: TextField(controller: _atencion, enabled: _editable, decoration: InputDecoration(labelText: tr('Atención')))),
+                            SizedBox(width: 140, child: TextField(controller: _bonificacion, enabled: _editable, decoration: InputDecoration(labelText: tr('Bonificación %')))),
                           ],
                         ),
                         const SizedBox(height: 18),
                         for (var i = 0; i < _lineas.length; i++) _lineaWidget(_lineas[i], i),
                         if (_editable)
-                          OutlinedButton.icon(key: const Key('agregar_item'), onPressed: _agregarLinea, icon: const Icon(Icons.add), label: const Text('Agregar ítem')),
+                          OutlinedButton.icon(key: const Key('agregar_item'), onPressed: _agregarLinea, icon: const Icon(Icons.add), label: const Tx('Agregar ítem')),
                         const SizedBox(height: 16),
-                        TextField(controller: _observaciones, enabled: _editable, maxLines: 3, decoration: const InputDecoration(labelText: 'Observaciones')),
+                        TextField(controller: _observaciones, enabled: _editable, maxLines: 3, decoration: InputDecoration(labelText: tr('Observaciones'))),
                         const SizedBox(height: 10),
-                        TextField(controller: _referencia, enabled: _editable, decoration: const InputDecoration(labelText: 'Valor de referencia (cómo se actualiza el precio)')),
+                        TextField(controller: _referencia, enabled: _editable, decoration: InputDecoration(labelText: tr('Valor de referencia (cómo se actualiza el precio)'))),
                         const SizedBox(height: 10),
                         Row(children: [
-                          Expanded(child: TextField(controller: _formaPago, enabled: _editable, decoration: const InputDecoration(labelText: 'Forma de pago'))),
+                          Expanded(child: TextField(controller: _formaPago, enabled: _editable, decoration: InputDecoration(labelText: tr('Forma de pago')))),
                           const SizedBox(width: 10),
-                          Expanded(child: TextField(controller: _plazo, enabled: _editable, decoration: const InputDecoration(labelText: 'Plazo de entrega'))),
+                          Expanded(child: TextField(controller: _plazo, enabled: _editable, decoration: InputDecoration(labelText: tr('Plazo de entrega')))),
                         ]),
                         const SizedBox(height: 10),
-                        TextField(controller: _validez, enabled: _editable, maxLines: 2, decoration: const InputDecoration(labelText: 'Validez de la oferta')),
+                        TextField(controller: _validez, enabled: _editable, maxLines: 2, decoration: InputDecoration(labelText: tr('Validez de la oferta'))),
                       ],
                     ),
                   ),
@@ -653,13 +654,13 @@ class _DialogoElegirTarifaState extends State<_DialogoElegirTarifa> {
       return coincideBusqueda(texto, _busqueda.text);
     }).toList();
     return AlertDialog(
-      title: const Text('Elegir del tarifario'),
+      title: const Tx('Elegir del tarifario'),
       content: SizedBox(
         width: 560,
         height: 460,
         child: Column(
           children: [
-            TextField(controller: _busqueda, onChanged: (_) => setState(() {}), decoration: const InputDecoration(prefixIcon: Icon(Icons.search), hintText: 'Buscar...')),
+            TextField(controller: _busqueda, onChanged: (_) => setState(() {}), decoration: InputDecoration(prefixIcon: Icon(Icons.search), hintText: tr('Buscar...'))),
             const SizedBox(height: 12),
             Expanded(
               child: ListView.builder(
@@ -668,9 +669,9 @@ class _DialogoElegirTarifaState extends State<_DialogoElegirTarifa> {
                   final t = visibles[i];
                   final sinValor = t['valorActual'] == null;
                   return ListTile(
-                    title: Text('${t['servicio']}'),
-                    subtitle: Text([t['familia'], t['tramo']].where((x) => '$x'.trim().isNotEmpty).join(' · ')),
-                    trailing: Text(sinValor ? 'Sin valor' : pesos(t['valorActual'] as num?), style: TextStyle(color: sinValor ? sonAmbar : sonTexto, fontWeight: FontWeight.bold)),
+                    title: Tx('${t['servicio']}'),
+                    subtitle: Tx([t['familia'], t['tramo']].where((x) => '$x'.trim().isNotEmpty).join(' · ')),
+                    trailing: Tx(sinValor ? 'Sin valor' : pesos(t['valorActual'] as num?), style: TextStyle(color: sinValor ? sonAmbar : sonTexto, fontWeight: FontWeight.bold)),
                     onTap: () => Navigator.pop(context, t),
                   );
                 },
@@ -679,7 +680,7 @@ class _DialogoElegirTarifaState extends State<_DialogoElegirTarifa> {
           ],
         ),
       ),
-      actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar'))],
+      actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Tx('Cancelar'))],
     );
   }
 }

@@ -9,6 +9,7 @@ import 'package:son_admin/services/api.dart';
 import 'package:son_admin/theme/tema.dart';
 import 'package:son_admin/ui/componentes.dart';
 
+import 'package:son_admin/i18n/idioma.dart';
 // 'Enviada' y 'Aprobada' son para lo que se presupuesta por fuera (WhatsApp, mail): el técnico ve en la app en qué quedó.
 const List<String> estadosSolicitud = ['Nueva', 'En presupuesto', 'Presupuestada', 'Enviada', 'Aprobada', 'Descartada'];
 
@@ -139,7 +140,7 @@ class _PantallaPorPresupuestarState extends State<PantallaPorPresupuestar> {
     }
     if (!mounted) return;
     setState(() => _ocupadas.remove(id));
-    if (mensaje != null) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensaje)));
+    if (mensaje != null) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx(mensaje)));
   }
 
   Future<void> _editar(Map<String, dynamic> nota) async {
@@ -175,12 +176,12 @@ class _PantallaPorPresupuestarState extends State<PantallaPorPresupuestar> {
             key: const Key('buscar_solicitud'),
             controller: _busqueda,
             decoration: InputDecoration(
-              hintText: 'Buscar empresa, técnico o texto',
+              hintText: tr('Buscar empresa, técnico o texto'),
               prefixIcon: const Icon(Icons.search, size: 20),
               isDense: true,
               suffixIcon: _busqueda.text.isEmpty
                   ? null
-                  : IconButton(tooltip: 'Borrar búsqueda', icon: const Icon(Icons.close, size: 18), onPressed: _busqueda.clear),
+                  : IconButton(tooltip: tr('Borrar búsqueda'), icon: const Icon(Icons.close, size: 18), onPressed: _busqueda.clear),
             ),
           ),
         ),
@@ -195,16 +196,16 @@ class _PantallaPorPresupuestarState extends State<PantallaPorPresupuestar> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(_error!, style: TextStyle(color: sonRojo)),
+            Tx(_error!, style: TextStyle(color: sonRojo)),
             const SizedBox(height: 12),
-            OutlinedButton.icon(onPressed: _cargar, icon: const Icon(Icons.refresh), label: const Text('Reintentar')),
+            OutlinedButton.icon(onPressed: _cargar, icon: const Icon(Icons.refresh), label: const Tx('Reintentar')),
           ],
         ),
       );
     }
     if (_notas.isEmpty) {
       return Center(
-        child: Text(
+        child: Tx(
           'Todavía no hay notas. Cuando un técnico anote algo que falta en una visita, aparece acá.',
           textAlign: TextAlign.center,
           style: TextStyle(color: sonTextoSuave),
@@ -213,7 +214,7 @@ class _PantallaPorPresupuestarState extends State<PantallaPorPresupuestar> {
     }
     final visibles = _visibles;
     if (visibles.isEmpty) {
-      return Center(child: Text('No hay notas con este filtro.', style: TextStyle(color: sonTextoSuave)));
+      return Center(child: Tx('No hay notas con este filtro.', style: TextStyle(color: sonTextoSuave)));
     }
 
     // Se agrupan por empresa; la primera es la que tiene la nota más reciente.
@@ -243,8 +244,8 @@ class _PantallaPorPresupuestarState extends State<PantallaPorPresupuestar> {
               children: [
                 Icon(Icons.business_outlined, color: sonLightGreen, size: 22),
                 const SizedBox(width: 12),
-                Expanded(child: Text(empresa, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold, fontSize: 17))),
-                Text(notas.length == 1 ? '1 nota' : '${notas.length} notas', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
+                Expanded(child: Tx(empresa, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold, fontSize: 17))),
+                Tx(notas.length == 1 ? '1 nota' : '${notas.length} notas', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
                 if (notas.any((n) => n['estado'] == 'Nueva' || n['estado'] == 'En presupuesto')) ...[
                   const SizedBox(width: 12),
                   TextButton.icon(
@@ -258,7 +259,7 @@ class _PantallaPorPresupuestarState extends State<PantallaPorPresupuestar> {
                       }
                     },
                     icon: const Icon(Icons.receipt_long_outlined, size: 18),
-                    label: const Text('Armar presupuesto'),
+                    label: const Tx('Armar presupuesto'),
                   ),
                 ],
               ],
@@ -290,14 +291,14 @@ class _PantallaPorPresupuestarState extends State<PantallaPorPresupuestar> {
             height: 44,
             alignment: Alignment.center,
             decoration: BoxDecoration(color: sonTarjetaAlta, borderRadius: BorderRadius.circular(10)),
-            child: Text('×${nota['cantidad']}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
+            child: Tx('×${nota['cantidad']}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                Tx(
                   '${nota['descripcion']}',
                   style: TextStyle(
                     color: descartada ? sonTextoSuave : sonTexto,
@@ -347,7 +348,7 @@ class _PantallaPorPresupuestarState extends State<PantallaPorPresupuestar> {
                   else
                     _accionPrincipal(nota, estado),
                   PopupMenuButton<String>(
-                    tooltip: 'Más opciones',
+                    tooltip: tr('Más opciones'),
                     icon: Icon(Icons.more_vert, color: sonTextoSuave),
                     onSelected: (opcion) {
                       if (opcion == 'editar') {
@@ -359,10 +360,10 @@ class _PantallaPorPresupuestarState extends State<PantallaPorPresupuestar> {
                       }
                     },
                     itemBuilder: (_) => [
-                      const PopupMenuItem(value: 'editar', child: Text('Editar o agregar una nota')),
-                      if (tieneFoto) const PopupMenuItem(value: 'foto', child: Text('Ver foto')),
+                      const PopupMenuItem(value: 'editar', child: Tx('Editar o agregar una nota')),
+                      if (tieneFoto) const PopupMenuItem(value: 'foto', child: Tx('Ver foto')),
                       const PopupMenuDivider(),
-                      for (final otro in estadosSolicitud.where((e) => e != estado)) PopupMenuItem(value: otro, child: Text('Pasar a "$otro"')),
+                      for (final otro in estadosSolicitud.where((e) => e != estado)) PopupMenuItem(value: otro, child: Tx('Pasar a "$otro"')),
                     ],
                   ),
                 ],
@@ -382,7 +383,7 @@ class _PantallaPorPresupuestarState extends State<PantallaPorPresupuestar> {
         style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10)),
         onPressed: () => _cambiarEstado(nota, 'En presupuesto'),
         icon: const Icon(Icons.play_arrow_rounded, size: 18),
-        label: const Text('Tomar'),
+        label: const Tx('Tomar'),
       );
     }
     if (estado == 'En presupuesto') {
@@ -391,10 +392,10 @@ class _PantallaPorPresupuestarState extends State<PantallaPorPresupuestar> {
         style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10)),
         onPressed: () => _cambiarEstado(nota, 'Presupuestada'),
         icon: const Icon(Icons.check_rounded, size: 18),
-        label: const Text('Presupuestada'),
+        label: const Tx('Presupuestada'),
       );
     }
-    return TextButton(onPressed: () => _cambiarEstado(nota, 'Nueva'), child: const Text('Reabrir'));
+    return TextButton(onPressed: () => _cambiarEstado(nota, 'Nueva'), child: const Tx('Reabrir'));
   }
 
   @override
@@ -423,7 +424,7 @@ class _PantallaPorPresupuestarState extends State<PantallaPorPresupuestar> {
                   ],
                 ),
               ),
-              IconButton(tooltip: 'Actualizar', onPressed: () => _cargar(), icon: const Icon(Icons.refresh)),
+              IconButton(tooltip: tr('Actualizar'), onPressed: () => _cargar(), icon: const Icon(Icons.refresh)),
             ],
           ),
           const SizedBox(height: 28),
@@ -496,40 +497,40 @@ class _DialogoNotaState extends State<_DialogoNota> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('${widget.nota['empresa']}'),
+      title: Tx('${widget.nota['empresa']}'),
       content: SizedBox(
         width: 460,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: _descripcion, maxLines: 3, maxLength: 500, decoration: const InputDecoration(labelText: 'Qué hay que presupuestar')),
+              TextField(controller: _descripcion, maxLines: 3, maxLength: 500, decoration: InputDecoration(labelText: tr('Qué hay que presupuestar'))),
               const SizedBox(height: 8),
               TextField(
                 controller: _cantidad,
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: const InputDecoration(labelText: 'Cantidad'),
+                decoration: InputDecoration(labelText: tr('Cantidad')),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _comentario,
                 maxLines: 3,
                 maxLength: 1000,
-                decoration: const InputDecoration(labelText: 'Nota de comercial (opcional)', hintText: 'Ej: presupuesto enviado el 27/10'),
+                decoration: InputDecoration(labelText: tr('Nota de comercial (opcional)'), hintText: tr('Ej: presupuesto enviado el 27/10')),
               ),
               if (_error != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 12),
-                  child: Text(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600)),
+                  child: Tx(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600)),
                 ),
             ],
           ),
         ),
       ),
       actions: [
-        TextButton(onPressed: _guardando ? null : () => Navigator.pop(context), child: Text('Cancelar', style: TextStyle(color: sonTextoSuave))),
-        ElevatedButton(onPressed: _guardando ? null : _guardar, child: const Text('Guardar')),
+        TextButton(onPressed: _guardando ? null : () => Navigator.pop(context), child: Tx('Cancelar', style: TextStyle(color: sonTextoSuave))),
+        ElevatedButton(onPressed: _guardando ? null : _guardar, child: const Tx('Guardar')),
       ],
     );
   }
@@ -570,8 +571,8 @@ class _VisorFotoState extends State<_VisorFoto> {
               padding: const EdgeInsets.fromLTRB(20, 12, 8, 4),
               child: Row(
                 children: [
-                  Expanded(child: Text(widget.titulo, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold))),
-                  IconButton(tooltip: 'Cerrar', onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close)),
+                  Expanded(child: Tx(widget.titulo, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold))),
+                  IconButton(tooltip: tr('Cerrar'), onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close)),
                 ],
               ),
             ),
@@ -584,7 +585,7 @@ class _VisorFotoState extends State<_VisorFoto> {
                   }
                   final bytes = estado.data;
                   if (bytes == null) {
-                    return SizedBox(height: 160, child: Center(child: Text('No se pudo cargar la foto.', style: TextStyle(color: sonRojo))));
+                    return SizedBox(height: 160, child: Center(child: Tx('No se pudo cargar la foto.', style: TextStyle(color: sonRojo))));
                   }
                   return Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),

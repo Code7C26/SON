@@ -8,6 +8,7 @@ import 'package:son_admin/services/api.dart';
 import 'package:son_admin/theme/tema.dart';
 import 'package:son_admin/ui/componentes.dart';
 
+import 'package:son_admin/i18n/idioma.dart';
 const LatLng _centroPorDefecto = LatLng(-31.6643, -64.4282); // Alta Gracia, la base
 
 const List<String> _dias = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
@@ -253,7 +254,7 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
             ),
           ),
           const SizedBox(width: 8),
-          Text(texto, style: TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.w600)),
+          Tx(texto, style: TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -312,9 +313,9 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
             const SizedBox(height: AppSpacing.s32),
             Row(
               children: [
-                Text('Completadas', style: AppTypography.kpiEtiqueta(tenue)),
+                Tx('Completadas', style: AppTypography.kpiEtiqueta(tenue)),
                 const Spacer(),
-                Text('$completadas de $total · ${(avance * 100).round()}%',
+                Tx('$completadas de $total · ${(avance * 100).round()}%',
                     style: AppTypography.kpiEtiqueta(blanco).copyWith(fontWeight: FontWeight.w600)),
               ],
             ),
@@ -362,7 +363,7 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
                 Icon(Icons.map_outlined, color: sonLightGreen, size: 20),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text('Mapa', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: sonTexto)),
+                  child: Tx('Mapa', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: sonTexto)),
                 ),
               ],
             ),
@@ -394,7 +395,7 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
                 Positioned(
                   right: 8,
                   bottom: 6,
-                  child: Text('© OpenStreetMap', style: TextStyle(color: sonTextoSuave, fontSize: 10)),
+                  child: Tx('© OpenStreetMap', style: TextStyle(color: sonTextoSuave, fontSize: 10)),
                 ),
               ],
             ),
@@ -420,7 +421,7 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: color.withValues(alpha: 0.7)),
             ),
-            child: Text(
+            child: Tx(
               (tecnico['nombre'] ?? 'Técnico').toString(),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -451,7 +452,7 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
       padding: const EdgeInsets.only(bottom: 14),
       child: Row(
         children: [
-          Expanded(child: Text(texto, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: sonTexto))),
+          Expanded(child: Tx(texto, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: sonTexto))),
           if (derecha != null) derecha,
         ],
       ),
@@ -472,7 +473,7 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _tituloTarjeta('Estado de las órdenes', derecha: Text('$total en total', style: TextStyle(color: sonTextoSuave, fontSize: 12))),
+          _tituloTarjeta('Estado de las órdenes', derecha: Tx('$total en total', style: TextStyle(color: sonTextoSuave, fontSize: 12))),
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: SizedBox(
@@ -495,8 +496,8 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
                 children: [
                   Container(width: 10, height: 10, decoration: BoxDecoration(color: d.$3, borderRadius: BorderRadius.circular(3))),
                   const SizedBox(width: 10),
-                  Expanded(child: Text(d.$1, style: TextStyle(color: sonTexto, fontSize: 14))),
-                  Text('${d.$2}', style: TextStyle(color: sonTexto, fontSize: 14, fontWeight: FontWeight.bold)),
+                  Expanded(child: Tx(d.$1, style: TextStyle(color: sonTexto, fontSize: 14))),
+                  Tx('${d.$2}', style: TextStyle(color: sonTexto, fontSize: 14, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
@@ -519,17 +520,17 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _tituloTarjeta('Técnicos en campo', derecha: Text('${_tecnicos.length}', style: TextStyle(color: sonTextoSuave, fontSize: 12))),
+          _tituloTarjeta('Técnicos en campo', derecha: Tx('${_tecnicos.length}', style: TextStyle(color: sonTextoSuave, fontSize: 12))),
           if (lista.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Text('Todavía no hay técnicos registrados.', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
+              child: Tx('Todavía no hay técnicos registrados.', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
             ),
           for (final tecnico in lista.take(6)) _filaTecnico(tecnico),
           if (lista.length > 6)
             Padding(
               padding: const EdgeInsets.only(top: 6),
-              child: Text('y ${lista.length - 6} más en la sección Técnicos', style: TextStyle(color: sonTextoSuave, fontSize: 12)),
+              child: Tx('y ${lista.length - 6} más en la sección Técnicos', style: TextStyle(color: sonTextoSuave, fontSize: 12)),
             ),
         ],
       ),
@@ -556,7 +557,7 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
                 CircleAvatar(
                   radius: 18,
                   backgroundColor: sonTarjetaAlta,
-                  child: Text(nombre.isEmpty ? '?' : nombre[0].toUpperCase(), style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold)),
+                  child: Tx(nombre.isEmpty ? '?' : nombre[0].toUpperCase(), style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold)),
                 ),
                 Positioned(
                   right: -1,
@@ -578,9 +579,9 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(nombre, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600, fontSize: 14)),
+                  Tx(nombre, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600, fontSize: 14)),
                   const SizedBox(height: 2),
-                  Text(detalle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: enLinea ? sonLightGreen : sonTextoSuave, fontSize: 12)),
+                  Tx(detalle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: enLinea ? sonLightGreen : sonTextoSuave, fontSize: 12)),
                 ],
               ),
             ),
@@ -606,17 +607,17 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _tituloTarjeta('Órdenes activas', derecha: Text('${activas.length}', style: TextStyle(color: sonTextoSuave, fontSize: 12))),
+          _tituloTarjeta('Órdenes activas', derecha: Tx('${activas.length}', style: TextStyle(color: sonTextoSuave, fontSize: 12))),
           if (activas.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Text('No hay órdenes pendientes ni en curso.', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
+              child: Tx('No hay órdenes pendientes ni en curso.', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
             ),
           for (final orden in activas.take(5)) _filaOrden(orden),
           if (activas.length > 5)
             Padding(
               padding: const EdgeInsets.only(top: 6),
-              child: Text('y ${activas.length - 5} más en Órdenes de Trabajo', style: TextStyle(color: sonTextoSuave, fontSize: 12)),
+              child: Tx('y ${activas.length - 5} más en Órdenes de Trabajo', style: TextStyle(color: sonTextoSuave, fontSize: 12)),
             ),
         ],
       ),
@@ -636,14 +637,14 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                Tx(
                   (orden['cliente'] ?? 'Cliente sin nombre').toString(),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600, fontSize: 14),
                 ),
                 const SizedBox(height: 2),
-                Text(
+                Tx(
                   _nombreTecnico(orden['tecnico_id']),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -656,7 +657,7 @@ class _PantallaDashboardState extends State<PantallaDashboard> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(color: color.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(20)),
-            child: Text(estado, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold)),
+            child: Tx(estado, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold)),
           ),
         ],
       ),

@@ -5,6 +5,7 @@ import 'package:son_admin/services/api.dart';
 import 'package:son_admin/theme/tema.dart';
 import 'package:son_admin/ui/componentes.dart';
 
+import 'package:son_admin/i18n/idioma.dart';
 /// Análisis operativo: órdenes, tiempos, clientes y encuestas.
 class PantallaAnalisis extends StatefulWidget {
   const PantallaAnalisis({super.key});
@@ -90,9 +91,9 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
         firstDate: DateTime(2020),
         lastDate: DateTime(ahora.year + 1, 12, 31),
         initialDateRange: _desde != null && _hasta != null ? DateTimeRange(start: _desde!, end: _hasta!) : null,
-        helpText: 'Elegí el período',
-        cancelText: 'Cancelar',
-        confirmText: 'Aplicar',
+        helpText: tr('Elegí el período'),
+        cancelText: tr('Cancelar'),
+        confirmText: tr('Aplicar'),
         saveText: 'Aplicar',
       );
       if (rango == null || !mounted) return;
@@ -118,7 +119,7 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
           _barraFiltros(datos),
           if (_error != null) ...[
             const SizedBox(height: 12),
-            Text(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600)),
+            Tx(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600)),
           ],
           if (_cargando) ...[
             const SizedBox(height: 12),
@@ -127,7 +128,7 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
           const SizedBox(height: 16),
           Expanded(
             child: datos == null
-                ? Center(child: Text(_cargando ? 'Cargando...' : 'No se pudieron cargar los indicadores.', style: TextStyle(color: sonTextoSuave)))
+                ? Center(child: Tx(_cargando ? 'Cargando...' : 'No se pudieron cargar los indicadores.', style: TextStyle(color: sonTextoSuave)))
                 : LayoutBuilder(builder: (context, caja) {
                     return ListView(
                       children: [
@@ -171,7 +172,7 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
           showSelectedIcon: false,
           segments: [
             for (final periodo in _periodos)
-              ButtonSegment(value: periodo.$1, label: Text(periodo.$1 == 'custom' ? etiquetaCustom : periodo.$2)),
+              ButtonSegment(value: periodo.$1, label: Tx(periodo.$1 == 'custom' ? etiquetaCustom : periodo.$2)),
           ],
           selected: {_periodo},
           onSelectionChanged: (elegido) => _elegirPeriodo(elegido.first),
@@ -182,11 +183,11 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
             key: const Key('analisis_cliente'),
             initialValue: _empresaId,
             isExpanded: true,
-            decoration: const InputDecoration(labelText: 'Cliente', isDense: true),
+            decoration: InputDecoration(labelText: tr('Cliente'), isDense: true),
             items: [
-              const DropdownMenuItem<int?>(value: null, child: Text('Todos los clientes')),
+              const DropdownMenuItem<int?>(value: null, child: Tx('Todos los clientes')),
               for (final cliente in clientes)
-                DropdownMenuItem<int?>(value: (cliente['id'] as num).toInt(), child: Text('${cliente['nombre']}', overflow: TextOverflow.ellipsis)),
+                DropdownMenuItem<int?>(value: (cliente['id'] as num).toInt(), child: Tx('${cliente['nombre']}', overflow: TextOverflow.ellipsis)),
             ],
             onChanged: (valor) {
               setState(() => _empresaId = valor);
@@ -200,11 +201,11 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
             key: const Key('analisis_tecnico'),
             initialValue: _tecnicoId,
             isExpanded: true,
-            decoration: const InputDecoration(labelText: 'Técnico', isDense: true),
+            decoration: InputDecoration(labelText: tr('Técnico'), isDense: true),
             items: [
-              const DropdownMenuItem<int?>(value: null, child: Text('Todos los técnicos')),
+              const DropdownMenuItem<int?>(value: null, child: Tx('Todos los técnicos')),
               for (final tecnico in tecnicos)
-                DropdownMenuItem<int?>(value: (tecnico['id'] as num).toInt(), child: Text('${tecnico['nombre']}', overflow: TextOverflow.ellipsis)),
+                DropdownMenuItem<int?>(value: (tecnico['id'] as num).toInt(), child: Tx('${tecnico['nombre']}', overflow: TextOverflow.ellipsis)),
             ],
             onChanged: (valor) {
               setState(() => _tecnicoId = valor);
@@ -253,12 +254,12 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
         children: [
           Row(
             children: [
-              Expanded(child: Text(titulo, style: TextStyle(color: sonTextoSuave))),
+              Expanded(child: Tx(titulo, style: TextStyle(color: sonTextoSuave))),
               Icon(icono, color: sonLightGreen, size: 20),
             ],
           ),
           const SizedBox(height: 8),
-          Text(valor, style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: sonTexto)),
+          Tx(valor, style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: sonTexto)),
         ],
       ),
     );
@@ -285,7 +286,7 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
 
   Widget _barrasMes(List<Map<String, dynamic>> puntos) {
     if (puntos.isEmpty || puntos.every((p) => ((p['ordenes'] as num?)?.toInt() ?? 0) == 0)) {
-      return Text('No hay órdenes en este período.', style: TextStyle(color: sonTextoSuave));
+      return Tx('No hay órdenes en este período.', style: TextStyle(color: sonTextoSuave));
     }
     final maximo = puntos.fold<int>(1, (mayor, p) {
       final n = (p['ordenes'] as num?)?.toInt() ?? 0;
@@ -327,7 +328,7 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Text(ordenes == 0 ? '' : '$ordenes', style: TextStyle(color: sonTextoSuave, fontSize: 12)),
+          Tx(ordenes == 0 ? '' : '$ordenes', style: TextStyle(color: sonTextoSuave, fontSize: 12)),
           const SizedBox(height: 4),
           SizedBox(
             height: 120,
@@ -354,7 +355,7 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
             ),
           ),
           const SizedBox(height: 6),
-          Text('${punto['etiqueta']}', style: TextStyle(color: sonTextoSuave, fontSize: 12)),
+          Tx('${punto['etiqueta']}', style: TextStyle(color: sonTextoSuave, fontSize: 12)),
         ],
       ),
     );
@@ -369,7 +370,7 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
     ].where((fila) => fila.$1 != 'Por asignar' || fila.$2 > 0).toList();
     final maximo = filas.fold<int>(1, (mayor, fila) => fila.$2 > mayor ? fila.$2 : mayor);
     if (filas.every((fila) => fila.$2 == 0)) {
-      return Text('No hay órdenes en este período.', style: TextStyle(color: sonTextoSuave));
+      return Tx('No hay órdenes en este período.', style: TextStyle(color: sonTextoSuave));
     }
     return Column(
       children: [
@@ -378,10 +379,10 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
             padding: const EdgeInsets.only(bottom: 12),
             child: Row(
               children: [
-                SizedBox(width: 110, child: Text(fila.$1, style: TextStyle(color: sonTexto))),
+                SizedBox(width: 110, child: Tx(fila.$1, style: TextStyle(color: sonTexto))),
                 Expanded(child: _barra(fila.$2 / maximo, fila.$3)),
                 const SizedBox(width: 8),
-                SizedBox(width: 28, child: Text('${fila.$2}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w700))),
+                SizedBox(width: 28, child: Tx('${fila.$2}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w700))),
               ],
             ),
           ),
@@ -391,7 +392,7 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
 
   Widget _barrasCliente(List<Map<String, dynamic>> clientes) {
     if (clientes.isEmpty) {
-      return Text('No hay órdenes en este período.', style: TextStyle(color: sonTextoSuave));
+      return Tx('No hay órdenes en este período.', style: TextStyle(color: sonTextoSuave));
     }
     final maximo = clientes.fold<int>(1, (mayor, c) {
       final n = (c['ordenes'] as num?)?.toInt() ?? 0;
@@ -407,8 +408,8 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
               children: [
                 Row(
                   children: [
-                    Expanded(child: Text('${cliente['nombre']}', style: TextStyle(color: sonTexto))),
-                    Text(_detalleCliente(cliente), style: TextStyle(color: sonTextoSuave, fontSize: 13)),
+                    Expanded(child: Tx('${cliente['nombre']}', style: TextStyle(color: sonTexto))),
+                    Tx(_detalleCliente(cliente), style: TextStyle(color: sonTextoSuave, fontSize: 13)),
                   ],
                 ),
                 const SizedBox(height: 6),
@@ -433,7 +434,7 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
       children: [
         Container(width: 10, height: 10, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2))),
         const SizedBox(width: 6),
-        Text(texto, style: TextStyle(color: sonTextoSuave, fontSize: 12)),
+        Tx(texto, style: TextStyle(color: sonTextoSuave, fontSize: 12)),
       ],
     );
   }
@@ -445,7 +446,7 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(titulo, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: sonTexto)),
+          Tx(titulo, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: sonTexto)),
           const SizedBox(height: 14),
           cuerpo,
         ],
@@ -458,7 +459,7 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
     return _seccion(
       'Rendimiento de técnicos',
       filas.isEmpty
-          ? Text('No hay órdenes en este período.', style: TextStyle(color: sonTextoSuave))
+          ? Tx('No hay órdenes en este período.', style: TextStyle(color: sonTextoSuave))
           : LayoutBuilder(builder: (context, caja) {
               final ancho = caja.maxWidth < 860 ? 860.0 : caja.maxWidth;
               return SingleChildScrollView(
@@ -511,10 +512,10 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
                 CircleAvatar(
                   radius: 16,
                   backgroundColor: sonLightGreen,
-                  child: Text(_iniciales(nombre), style: TextStyle(color: sonDarkGreen, fontWeight: FontWeight.bold, fontSize: 12)),
+                  child: Tx(_iniciales(nombre), style: TextStyle(color: sonDarkGreen, fontWeight: FontWeight.bold, fontSize: 12)),
                 ),
                 const SizedBox(width: 8),
-                Expanded(child: Text(nombre, style: TextStyle(color: sonTexto))),
+                Expanded(child: Tx(nombre, style: TextStyle(color: sonTexto))),
               ],
             ),
           ),
@@ -522,7 +523,7 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
             width: 220,
             child: Row(
               children: [
-                SizedBox(width: 52, child: Text('$completadas / $asignadas', style: TextStyle(color: sonTexto))),
+                SizedBox(width: 52, child: Tx('$completadas / $asignadas', style: TextStyle(color: sonTexto))),
                 Expanded(child: _barra(avance, sonLightGreen)),
               ],
             ),
@@ -532,12 +533,12 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
           SizedBox(
             width: 130,
             child: calificacion == null
-                ? Text('Sin notas', style: TextStyle(color: sonTextoSuave))
+                ? Tx('Sin notas', style: TextStyle(color: sonTextoSuave))
                 : Row(
                     children: [
                       _estrellas(calificacion, tamano: 14),
                       const SizedBox(width: 4),
-                      Text(_nota(calificacion), style: TextStyle(color: sonTexto, fontWeight: FontWeight.w700)),
+                      Tx(_nota(calificacion), style: TextStyle(color: sonTexto, fontWeight: FontWeight.w700)),
                     ],
                   ),
           ),
@@ -570,10 +571,10 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
             ],
           ),
           const SizedBox(height: 6),
-          Text('De los mails que salieron en este período.', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
+          Tx('De los mails que salieron en este período.', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
           const SizedBox(height: 18),
           if (respondidas == 0)
-            Text('Todavía no hay respuestas en este período.', style: TextStyle(color: sonTextoSuave))
+            Tx('Todavía no hay respuestas en este período.', style: TextStyle(color: sonTextoSuave))
           else
             LayoutBuilder(builder: (context, caja) {
               final angosta = caja.maxWidth < 760;
@@ -582,9 +583,9 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
                     children: [
                       Row(
                         children: [
-                          Text(promedio == null ? '—' : _nota(promedio), style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: sonTexto)),
+                          Tx(promedio == null ? '—' : _nota(promedio), style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: sonTexto)),
                           const SizedBox(width: 8),
-                          Text('/ 5', style: TextStyle(color: sonTextoSuave)),
+                          Tx('/ 5', style: TextStyle(color: sonTextoSuave)),
                           const SizedBox(width: 8),
                           if (promedio != null) _estrellas(promedio),
                         ],
@@ -595,11 +596,11 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
                           padding: const EdgeInsets.only(bottom: 6),
                           child: Row(
                             children: [
-                              SizedBox(width: 16, child: Text('$estrellas', style: TextStyle(color: sonTextoSuave))),
+                              SizedBox(width: 16, child: Tx('$estrellas', style: TextStyle(color: sonTextoSuave))),
                               const SizedBox(width: 8),
                               Expanded(child: _barra((distribucion[estrellas - 1]) / maximo, sonLightGreen)),
                               const SizedBox(width: 8),
-                              SizedBox(width: 24, child: Text('${distribucion[estrellas - 1]}', style: TextStyle(color: sonTextoSuave))),
+                              SizedBox(width: 24, child: Tx('${distribucion[estrellas - 1]}', style: TextStyle(color: sonTextoSuave))),
                             ],
                           ),
                         ),
@@ -619,7 +620,7 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
                       ),
                       const SizedBox(height: 12),
                       if (detalle.isEmpty)
-                        Text('No hay respuestas con este filtro.', style: TextStyle(color: sonTextoSuave))
+                        Tx('No hay respuestas con este filtro.', style: TextStyle(color: sonTextoSuave))
                       else
                         for (var i = 0; i < detalle.length; i++) _respuesta(detalle[i], i),
                     ],
@@ -652,7 +653,7 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
   Widget _chipEncuesta(String valor, String texto) {
     return ChoiceChip(
       key: Key('encuesta_$valor'),
-      label: Text(texto),
+      label: Tx(texto),
       selected: _filtroEncuesta == valor,
       onSelected: (_) => setState(() => _filtroEncuesta = valor),
     );
@@ -673,14 +674,14 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
         children: [
           Row(
             children: [
-              Expanded(child: Text('${respuesta['cliente']}', style: TextStyle(fontWeight: FontWeight.w700, color: sonTexto))),
-              Text('${respuesta['cuando'] ?? ''}', style: TextStyle(color: sonTextoSuave, fontSize: 12)),
+              Expanded(child: Tx('${respuesta['cliente']}', style: TextStyle(fontWeight: FontWeight.w700, color: sonTexto))),
+              Tx('${respuesta['cuando'] ?? ''}', style: TextStyle(color: sonTextoSuave, fontSize: 12)),
             ],
           ),
           const SizedBox(height: 2),
-          Text('${respuesta['tecnico'] ?? 'Sin técnico'}', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
+          Tx('${respuesta['tecnico'] ?? 'Sin técnico'}', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
           const SizedBox(height: 6),
-          Row(children: [_estrellas(nota, tamano: 16), const SizedBox(width: 6), Text(_nota(nota), style: TextStyle(color: sonTexto, fontWeight: FontWeight.w700))]),
+          Row(children: [_estrellas(nota, tamano: 16), const SizedBox(width: 6), Tx(_nota(nota), style: TextStyle(color: sonTexto, fontWeight: FontWeight.w700))]),
           if (comentario.isNotEmpty) ...[
             const SizedBox(height: 8),
             _comentarioPlegable(respuesta, comentario, baja, indice),
@@ -706,7 +707,7 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
               if (!_comentariosAbiertos.remove(clave)) _comentariosAbiertos.add(clave);
             }),
             icon: Icon(abierto ? Icons.visibility_off_outlined : Icons.chat_bubble_outline, size: 18),
-            label: Text(abierto ? 'Ocultar' : 'Ver comentario'),
+            label: Tx(abierto ? 'Ocultar' : 'Ver comentario'),
             style: OutlinedButton.styleFrom(
               foregroundColor: sonTexto,
               minimumSize: const Size(48, 48),
@@ -724,7 +725,7 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: baja ? sonRojo : sonBorde),
               ),
-              child: Text(comentario, style: TextStyle(color: sonTexto)),
+              child: Tx(comentario, style: TextStyle(color: sonTexto)),
             ),
           ],
         ],
@@ -736,9 +737,9 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
     return Expanded(
       child: Column(
         children: [
-          Text(valor, style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: sonTexto)),
+          Tx(valor, style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: sonTexto)),
           const SizedBox(height: 2),
-          Text(etiqueta, textAlign: TextAlign.center, style: TextStyle(color: sonTextoSuave, fontSize: 13)),
+          Tx(etiqueta, textAlign: TextAlign.center, style: TextStyle(color: sonTextoSuave, fontSize: 13)),
         ],
       ),
     );
@@ -759,7 +760,7 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
   Widget _celda(String texto, double ancho, {bool titulo = false}) {
     return SizedBox(
       width: ancho,
-      child: Text(texto, style: TextStyle(color: titulo ? sonTextoSuave : sonTexto, fontWeight: titulo ? FontWeight.w700 : FontWeight.w500, fontSize: titulo ? 13 : 14)),
+      child: Tx(texto, style: TextStyle(color: titulo ? sonTextoSuave : sonTexto, fontWeight: titulo ? FontWeight.w700 : FontWeight.w500, fontSize: titulo ? 13 : 14)),
     );
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:son_tecnico/pantallas/planilla_excel.dart';
 import 'package:son_tecnico/theme/colores.dart';
 
+import 'package:son_tecnico/i18n/idioma.dart';
 // Formularios de control en la visita (tableros, extintores, almacenaje...). Hay dos tipos:
 //  - 'lista': preguntas fijas; se toca la respuesta (SI / NO / NC) de cada una.
 //  - 'planilla': una fila por cada cosa revisada (cada tablero, cada extintor), con sus datos.
@@ -131,7 +132,7 @@ class _PantallaFormularioState extends State<PantallaFormulario> {
       runSpacing: 6,
       children: opciones
           .map((opcion) => ChoiceChip(
-                label: Text(opcion, style: const TextStyle(fontWeight: FontWeight.bold)),
+                label: Tx(opcion, style: const TextStyle(fontWeight: FontWeight.bold)),
                 selected: actual == opcion,
                 selectedColor: sonLightGreen.withValues(alpha: 0.35),
                 onSelected: (_) => alElegir(actual == opcion ? null : opcion),
@@ -145,7 +146,7 @@ class _PantallaFormularioState extends State<PantallaFormulario> {
     if (p['seccion'] == true) {
       return Padding(
         padding: const EdgeInsets.fromLTRB(4, 18, 4, 6),
-        child: Text('${p['texto']}'.toUpperCase(), style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, letterSpacing: 1)),
+        child: Tx('${p['texto']}'.toUpperCase(), style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, letterSpacing: 1)),
       );
     }
     final r = _respuestas[i]!;
@@ -157,7 +158,7 @@ class _PantallaFormularioState extends State<PantallaFormulario> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('${p['texto']}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600, fontSize: 15)),
+          Tx('${p['texto']}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600, fontSize: 15)),
           const SizedBox(height: 10),
           if (_columnas.isEmpty)
             _botones(_opciones, valores[0], (v) => setState(() => valores[0] = v))
@@ -167,20 +168,20 @@ class _PantallaFormularioState extends State<PantallaFormulario> {
                 padding: const EdgeInsets.only(bottom: 6),
                 child: Row(
                   children: [
-                    SizedBox(width: 96, child: Text(_columnas[k], style: TextStyle(color: sonTextoSuave, fontSize: 13))),
+                    SizedBox(width: 96, child: Tx(_columnas[k], style: TextStyle(color: sonTextoSuave, fontSize: 13))),
                     Expanded(child: _botones(_opciones, valores[k], (v) => setState(() => valores[k] = v))),
                   ],
                 ),
               ),
           if (_conObservacion.contains(i))
-            TextField(controller: _obs[i], decoration: const InputDecoration(labelText: 'Observación', isDense: true))
+            TextField(controller: _obs[i], decoration: InputDecoration(labelText: tr('Observación'), isDense: true))
           else
             Align(
               alignment: Alignment.centerLeft,
               child: TextButton.icon(
                 onPressed: () => setState(() => _conObservacion.add(i)),
                 icon: const Icon(Icons.edit_note, size: 18),
-                label: const Text('Observación'),
+                label: const Tx('Observación'),
               ),
             ),
         ],
@@ -226,17 +227,17 @@ class _PantallaFormularioState extends State<PantallaFormulario> {
       decoration: decoracionTarjeta(),
       child: ListTile(
         onTap: () => _editarFila(indice: i),
-        leading: CircleAvatar(backgroundColor: sonTarjetaAlta, child: Text('${i + 1}', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold))),
-        title: Text(titulo, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: Text(resumen.isEmpty ? 'Sin datos' : resumen.join(' · '), maxLines: 3, overflow: TextOverflow.ellipsis),
+        leading: CircleAvatar(backgroundColor: sonTarjetaAlta, child: Tx('${i + 1}', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold))),
+        title: Tx(titulo, style: const TextStyle(fontWeight: FontWeight.w600)),
+        subtitle: Tx(resumen.isEmpty ? 'Sin datos' : resumen.join(' · '), maxLines: 3, overflow: TextOverflow.ellipsis),
         trailing: PopupMenuButton<String>(
           onSelected: (accion) {
             if (accion == 'copiar') _editarFila(base: {'valores': List.from(valores)..[0] = null, 'obs': ''});
             if (accion == 'borrar') setState(() => _filas.removeAt(i));
           },
           itemBuilder: (_) => [
-            const PopupMenuItem(value: 'copiar', child: Text('Copiar en una nueva')),
-            PopupMenuItem(value: 'borrar', child: Text('Borrar', style: TextStyle(color: sonRojo))),
+            const PopupMenuItem(value: 'copiar', child: Tx('Copiar en una nueva')),
+            PopupMenuItem(value: 'borrar', child: Tx('Borrar', style: TextStyle(color: sonRojo))),
           ],
         ),
       ),
@@ -254,28 +255,28 @@ class _PantallaFormularioState extends State<PantallaFormulario> {
       child: Scaffold(
         backgroundColor: sonFondo,
         appBar: AppBar(
-          title: Text('${widget.formulario['nombre']}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
+          title: Tx('${widget.formulario['nombre']}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
           backgroundColor: sonPanel,
-          actions: [TextButton(onPressed: _listo, child: Text('Listo', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, fontSize: 16)))],
+          actions: [TextButton(onPressed: _listo, child: Tx('Listo', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, fontSize: 16)))],
         ),
         floatingActionButton: _esPlanilla
             ? FloatingActionButton.extended(
                 backgroundColor: sonLightGreen,
                 onPressed: () => _editarFila(),
                 icon: Icon(Icons.add, color: sonDarkGreen),
-                label: Text('Agregar ${elemento.toLowerCase()}', style: TextStyle(color: sonDarkGreen, fontWeight: FontWeight.bold)),
+                label: Tx('Agregar ${elemento.toLowerCase()}', style: TextStyle(color: sonDarkGreen, fontWeight: FontWeight.bold)),
               )
             : null,
         body: ListView(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
           children: [
             if (_esPlanilla) ...[
-              Text('Cargá una fila por cada ${elemento.toLowerCase()} que revises.', style: TextStyle(color: sonTextoSuave)),
+              Tx('Cargá una fila por cada ${elemento.toLowerCase()} que revises.', style: TextStyle(color: sonTextoSuave)),
               const SizedBox(height: 12),
               if (_filas.isEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 30),
-                  child: Center(child: Text('Todavía no cargaste ninguno.', style: TextStyle(color: sonTextoSuave))),
+                  child: Center(child: Tx('Todavía no cargaste ninguno.', style: TextStyle(color: sonTextoSuave))),
                 ),
               for (var i = 0; i < _filas.length; i++) _tarjetaFila(i),
             ] else
@@ -284,10 +285,10 @@ class _PantallaFormularioState extends State<PantallaFormulario> {
             TextField(
               controller: _observacion,
               maxLines: 3,
-              decoration: const InputDecoration(labelText: 'Observaciones del formulario (opcional)'),
+              decoration: InputDecoration(labelText: tr('Observaciones del formulario (opcional)')),
             ),
             const SizedBox(height: 16),
-            SizedBox(height: 50, child: ElevatedButton(onPressed: _listo, child: const Text('Listo', style: TextStyle(fontSize: 16)))),
+            SizedBox(height: 50, child: ElevatedButton(onPressed: _listo, child: const Tx('Listo', style: TextStyle(fontSize: 16)))),
           ],
         ),
       ),
@@ -344,13 +345,13 @@ class _PantallaFilaState extends State<_PantallaFila> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(etiqueta, style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600)),
+            Tx(etiqueta, style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600)),
             const SizedBox(height: 6),
             Wrap(
               spacing: 8,
               children: opciones
                   .map((opcion) => ChoiceChip(
-                        label: Text(opcion, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        label: Tx(opcion, style: const TextStyle(fontWeight: FontWeight.bold)),
                         selected: _valores[k] == opcion,
                         selectedColor: sonLightGreen.withValues(alpha: 0.35),
                         onSelected: (_) => setState(() => _valores[k] = _valores[k] == opcion ? null : opcion),
@@ -365,7 +366,7 @@ class _PantallaFilaState extends State<_PantallaFila> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(etiqueta, style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600)),
+            Tx(etiqueta, style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600)),
             const SizedBox(height: 6),
             Row(
               children: [
@@ -383,9 +384,9 @@ class _PantallaFilaState extends State<_PantallaFila> {
                     }
                   },
                   icon: const Icon(Icons.event_outlined),
-                  label: Text(partes.length == 3 ? '${partes[2]}/${partes[1]}/${partes[0]}' : 'Elegir fecha'),
+                  label: Tx(partes.length == 3 ? '${partes[2]}/${partes[1]}/${partes[0]}' : 'Elegir fecha'),
                 ),
-                if (valor != null) IconButton(tooltip: 'Borrar fecha', onPressed: () => setState(() => _valores[k] = null), icon: const Icon(Icons.close)),
+                if (valor != null) IconButton(tooltip: tr('Borrar fecha'), onPressed: () => setState(() => _valores[k] = null), icon: const Icon(Icons.close)),
               ],
             ),
           ],
@@ -395,7 +396,7 @@ class _PantallaFilaState extends State<_PantallaFila> {
           controller: _textos[k],
           keyboardType: campo['tipo'] == 'numero' ? const TextInputType.numberWithOptions(decimal: true) : TextInputType.text,
           textCapitalization: TextCapitalization.sentences,
-          decoration: InputDecoration(labelText: etiqueta),
+          decoration: InputDecoration(labelText: trn(etiqueta)),
         );
     }
   }
@@ -405,17 +406,17 @@ class _PantallaFilaState extends State<_PantallaFila> {
     return Scaffold(
       backgroundColor: sonFondo,
       appBar: AppBar(
-        title: Text('${widget.definicion['elemento'] ?? 'Elemento'} ${widget.numero}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
+        title: Tx('${widget.definicion['elemento'] ?? 'Elemento'} ${widget.numero}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)),
         backgroundColor: sonPanel,
-        actions: [TextButton(onPressed: _guardar, child: Text('Guardar', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, fontSize: 16)))],
+        actions: [TextButton(onPressed: _guardar, child: Tx('Guardar', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, fontSize: 16)))],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           for (var k = 0; k < widget.campos.length; k++) Padding(padding: const EdgeInsets.only(bottom: 16), child: _campo(k)),
-          TextField(controller: _obs, maxLines: 2, decoration: const InputDecoration(labelText: 'Observación (opcional)')),
+          TextField(controller: _obs, maxLines: 2, decoration: InputDecoration(labelText: tr('Observación (opcional)'))),
           const SizedBox(height: 16),
-          SizedBox(height: 50, child: ElevatedButton(onPressed: _guardar, child: const Text('Guardar', style: TextStyle(fontSize: 16)))),
+          SizedBox(height: 50, child: ElevatedButton(onPressed: _guardar, child: const Tx('Guardar', style: TextStyle(fontSize: 16)))),
         ],
       ),
     );

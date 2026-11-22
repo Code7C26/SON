@@ -9,6 +9,7 @@ import 'package:son_admin/services/sesion.dart';
 import 'package:son_admin/theme/tema.dart';
 import 'package:son_admin/ui/componentes.dart';
 
+import 'package:son_admin/i18n/idioma.dart';
 // CRM comercial dentro de Presupuestos (lo que hacía el "CRM Comercial SIMA"):
 //  - Clientes y contactos: semáforo de días sin contacto según el tipo de cliente, y la ficha con la
 //    bitácora (llamadas, visitas, mails...) y los pendientes con fecha y responsable.
@@ -59,16 +60,16 @@ class ConfigCrm {
 }
 
 Widget _botonesPlanilla() => PopupMenuButton<String>(
-      tooltip: 'Planilla para Excel',
+      tooltip: tr('Planilla para Excel'),
       onSelected: (tipo) => abrirInforme('$apiBaseUrl/api/crm/planilla?tipo=$tipo&token=${SesionAdmin.token}'),
       itemBuilder: (_) => const [
-        PopupMenuItem(value: 'clientes', child: Text('Clientes y días sin contacto')),
-        PopupMenuItem(value: 'presupuestos', child: Text('Presupuestos')),
-        PopupMenuItem(value: 'bitacora', child: Text('Bitácora y pendientes')),
+        PopupMenuItem(value: 'clientes', child: Tx('Clientes y días sin contacto')),
+        PopupMenuItem(value: 'presupuestos', child: Tx('Presupuestos')),
+        PopupMenuItem(value: 'bitacora', child: Tx('Bitácora y pendientes')),
       ],
       child: const Padding(
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.table_view_outlined, size: 18), SizedBox(width: 6), Text('Exportar Excel')]),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.table_view_outlined, size: 18), SizedBox(width: 6), Tx('Exportar Excel')]),
       ),
     );
 
@@ -175,7 +176,7 @@ class _PestanaClientesCrmState extends State<PestanaClientesCrm> {
           children: [
             SizedBox(
               width: 260,
-              child: TextField(controller: _busqueda, decoration: const InputDecoration(hintText: 'Buscar empresa o contacto...', prefixIcon: Icon(Icons.search, size: 20), isDense: true)),
+              child: TextField(controller: _busqueda, decoration: InputDecoration(hintText: tr('Buscar empresa o contacto...'), prefixIcon: Icon(Icons.search, size: 20), isDense: true)),
             ),
             PildoraFiltro(texto: 'Todos', activo: _alerta.isEmpty, alTocar: () => setState(() => _alerta = '')),
             PildoraFiltro(texto: 'Sin contacto hace mucho · ${cuenta['rojo']}', activo: _alerta == 'rojo', color: sonRojo, alTocar: () => setState(() => _alerta = 'rojo')),
@@ -185,12 +186,12 @@ class _PestanaClientesCrmState extends State<PestanaClientesCrm> {
             DropdownButton<String>(
               value: _tipo,
               underline: const SizedBox.shrink(),
-              items: [const DropdownMenuItem(value: '', child: Text('Todos los tipos')), ...tipos.map((t) => DropdownMenuItem(value: t, child: Text(t)))],
+              items: [const DropdownMenuItem(value: '', child: Tx('Todos los tipos')), ...tipos.map((t) => DropdownMenuItem(value: t, child: Tx(t)))],
               onChanged: (valor) => setState(() => _tipo = valor ?? ''),
             ),
             _botonesPlanilla(),
             IconButton(
-              tooltip: 'Configurar CRM',
+              tooltip: tr('Configurar CRM'),
               icon: const Icon(Icons.settings_outlined),
               onPressed: () async {
                 final cambio = await abrirConfigCrm(context);
@@ -204,7 +205,7 @@ class _PestanaClientesCrmState extends State<PestanaClientesCrm> {
           child: Container(
             decoration: decoracionTarjeta(),
             child: visibles.isEmpty
-                ? Center(child: Text('Ningún cliente coincide con el filtro.', style: TextStyle(color: sonTextoSuave)))
+                ? Center(child: Tx('Ningún cliente coincide con el filtro.', style: TextStyle(color: sonTextoSuave)))
                 : ListView.separated(
                     padding: const EdgeInsets.all(8),
                     itemCount: visibles.length,
@@ -217,8 +218,8 @@ class _PestanaClientesCrmState extends State<PestanaClientesCrm> {
                       return ListTile(
                         onTap: () => _abrirFicha(c),
                         leading: Container(width: 12, height: 12, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-                        title: Text('${c['razon_social']}', style: const TextStyle(fontWeight: FontWeight.w600)),
-                        subtitle: Text([
+                        title: Tx('${c['razon_social']}', style: const TextStyle(fontWeight: FontWeight.w600)),
+                        subtitle: Tx([
                           if ('${c['contacto'] ?? ''}'.isNotEmpty) '${c['contacto']}',
                           c['ultimo_contacto'] == null ? 'Nunca contactado' : 'Último contacto ${_fechaTexto(c['ultimo_contacto'])}',
                           'umbral ${alerta['umbral']} días',
@@ -232,9 +233,9 @@ class _PestanaClientesCrmState extends State<PestanaClientesCrm> {
                             const SizedBox(width: 8),
                             DropdownButton<String>(
                               value: tipos.contains(tipo) ? tipo : null,
-                              hint: const Text('Tipo'),
+                              hint: const Tx('Tipo'),
                               underline: const SizedBox.shrink(),
-                              items: tipos.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
+                              items: tipos.map((t) => DropdownMenuItem(value: t, child: Tx(t))).toList(),
                               onChanged: (valor) => _cambiarTipo(c, valor),
                             ),
                           ],
@@ -351,10 +352,10 @@ class _FichaCrmState extends State<_FichaCrm> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (dialogo) => AlertDialog(
-        title: const Text('¿Borrar la nota?'),
+        title: const Tx('¿Borrar la nota?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogo, false), child: const Text('Cancelar')),
-          TextButton(onPressed: () => Navigator.pop(dialogo, true), child: Text('Borrar', style: TextStyle(color: sonRojo))),
+          TextButton(onPressed: () => Navigator.pop(dialogo, false), child: const Tx('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(dialogo, true), child: Tx('Borrar', style: TextStyle(color: sonRojo))),
         ],
       ),
     );
@@ -380,7 +381,7 @@ class _FichaCrmState extends State<_FichaCrm> {
     return AlertDialog(
       title: Row(
         children: [
-          Expanded(child: Text('${c['razon_social']}')),
+          Expanded(child: Tx('${c['razon_social']}')),
           if (alerta.isNotEmpty) EtiquetaEstado(texto: textoAlerta(alerta), color: colorAlerta('${alerta['estado']}')),
         ],
       ),
@@ -392,7 +393,7 @@ class _FichaCrmState extends State<_FichaCrm> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    Tx(
                       [
                         if ('${c['tipo_cliente'] ?? ''}'.isNotEmpty) '${c['tipo_cliente']}',
                         if ('${c['contacto'] ?? ''}'.isNotEmpty) '${c['contacto']}',
@@ -402,9 +403,9 @@ class _FichaCrmState extends State<_FichaCrm> {
                       style: TextStyle(color: sonTextoSuave),
                     ),
                     const SizedBox(height: 14),
-                    Text('NOTA RÁPIDA', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.1)),
+                    Tx('NOTA RÁPIDA', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.1)),
                     const SizedBox(height: 8),
-                    TextField(controller: _texto, maxLines: 3, enabled: !_ocupado, decoration: const InputDecoration(hintText: 'Qué pasó con este cliente (llamada, visita, mail...)')),
+                    TextField(controller: _texto, maxLines: 3, enabled: !_ocupado, decoration: InputDecoration(hintText: tr('Qué pasó con este cliente (llamada, visita, mail...)'))),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 10,
@@ -413,7 +414,7 @@ class _FichaCrmState extends State<_FichaCrm> {
                       children: [
                         DropdownButton<String>(
                           value: tiposNota.contains(_tipoNota) ? _tipoNota : null,
-                          items: tiposNota.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
+                          items: tiposNota.map((t) => DropdownMenuItem(value: t, child: Tx(t))).toList(),
                           onChanged: (valor) => setState(() => _tipoNota = valor ?? 'Llamada'),
                         ),
                         OutlinedButton.icon(
@@ -422,14 +423,14 @@ class _FichaCrmState extends State<_FichaCrm> {
                             if (elegida != null) setState(() => _fecha = elegida);
                           },
                           icon: const Icon(Icons.event_outlined, size: 18),
-                          label: Text('${_fecha.day}/${_fecha.month}/${_fecha.year}'),
+                          label: Tx('${_fecha.day}/${_fecha.month}/${_fecha.year}'),
                         ),
-                        FilterChip(label: const Text('Deja un pendiente'), selected: _conPendiente, onSelected: (v) => setState(() => _conPendiente = v)),
+                        FilterChip(label: const Tx('Deja un pendiente'), selected: _conPendiente, onSelected: (v) => setState(() => _conPendiente = v)),
                       ],
                     ),
                     if (_conPendiente) ...[
                       const SizedBox(height: 8),
-                      TextField(controller: _pendiente, decoration: const InputDecoration(labelText: 'Qué hay que hacer', hintText: 'Ej: Enviar presupuesto de mediciones')),
+                      TextField(controller: _pendiente, decoration: InputDecoration(labelText: tr('Qué hay que hacer'), hintText: tr('Ej: Enviar presupuesto de mediciones'))),
                       const SizedBox(height: 8),
                       Wrap(
                         spacing: 10,
@@ -441,25 +442,25 @@ class _FichaCrmState extends State<_FichaCrm> {
                               if (elegida != null) setState(() => _pendienteFecha = elegida);
                             },
                             icon: const Icon(Icons.flag_outlined, size: 18),
-                            label: Text(_pendienteFecha == null ? 'Para cuándo' : 'Para el ${_pendienteFecha!.day}/${_pendienteFecha!.month}/${_pendienteFecha!.year}'),
+                            label: Tx(_pendienteFecha == null ? 'Para cuándo' : 'Para el ${_pendienteFecha!.day}/${_pendienteFecha!.month}/${_pendienteFecha!.year}'),
                           ),
                           DropdownButton<String?>(
                             value: responsables.contains(_responsable) ? _responsable : null,
-                            hint: const Text('Responsable'),
-                            items: responsables.map((r) => DropdownMenuItem<String?>(value: r, child: Text(r))).toList(),
+                            hint: const Tx('Responsable'),
+                            items: responsables.map((r) => DropdownMenuItem<String?>(value: r, child: Tx(r))).toList(),
                             onChanged: (valor) => setState(() => _responsable = valor),
                           ),
                         ],
                       ),
                     ],
                     const SizedBox(height: 8),
-                    Align(alignment: Alignment.centerRight, child: ElevatedButton(onPressed: _ocupado ? null : _guardar, child: const Text('Guardar nota'))),
-                    if (_error != null) Text(_error!, style: TextStyle(color: sonRojo)),
+                    Align(alignment: Alignment.centerRight, child: ElevatedButton(onPressed: _ocupado ? null : _guardar, child: const Tx('Guardar nota'))),
+                    if (_error != null) Tx(_error!, style: TextStyle(color: sonRojo)),
                     const SizedBox(height: 14),
-                    Text('BITÁCORA (${_notas.length})', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.1)),
+                    Tx('BITÁCORA (${_notas.length})', style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.1)),
                     const SizedBox(height: 6),
                     if (_notas.isEmpty)
-                      Text('Todavía no hay notas. La primera nota de contacto arranca el contador de días.', style: TextStyle(color: sonTextoSuave)),
+                      Tx('Todavía no hay notas. La primera nota de contacto arranca el contador de días.', style: TextStyle(color: sonTextoSuave)),
                     for (final n in _notas)
                       Container(
                         margin: const EdgeInsets.only(bottom: 8),
@@ -470,21 +471,21 @@ class _FichaCrmState extends State<_FichaCrm> {
                           children: [
                             Row(
                               children: [
-                                Text(_fechaTexto(n['fecha']), style: const TextStyle(fontWeight: FontWeight.bold)),
+                                Tx(_fechaTexto(n['fecha']), style: const TextStyle(fontWeight: FontWeight.bold)),
                                 const SizedBox(width: 8),
                                 EtiquetaEstado(texto: '${n['tipo']}', color: n['tipo'] == 'Interna' ? sonTextoSuave : sonAzul),
                                 const SizedBox(width: 8),
-                                Expanded(child: Text('${n['autor'] ?? ''}', style: TextStyle(color: sonTextoSuave, fontSize: 12))),
-                                IconButton(tooltip: 'Borrar', visualDensity: VisualDensity.compact, icon: Icon(Icons.delete_outline, size: 18, color: sonRojo), onPressed: () => _borrar(n)),
+                                Expanded(child: Tx('${n['autor'] ?? ''}', style: TextStyle(color: sonTextoSuave, fontSize: 12))),
+                                IconButton(tooltip: tr('Borrar'), visualDensity: VisualDensity.compact, icon: Icon(Icons.delete_outline, size: 18, color: sonRojo), onPressed: () => _borrar(n)),
                               ],
                             ),
-                            if ('${n['texto'] ?? ''}'.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 4), child: Text('${n['texto']}')),
+                            if ('${n['texto'] ?? ''}'.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 4), child: Tx('${n['texto']}')),
                             if (n['pendiente'] != null)
                               Row(
                                 children: [
                                   Checkbox(value: n['pendiente_hecho'] == true, onChanged: (v) => _tildar(n, v ?? false)),
                                   Expanded(
-                                    child: Text(
+                                    child: Tx(
                                       [
                                         '${n['pendiente']}',
                                         if (n['pendiente_fecha'] != null) _fechaTexto(n['pendiente_fecha']),
@@ -506,7 +507,7 @@ class _FichaCrmState extends State<_FichaCrm> {
                 ),
               ),
       ),
-      actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cerrar'))],
+      actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Tx('Cerrar'))],
     );
   }
 }
@@ -593,9 +594,9 @@ class _PestanaPendientesCrmState extends State<PestanaPendientesCrm> {
       children: [
         Row(
           children: [
-            Expanded(child: Text('Los pendientes se crean desde la ficha del cliente (Clientes y contactos), marcando "Deja un pendiente".', style: TextStyle(color: sonTextoSuave))),
+            Expanded(child: Tx('Los pendientes se crean desde la ficha del cliente (Clientes y contactos), marcando "Deja un pendiente".', style: TextStyle(color: sonTextoSuave))),
             FilterChip(
-              label: const Text('Mostrar hechos'),
+              label: const Tx('Mostrar hechos'),
               selected: _conHechos,
               onSelected: (v) {
                 setState(() => _conHechos = v);
@@ -607,7 +608,7 @@ class _PestanaPendientesCrmState extends State<PestanaPendientesCrm> {
         const SizedBox(height: 12),
         Expanded(
           child: _lista.isEmpty
-              ? Center(child: Text('No hay pendientes abiertos.', style: TextStyle(color: sonTextoSuave)))
+              ? Center(child: Tx('No hay pendientes abiertos.', style: TextStyle(color: sonTextoSuave)))
               : ListView(
                   children: [
                     for (final entrada in grupos.entries)
@@ -615,7 +616,7 @@ class _PestanaPendientesCrmState extends State<PestanaPendientesCrm> {
                         Padding(
                           padding: const EdgeInsets.only(top: 8, bottom: 6),
                           child: Row(children: [
-                            Text(entrada.key.toUpperCase(), style: TextStyle(color: colores[entrada.key], fontWeight: FontWeight.bold, letterSpacing: 1.1, fontSize: 12)),
+                            Tx(entrada.key.toUpperCase(), style: TextStyle(color: colores[entrada.key], fontWeight: FontWeight.bold, letterSpacing: 1.1, fontSize: 12)),
                             const SizedBox(width: 8),
                             EtiquetaEstado(texto: '${entrada.value.length}', color: colores[entrada.key]!),
                           ]),
@@ -626,13 +627,13 @@ class _PestanaPendientesCrmState extends State<PestanaPendientesCrm> {
                             decoration: decoracionTarjeta(borde: colores[entrada.key]!.withValues(alpha: 0.5)),
                             child: ListTile(
                               leading: Checkbox(value: n['pendiente_hecho'] == true, onChanged: (v) => _tildar(n, v ?? false)),
-                              title: Text('${n['pendiente']}', style: TextStyle(fontWeight: FontWeight.w600, decoration: n['pendiente_hecho'] == true ? TextDecoration.lineThrough : null)),
-                              subtitle: Text([
+                              title: Tx('${n['pendiente']}', style: TextStyle(fontWeight: FontWeight.w600, decoration: n['pendiente_hecho'] == true ? TextDecoration.lineThrough : null)),
+                              subtitle: Tx([
                                 '${n['empresa']}',
                                 if (n['pendiente_responsable'] != null) '${n['pendiente_responsable']}',
                                 if ('${n['texto'] ?? ''}'.isNotEmpty) '${n['texto']}'.length > 80 ? '${'${n['texto']}'.substring(0, 80)}…' : '${n['texto']}',
                               ].join(' · ')),
-                              trailing: Text(n['pendiente_fecha'] == null ? '—' : _fechaTexto(n['pendiente_fecha']), style: TextStyle(fontWeight: FontWeight.bold, color: colores[entrada.key])),
+                              trailing: Tx(n['pendiente_fecha'] == null ? '—' : _fechaTexto(n['pendiente_fecha']), style: TextStyle(fontWeight: FontWeight.bold, color: colores[entrada.key])),
                             ),
                           ),
                       ],
@@ -721,15 +722,15 @@ class _PestanaConversionCrmState extends State<PestanaConversionCrm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(titulo, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+          Tx(titulo, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
           const SizedBox(height: 10),
-          if (grupos.isEmpty) Text('Sin datos en el período.', style: TextStyle(color: sonTextoSuave)),
+          if (grupos.isEmpty) Tx('Sin datos en el período.', style: TextStyle(color: sonTextoSuave)),
           for (final g in grupos)
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(
                 children: [
-                  Expanded(flex: 3, child: Text(razones ? '${g['razon']}' : '${g['nombre']}', overflow: TextOverflow.ellipsis)),
+                  Expanded(flex: 3, child: Tx(razones ? '${g['razon']}' : '${g['nombre']}', overflow: TextOverflow.ellipsis)),
                   Expanded(
                     flex: 2,
                     child: razones
@@ -737,7 +738,7 @@ class _PestanaConversionCrmState extends State<PestanaConversionCrm> {
                         : _barra((g['enviados'] as num) == 0 ? 0 : (g['ganados'] as num) / (g['enviados'] as num), sonLightGreen),
                   ),
                   const SizedBox(width: 10),
-                  Text(razones ? '${g['cantidad']}' : '${g['ganados']}/${g['enviados']}', style: const TextStyle(fontFeatures: [FontFeature.tabularFigures()])),
+                  Tx(razones ? '${g['cantidad']}' : '${g['ganados']}/${g['enviados']}', style: const TextStyle(fontFeatures: [FontFeature.tabularFigures()])),
                 ],
               ),
             ),
@@ -760,7 +761,7 @@ class _PestanaConversionCrmState extends State<PestanaConversionCrm> {
             children: [
               for (final (valor, texto) in _periodos)
                 ChoiceChip(
-                  label: Text(texto),
+                  label: Tx(texto),
                   selected: _periodo == valor,
                   onSelected: (_) {
                     setState(() => _periodo = valor);
@@ -771,9 +772,9 @@ class _PestanaConversionCrmState extends State<PestanaConversionCrm> {
             ],
           ),
           const SizedBox(height: 6),
-          Text('Cuenta los presupuestos enviados en el período (tienen fecha de envío). Ganado = Aceptado, perdido = Rechazado.', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
+          Tx('Cuenta los presupuestos enviados en el período (tienen fecha de envío). Ganado = Aceptado, perdido = Rechazado.', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
           const SizedBox(height: 16),
-          if (_error != null) Text(_error!, style: TextStyle(color: sonRojo)),
+          if (_error != null) Tx(_error!, style: TextStyle(color: sonRojo)),
           if (d == null && _error == null) const Center(child: CircularProgressIndicator()),
           if (d != null) ...[
             Container(
@@ -785,11 +786,11 @@ class _PestanaConversionCrmState extends State<PestanaConversionCrm> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text(d['porcentaje'] == null ? '—' : '${d['porcentaje']}%', style: TextStyle(fontSize: 44, fontWeight: FontWeight.bold, color: sonTexto)),
+                      Tx(d['porcentaje'] == null ? '—' : '${d['porcentaje']}%', style: TextStyle(fontSize: 44, fontWeight: FontWeight.bold, color: sonTexto)),
                       const SizedBox(width: 12),
                       Padding(
                         padding: const EdgeInsets.only(bottom: 8),
-                        child: Text('${d['ganados']} ganados de ${d['enviados']} enviados', style: TextStyle(color: sonTextoSuave, fontSize: 16)),
+                        child: Tx('${d['ganados']} ganados de ${d['enviados']} enviados', style: TextStyle(color: sonTextoSuave, fontSize: 16)),
                       ),
                     ],
                   ),
@@ -898,13 +899,13 @@ class _ConfigCrmState extends State<_ConfigCrm> {
 
   Widget _campo(String titulo, TextEditingController control, {String? ayuda}) => Padding(
         padding: const EdgeInsets.only(bottom: 12),
-        child: TextField(controller: control, maxLines: 5, minLines: 2, decoration: InputDecoration(labelText: titulo, helperText: ayuda, helperMaxLines: 2)),
+        child: TextField(controller: control, maxLines: 5, minLines: 2, decoration: InputDecoration(labelText: trn(titulo), helperText: trn(ayuda), helperMaxLines: 2)),
       );
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Configurar CRM'),
+      title: const Tx('Configurar CRM'),
       content: SizedBox(
         width: 560,
         child: _cargando
@@ -913,20 +914,20 @@ class _ConfigCrmState extends State<_ConfigCrm> {
                 child: Column(
                   children: [
                     _campo('Tipos de cliente y días sin contacto', _umbrales, ayuda: 'Uno por renglón, así: "Prospecto: 7". Pasado ese número de días el cliente se pone en rojo.'),
-                    TextField(controller: _umbralPresupuesto, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Días máximos con un presupuesto abierto')),
+                    TextField(controller: _umbralPresupuesto, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: tr('Días máximos con un presupuesto abierto'))),
                     const SizedBox(height: 12),
                     _campo('Servicios que se presupuestan', _servicios, ayuda: 'Uno por renglón.'),
                     _campo('Responsables comerciales', _responsables, ayuda: 'Uno por renglón.'),
                     _campo('Razones de pérdida', _razones, ayuda: 'Uno por renglón.'),
                     _campo('Tipos de nota', _tiposNota, ayuda: 'Las notas "Interna" no cuentan como contacto con el cliente.'),
-                    if (_error != null) Text(_error!, style: TextStyle(color: sonRojo)),
+                    if (_error != null) Tx(_error!, style: TextStyle(color: sonRojo)),
                   ],
                 ),
               ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-        ElevatedButton(onPressed: _cargando ? null : _guardar, child: const Text('Guardar')),
+        TextButton(onPressed: () => Navigator.pop(context, false), child: const Tx('Cancelar')),
+        ElevatedButton(onPressed: _cargando ? null : _guardar, child: const Tx('Guardar')),
       ],
     );
   }

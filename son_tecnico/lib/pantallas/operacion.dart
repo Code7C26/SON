@@ -11,6 +11,7 @@ import 'package:son_tecnico/services/sesion.dart';
 import 'package:son_tecnico/services/sincronizacion.dart';
 import 'package:son_tecnico/theme/colores.dart';
 
+import 'package:son_tecnico/i18n/idioma.dart';
 // Lo que pidieron los técnicos en la reunión de noviembre de 2026: gastos del auto, vencimientos,
 // ver en qué quedó cada presupuesto pedido y usar la firma con sello cargada en el perfil.
 
@@ -95,7 +96,7 @@ Future<List<Map<String, dynamic>>> cargarGasto(BuildContext context, {Map? orden
   unawaited(Sincronizador.sincronizar());
   if (context.mounted) {
     final texto = cargados.length == 1 ? 'Gasto guardado.' : '${cargados.length} gastos guardados.';
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$texto Le llega a Administración.')));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx('$texto Le llega a Administración.')));
   }
   return cargados;
 }
@@ -200,19 +201,19 @@ class _FormularioGastoState extends State<_FormularioGasto> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            Tx(
               widget.cargadosAntes == 0 ? 'Vehículo y gastos' : 'Otro gasto (${widget.cargadosAntes} ya cargado${widget.cargadosAntes == 1 ? '' : 's'})',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: sonTexto),
             ),
-            if (widget.orden != null) Text('${widget.orden!['cliente'] ?? ''}', style: TextStyle(color: sonTextoSuave)),
+            if (widget.orden != null) Tx('${widget.orden!['cliente'] ?? ''}', style: TextStyle(color: sonTextoSuave)),
             const SizedBox(height: 16),
-            TextField(controller: _vehiculo, textCapitalization: TextCapitalization.words, decoration: const InputDecoration(labelText: 'Auto que usaste hoy', hintText: 'Ej: Clio')),
+            TextField(controller: _vehiculo, textCapitalization: TextCapitalization.words, decoration: InputDecoration(labelText: tr('Auto que usaste hoy'), hintText: tr('Ej: Clio'))),
             const SizedBox(height: 10),
             Row(
               children: [
-                Expanded(child: TextField(controller: _kmInicio, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Km al salir'))),
+                Expanded(child: TextField(controller: _kmInicio, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: tr('Km al salir')))),
                 const SizedBox(width: 12),
-                Expanded(child: TextField(controller: _kmFin, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Km al volver'))),
+                Expanded(child: TextField(controller: _kmFin, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: tr('Km al volver')))),
               ],
             ),
             const SizedBox(height: 10),
@@ -221,19 +222,19 @@ class _FormularioGastoState extends State<_FormularioGasto> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     initialValue: _tipo,
-                    decoration: const InputDecoration(labelText: 'Gasto'),
-                    items: tiposDeGasto.map((tipo) => DropdownMenuItem(value: tipo, child: Text(tipo))).toList(),
+                    decoration: InputDecoration(labelText: tr('Gasto')),
+                    items: tiposDeGasto.map((tipo) => DropdownMenuItem(value: tipo, child: Tx(tipo))).toList(),
                     onChanged: (valor) => setState(() => _tipo = valor ?? 'Otro'),
                   ),
                 ),
                 const SizedBox(width: 12),
-                Expanded(child: TextField(controller: _monto, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(labelText: 'Monto \$'))),
+                Expanded(child: TextField(controller: _monto, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: InputDecoration(labelText: tr('Monto \$')))),
               ],
             ),
             const SizedBox(height: 10),
-            TextField(controller: _detalle, maxLength: 500, decoration: const InputDecoration(labelText: 'Detalle (opcional)', hintText: 'Ej: YPF ruta 5')),
+            TextField(controller: _detalle, maxLength: 500, decoration: InputDecoration(labelText: tr('Detalle (opcional)'), hintText: tr('Ej: YPF ruta 5'))),
             if (_foto == null)
-              OutlinedButton.icon(onPressed: _sacarFoto, icon: const Icon(Icons.receipt_long_outlined), label: const Text('Foto del ticket'))
+              OutlinedButton.icon(onPressed: _sacarFoto, icon: const Icon(Icons.receipt_long_outlined), label: const Tx('Foto del ticket'))
             else
               Row(
                 children: [
@@ -248,28 +249,28 @@ class _FormularioGastoState extends State<_FormularioGasto> {
                   TextButton.icon(
                     onPressed: () => setState(() => _foto = null),
                     icon: Icon(Icons.delete_outline, color: sonRojo),
-                    label: Text('Quitar foto', style: TextStyle(color: sonRojo)),
+                    label: Tx('Quitar foto', style: TextStyle(color: sonRojo)),
                   ),
                 ],
               ),
-            if (_error != null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600))),
+            if (_error != null) Padding(padding: const EdgeInsets.only(top: 10), child: Tx(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600))),
             const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
                   child: SizedBox(
                     height: 50,
-                    child: OutlinedButton(onPressed: () => _guardar(otro: true), child: const Text('Guardar y cargar otro', textAlign: TextAlign.center)),
+                    child: OutlinedButton(onPressed: () => _guardar(otro: true), child: const Tx('Guardar y cargar otro', textAlign: TextAlign.center)),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: SizedBox(height: 50, child: ElevatedButton(onPressed: _guardar, child: const Text('Guardar', style: TextStyle(fontSize: 16)))),
+                  child: SizedBox(height: 50, child: ElevatedButton(onPressed: _guardar, child: const Tx('Guardar', style: TextStyle(fontSize: 16)))),
                 ),
               ],
             ),
             const SizedBox(height: 8),
-            Text('Va solo a Administración: no sale en el informe del cliente.', style: TextStyle(color: sonTextoSuave, fontSize: 12.5)),
+            Tx('Va solo a Administración: no sale en el informe del cliente.', style: TextStyle(color: sonTextoSuave, fontSize: 12.5)),
           ],
         ),
       ),
@@ -293,7 +294,7 @@ Future<Map<String, dynamic>?> anotarVencimiento(BuildContext context, {required 
   await Sincronizador.encolarVencimiento(vencimiento);
   unawaited(Sincronizador.sincronizar());
   if (context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vencimiento anotado. Avisa antes de que venza.')));
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx('Vencimiento anotado. Avisa antes de que venza.')));
   }
   return vencimiento;
 }
@@ -340,22 +341,22 @@ class _FormularioVencimientoState extends State<_FormularioVencimiento> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Anotar un vencimiento', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: sonTexto)),
-            Text('Avisa a vos y a la oficina dos meses antes.', style: TextStyle(color: sonTextoSuave)),
+            Tx('Anotar un vencimiento', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: sonTexto)),
+            Tx('Avisa a vos y a la oficina dos meses antes.', style: TextStyle(color: sonTextoSuave)),
             const SizedBox(height: 16),
             TextField(
               controller: _descripcion,
               autofocus: true,
               maxLength: 300,
               textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(labelText: '¿Qué vence?', hintText: 'Ej: Extintores ABC 5 kg (carga)'),
+              decoration: InputDecoration(labelText: tr('¿Qué vence?'), hintText: tr('Ej: Extintores ABC 5 kg (carga)')),
             ),
             Row(
               children: [
-                Text('Cantidad', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600)),
+                Tx('Cantidad', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600)),
                 const Spacer(),
                 IconButton(onPressed: _cantidad > 1 ? () => setState(() => _cantidad--) : null, icon: const Icon(Icons.remove_circle_outline)),
-                SizedBox(width: 44, child: Center(child: Text('$_cantidad', style: TextStyle(color: sonTexto, fontSize: 18, fontWeight: FontWeight.bold)))),
+                SizedBox(width: 44, child: Center(child: Tx('$_cantidad', style: TextStyle(color: sonTexto, fontSize: 18, fontWeight: FontWeight.bold)))),
                 IconButton(onPressed: _cantidad < 999 ? () => setState(() => _cantidad++) : null, icon: const Icon(Icons.add_circle_outline)),
               ],
             ),
@@ -371,11 +372,11 @@ class _FormularioVencimientoState extends State<_FormularioVencimiento> {
                 if (elegida != null) setState(() => _vence = elegida);
               },
               icon: const Icon(Icons.event_outlined),
-              label: Text(_vence == null ? 'Fecha de vencimiento' : 'Vence el ${_vence!.day}/${_vence!.month}/${_vence!.year}'),
+              label: Tx(_vence == null ? 'Fecha de vencimiento' : 'Vence el ${_vence!.day}/${_vence!.month}/${_vence!.year}'),
             ),
-            if (_error != null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600))),
+            if (_error != null) Padding(padding: const EdgeInsets.only(top: 10), child: Tx(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600))),
             const SizedBox(height: 16),
-            SizedBox(width: double.infinity, height: 50, child: ElevatedButton(onPressed: _guardar, child: const Text('Anotar', style: TextStyle(fontSize: 16)))),
+            SizedBox(width: double.infinity, height: 50, child: ElevatedButton(onPressed: _guardar, child: const Tx('Anotar', style: TextStyle(fontSize: 16)))),
           ],
         ),
       ),
@@ -410,7 +411,7 @@ String textoDeVencimiento(int dias) => dias < 0 ? 'Vencido' : (dias == 0 ? 'Venc
 Widget _chip(String texto, Color color) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(color: color.withValues(alpha: 0.16), borderRadius: BorderRadius.circular(20)),
-      child: Text(texto, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
+      child: Tx(texto, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
     );
 
 Widget filaVencimiento(Map v, {bool conEmpresa = true}) {
@@ -418,8 +419,8 @@ Widget filaVencimiento(Map v, {bool conEmpresa = true}) {
   return ListTile(
     contentPadding: const EdgeInsets.symmetric(horizontal: 12),
     leading: Icon(Icons.event_busy_outlined, color: colorDeVencimiento(dias)),
-    title: Text('${v['descripcion']}${((v['cantidad'] as num?) ?? 1) > 1 ? ' (x${v['cantidad']})' : ''}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600)),
-    subtitle: Text([if (conEmpresa) '${v['empresa'] ?? ''}', 'Vence el ${fechaCorta('${v['vence']}')}'].where((t) => t.isNotEmpty).join(' · ')),
+    title: Tx('${v['descripcion']}${((v['cantidad'] as num?) ?? 1) > 1 ? ' (x${v['cantidad']})' : ''}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600)),
+    subtitle: Tx([if (conEmpresa) '${v['empresa'] ?? ''}', 'Vence el ${fechaCorta('${v['vence']}')}'].where((t) => t.isNotEmpty).join(' · ')),
     trailing: _chip(textoDeVencimiento(dias), colorDeVencimiento(dias)),
   );
 }
@@ -451,7 +452,7 @@ class _PantallaVencimientosState extends State<PantallaVencimientos> {
     final lista = _lista ?? [];
     return Scaffold(
       backgroundColor: sonFondo,
-      appBar: AppBar(title: Text('Vencimientos de mis clientes', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)), backgroundColor: sonFondo),
+      appBar: AppBar(title: Tx('Vencimientos de mis clientes', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)), backgroundColor: sonFondo),
       body: _cargando
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
@@ -460,8 +461,8 @@ class _PantallaVencimientosState extends State<PantallaVencimientos> {
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
                 children: [
-                  if (_lista == null) Text('Sin conexión y sin datos guardados.', style: TextStyle(color: sonTextoSuave)),
-                  if (_lista != null && lista.isEmpty) Text('No hay nada por vencer en los próximos 4 meses.', style: TextStyle(color: sonTextoSuave)),
+                  if (_lista == null) Tx('Sin conexión y sin datos guardados.', style: TextStyle(color: sonTextoSuave)),
+                  if (_lista != null && lista.isEmpty) Tx('No hay nada por vencer en los próximos 4 meses.', style: TextStyle(color: sonTextoSuave)),
                   if (lista.isNotEmpty) Container(decoration: decoracionTarjeta(), child: Column(children: lista.map((v) => filaVencimiento(v)).toList())),
                 ],
               ),
@@ -498,7 +499,7 @@ class LineaDelPedido extends StatelessWidget {
       children: [
         for (var i = 0; i < pasosDelPresupuesto.length; i++) ...[
           if (i > 0) Icon(Icons.chevron_right, size: 14, color: sonTextoSuave),
-          Text(
+          Tx(
             pasosDelPresupuesto[i],
             style: TextStyle(
               fontSize: 12,
@@ -521,9 +522,9 @@ Widget filaPedido(Map p, {bool conEmpresa = true}) {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('${p['descripcion']}${cantidad > 1 ? ' (x$cantidad)' : ''}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600)),
+        Tx('${p['descripcion']}${cantidad > 1 ? ' (x$cantidad)' : ''}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600)),
         const SizedBox(height: 2),
-        Text(
+        Tx(
           [
             if (conEmpresa) '${p['empresa'] ?? ''}',
             if (creada.length >= 10) 'Pedido el ${fechaCorta(creada.substring(0, 10))}',
@@ -569,7 +570,7 @@ class _PantallaMisPresupuestosState extends State<PantallaMisPresupuestos> {
     final lista = _soloAbiertos ? todos.where((p) => !cerrados.contains(p['estado_visible'])).toList() : todos;
     return Scaffold(
       backgroundColor: sonFondo,
-      appBar: AppBar(title: Text('Mis pedidos de presupuesto', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)), backgroundColor: sonFondo),
+      appBar: AppBar(title: Tx('Mis pedidos de presupuesto', style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold)), backgroundColor: sonFondo),
       body: _cargando
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
@@ -578,16 +579,16 @@ class _PantallaMisPresupuestosState extends State<PantallaMisPresupuestos> {
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
                 children: [
-                  Text('Antes de volver al cliente, fijate si ya se le mandó el presupuesto.', style: TextStyle(color: sonTextoSuave)),
+                  Tx('Antes de volver al cliente, fijate si ya se le mandó el presupuesto.', style: TextStyle(color: sonTextoSuave)),
                   const SizedBox(height: 8),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: const Text('Solo los que siguen abiertos'),
+                    title: const Tx('Solo los que siguen abiertos'),
                     value: _soloAbiertos,
                     onChanged: (valor) => setState(() => _soloAbiertos = valor),
                   ),
-                  if (_lista == null) Text('Sin conexión y sin datos guardados.', style: TextStyle(color: sonTextoSuave)),
-                  if (_lista != null && lista.isEmpty) Text('No hay pedidos para mostrar.', style: TextStyle(color: sonTextoSuave)),
+                  if (_lista == null) Tx('Sin conexión y sin datos guardados.', style: TextStyle(color: sonTextoSuave)),
+                  if (_lista != null && lista.isEmpty) Tx('No hay pedidos para mostrar.', style: TextStyle(color: sonTextoSuave)),
                   if (lista.isNotEmpty)
                     Container(
                       decoration: decoracionTarjeta(),
@@ -651,13 +652,13 @@ class _ResumenDelClienteState extends State<ResumenDelCliente> {
       children: [
         if (_vencimientos.isNotEmpty) ...[
           const SizedBox(height: 20),
-          Text('Vencimientos de este cliente', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: sonTexto)),
+          Tx('Vencimientos de este cliente', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: sonTexto)),
           const SizedBox(height: 8),
           Container(decoration: decoracionTarjeta(), child: Column(children: _vencimientos.map((v) => filaVencimiento(v, conEmpresa: false)).toList())),
         ],
         if (_pedidos.isNotEmpty) ...[
           const SizedBox(height: 20),
-          Text('Presupuestos pedidos', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: sonTexto)),
+          Tx('Presupuestos pedidos', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: sonTexto)),
           const SizedBox(height: 8),
           Container(
             decoration: decoracionTarjeta(),

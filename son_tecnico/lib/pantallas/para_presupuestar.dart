@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:son_tecnico/theme/colores.dart';
 
+import 'package:son_tecnico/i18n/idioma.dart';
 /// Lo que el técnico escribió en la ventana "Anotar para presupuestar".
 class NotaNueva {
   final String descripcion;
@@ -56,7 +57,7 @@ class SeccionParaPresupuestar extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.s12),
-          child: Text('Para presupuestar', style: Theme.of(context).textTheme.titleLarge),
+          child: Tx('Para presupuestar', style: Theme.of(context).textTheme.titleLarge),
         ),
         if (notas.isNotEmpty)
           Container(
@@ -85,7 +86,7 @@ class SeccionParaPresupuestar extends StatelessWidget {
               key: const Key('anotar_presupuesto'),
               onPressed: onAnotar,
               icon: const Icon(Icons.playlist_add_rounded),
-              label: const Text('Anotar para presupuestar'),
+              label: const Tx('Anotar para presupuestar'),
             ),
           ),
         ),
@@ -130,9 +131,9 @@ class _FilaNota extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('${nota['descripcion']}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600)),
+                Tx('${nota['descripcion']}', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 2),
-                Text('Cantidad: $cantidad', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
+                Tx('Cantidad: $cantidad', style: TextStyle(color: sonTextoSuave, fontSize: 13)),
               ],
             ),
           ),
@@ -145,7 +146,7 @@ class _FilaNota extends StatelessWidget {
               children: [
                 Icon(icono, size: 14, color: color),
                 const SizedBox(width: 4),
-                Text(texto, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
+                Tx(texto, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
               ],
             ),
           ),
@@ -201,7 +202,7 @@ class _FormularioNotaState extends State<_FormularioNota> {
       if (mounted) setState(() => _foto = bytes);
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No se pudo abrir la cámara')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Tx('No se pudo abrir la cámara')));
     }
   }
 
@@ -218,7 +219,7 @@ class _FormularioNotaState extends State<_FormularioNota> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Anotar para presupuestar', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: sonTexto)),
+            Tx('Anotar para presupuestar', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: sonTexto)),
             const SizedBox(height: 12),
             const SizedBox(height: 16),
             TextField(
@@ -229,26 +230,26 @@ class _FormularioNotaState extends State<_FormularioNota> {
               maxLines: 4,
               maxLength: 500,
               textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(labelText: '¿Qué hay que presupuestar?', hintText: 'Ej: Extintor ABC de 5 kg'),
+              decoration: InputDecoration(labelText: tr('¿Qué hay que presupuestar?'), hintText: tr('Ej: Extintor ABC de 5 kg')),
             ),
             const SizedBox(height: 4),
             Row(
               children: [
-                Text('Cantidad', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600)),
+                Tx('Cantidad', style: TextStyle(color: sonTexto, fontWeight: FontWeight.w600)),
                 const Spacer(),
                 IconButton(
                   key: const Key('nota_menos'),
-                  tooltip: 'Menos',
+                  tooltip: tr('Menos'),
                   onPressed: _cantidad > 1 ? () => setState(() => _cantidad--) : null,
                   icon: const Icon(Icons.remove_circle_outline),
                 ),
                 SizedBox(
                   width: 44,
-                  child: Center(child: Text('$_cantidad', key: Key('nota_cantidad'), style: TextStyle(color: sonTexto, fontSize: 18, fontWeight: FontWeight.bold))),
+                  child: Center(child: Tx('$_cantidad', key: Key('nota_cantidad'), style: TextStyle(color: sonTexto, fontSize: 18, fontWeight: FontWeight.bold))),
                 ),
                 IconButton(
                   key: const Key('nota_mas'),
-                  tooltip: 'Más',
+                  tooltip: tr('Más'),
                   onPressed: _cantidad < 999 ? () => setState(() => _cantidad++) : null,
                   icon: const Icon(Icons.add_circle_outline),
                 ),
@@ -260,7 +261,7 @@ class _FormularioNotaState extends State<_FormularioNota> {
                 key: const Key('nota_foto'),
                 onPressed: _sacarFoto,
                 icon: const Icon(Icons.add_a_photo_outlined),
-                label: const Text('Agregar foto (opcional)'),
+                label: const Tx('Agregar foto (opcional)'),
               )
             else
               Row(
@@ -276,7 +277,7 @@ class _FormularioNotaState extends State<_FormularioNota> {
                   TextButton.icon(
                     onPressed: () => setState(() => _foto = null),
                     icon: Icon(Icons.delete_outline, color: sonRojo),
-                    label: Text('Quitar foto', style: TextStyle(color: sonRojo)),
+                    label: Tx('Quitar foto', style: TextStyle(color: sonRojo)),
                   ),
                 ],
               ),
@@ -287,7 +288,7 @@ class _FormularioNotaState extends State<_FormularioNota> {
               child: ElevatedButton(
                 key: const Key('nota_guardar'),
                 onPressed: _puedeAnotar ? _anotar : null,
-                child: const Text('Anotar', style: TextStyle(fontSize: 16)),
+                child: const Tx('Anotar', style: TextStyle(fontSize: 16)),
               ),
             ),
           ],

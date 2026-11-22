@@ -7,6 +7,7 @@ import 'package:son_admin/services/api.dart';
 import 'package:son_admin/theme/tema.dart';
 import 'package:son_admin/ui/componentes.dart';
 
+import 'package:son_admin/i18n/idioma.dart';
 const List<String> provinciasArgentinas = [
   'Buenos Aires',
   'Catamarca',
@@ -152,7 +153,7 @@ class _PantallaClientesState extends State<PantallaClientes> {
   Future<void> _abrir([Map<String, dynamic>? cliente]) async {
     final guardado = await showDialog<bool>(context: context, builder: (_) => DialogoCliente(cliente: cliente));
     if (guardado != true || !mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(cliente == null ? 'Cliente creado' : 'Cliente actualizado')));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Tx(cliente == null ? 'Cliente creado' : 'Cliente actualizado')));
     _cargar();
   }
 
@@ -182,7 +183,7 @@ class _PantallaClientesState extends State<PantallaClientes> {
     Widget etiqueta(String texto) => Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(color: sonTarjetaAlta, borderRadius: BorderRadius.circular(20), border: Border.all(color: sonBorde)),
-          child: Text(texto, style: TextStyle(color: sonTexto, fontSize: 12, fontWeight: FontWeight.w600)),
+          child: Tx(texto, style: TextStyle(color: sonTexto, fontSize: 12, fontWeight: FontWeight.w600)),
         );
 
     return InkWell(
@@ -199,13 +200,13 @@ class _PantallaClientesState extends State<PantallaClientes> {
               children: [
                 Icon(Icons.business_outlined, color: sonLightGreen, size: 20),
                 const SizedBox(width: 10),
-                Expanded(child: Text(_texto(cliente, 'razon_social'), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold, fontSize: 17))),
-                if (pendientes > 0) Tooltip(message: 'Notas de técnicos sin presupuestar', child: EtiquetaEstado(texto: '$pendientes por presupuestar', color: sonAmbar)),
+                Expanded(child: Tx(_texto(cliente, 'razon_social'), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sonTexto, fontWeight: FontWeight.bold, fontSize: 17))),
+                if (pendientes > 0) Tooltip(message: tr('Notas de técnicos sin presupuestar'), child: EtiquetaEstado(texto: '$pendientes por presupuestar', color: sonAmbar)),
               ],
             ),
             const SizedBox(height: 10),
             if (sinContacto)
-              Text('Sin datos de contacto todavía. Tocá la ficha para completarlos.', style: TextStyle(color: sonTextoSuave, fontSize: 13))
+              Tx('Sin datos de contacto todavía. Tocá la ficha para completarlos.', style: TextStyle(color: sonTextoSuave, fontSize: 13))
             else ...[
               if (contacto.isNotEmpty) DatoConIcono(icono: Icons.person_outline, texto: contacto, color: sonTexto),
               if (telefono.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 4), child: DatoConIcono(icono: Icons.phone_outlined, texto: telefono)),
@@ -227,7 +228,7 @@ class _PantallaClientesState extends State<PantallaClientes> {
             const SizedBox(height: 6),
             Row(
               children: [
-                Text(ordenes == 1 ? '1 orden de trabajo' : '$ordenes órdenes de trabajo', style: TextStyle(color: sonTextoSuave, fontSize: 12.5)),
+                Tx(ordenes == 1 ? '1 orden de trabajo' : '$ordenes órdenes de trabajo', style: TextStyle(color: sonTextoSuave, fontSize: 12.5)),
                 const Spacer(),
                 Icon(Icons.edit_outlined, size: 18, color: sonAzul),
               ],
@@ -245,9 +246,9 @@ class _PantallaClientesState extends State<PantallaClientes> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(_error!, style: TextStyle(color: sonRojo)),
+            Tx(_error!, style: TextStyle(color: sonRojo)),
             const SizedBox(height: 12),
-            OutlinedButton.icon(onPressed: _cargar, icon: const Icon(Icons.refresh), label: const Text('Reintentar')),
+            OutlinedButton.icon(onPressed: _cargar, icon: const Icon(Icons.refresh), label: const Tx('Reintentar')),
           ],
         ),
       );
@@ -256,7 +257,7 @@ class _PantallaClientesState extends State<PantallaClientes> {
       return Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 460),
-          child: Text(
+          child: Tx(
             'Todavía no hay clientes. Con Nuevo cliente se carga el primero: nombre, contacto y dirección. Las visitas de ese cliente quedan archivadas en SON.',
             textAlign: TextAlign.center,
             style: TextStyle(color: sonTextoSuave, fontSize: 16, height: 1.45),
@@ -265,7 +266,7 @@ class _PantallaClientesState extends State<PantallaClientes> {
       );
     }
     final visibles = _visibles;
-    if (visibles.isEmpty) return Center(child: Text('No se encontró ningún cliente con esa búsqueda.', style: TextStyle(color: sonTextoSuave)));
+    if (visibles.isEmpty) return Center(child: Tx('No se encontró ningún cliente con esa búsqueda.', style: TextStyle(color: sonTextoSuave)));
     return GridView.builder(
       padding: const EdgeInsets.only(bottom: 16),
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: 440, mainAxisExtent: 272, crossAxisSpacing: 18, mainAxisSpacing: 18),
@@ -294,7 +295,7 @@ class _PantallaClientesState extends State<PantallaClientes> {
               ElevatedButton.icon(
                 key: const Key('nuevo_cliente'),
                 icon: const Icon(Icons.add),
-                label: const Text('Nuevo cliente'),
+                label: const Tx('Nuevo cliente'),
                 onPressed: () => _abrir(),
               ),
             ],
@@ -308,18 +309,18 @@ class _PantallaClientesState extends State<PantallaClientes> {
                   key: const Key('buscar_cliente'),
                   controller: _busqueda,
                   decoration: InputDecoration(
-                    hintText: 'Buscar por nombre, contacto, CUIT, ciudad...',
+                    hintText: tr('Buscar por nombre, contacto, CUIT, ciudad...'),
                     prefixIcon: const Icon(Icons.search, size: 20),
                     isDense: true,
                     suffixIcon: _busqueda.text.isEmpty
                         ? null
-                        : IconButton(tooltip: 'Borrar búsqueda', icon: const Icon(Icons.close, size: 18), onPressed: _busqueda.clear),
+                        : IconButton(tooltip: tr('Borrar búsqueda'), icon: const Icon(Icons.close, size: 18), onPressed: _busqueda.clear),
                   ),
                 ),
               ),
               const SizedBox(width: 16),
               if (!_cargando && _error == null)
-                Text(_clientes.length == 1 ? '1 cliente' : '${_clientes.length} clientes', style: TextStyle(color: sonTextoSuave)),
+                Tx(_clientes.length == 1 ? '1 cliente' : '${_clientes.length} clientes', style: TextStyle(color: sonTextoSuave)),
             ],
           ),
           const SizedBox(height: 20),
@@ -419,10 +420,10 @@ class _DialogoClienteState extends State<DialogoCliente> {
       key: clave,
       initialValue: valor,
       isExpanded: true,
-      decoration: InputDecoration(labelText: etiqueta),
+      decoration: InputDecoration(labelText: trn(etiqueta)),
       items: [
-        DropdownMenuItem(value: '', child: Text('Sin definir', style: TextStyle(color: sonTextoSuave))),
-        for (final opcion in todas) DropdownMenuItem(value: opcion, child: Text(opcion, overflow: TextOverflow.ellipsis)),
+        DropdownMenuItem(value: '', child: Tx('Sin definir', style: TextStyle(color: sonTextoSuave))),
+        for (final opcion in todas) DropdownMenuItem(value: opcion, child: Tx(opcion, overflow: TextOverflow.ellipsis)),
       ],
       onChanged: (nuevo) => alCambiar(nuevo ?? ''),
     );
@@ -440,7 +441,7 @@ class _DialogoClienteState extends State<DialogoCliente> {
         fieldViewBuilder: (context, controlador, foco, alEnviar) => TextField(
           controller: controlador,
           focusNode: foco,
-          decoration: const InputDecoration(labelText: 'Actividad', suffixIcon: Icon(Icons.arrow_drop_down)),
+          decoration: InputDecoration(labelText: tr('Actividad'), suffixIcon: Icon(Icons.arrow_drop_down)),
         ),
         optionsViewBuilder: (context, alElegir, opciones) => Align(
           alignment: Alignment.topLeft,
@@ -452,7 +453,7 @@ class _DialogoClienteState extends State<DialogoCliente> {
               child: ListView(
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
-                children: [for (final opcion in opciones) ListTile(dense: true, title: Text(opcion), onTap: () => alElegir(opcion))],
+                children: [for (final opcion in opciones) ListTile(dense: true, title: Tx(opcion), onTap: () => alElegir(opcion))],
               ),
             ),
           ),
@@ -478,13 +479,13 @@ class _DialogoClienteState extends State<DialogoCliente> {
 
   Widget _titulo(String texto) => Padding(
         padding: const EdgeInsets.only(bottom: 10, top: 4),
-        child: Text(texto.toUpperCase(), style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.1)),
+        child: Tx(texto.toUpperCase(), style: TextStyle(color: sonLightGreen, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.1)),
       );
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(_esNuevo ? 'Nuevo cliente' : 'Ficha del cliente'),
+      title: Tx(_esNuevo ? 'Nuevo cliente' : 'Ficha del cliente'),
       content: SizedBox(
         width: 620,
         child: SingleChildScrollView(
@@ -493,9 +494,9 @@ class _DialogoClienteState extends State<DialogoCliente> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _titulo('Empresa'),
-              _fila([TextField(key: const Key('campo_nombre'), controller: _nombre, decoration: const InputDecoration(labelText: 'Nombre de la empresa *'))]),
+              _fila([TextField(key: const Key('campo_nombre'), controller: _nombre, decoration: InputDecoration(labelText: tr('Nombre de la empresa *')))]),
               _fila([
-                TextField(key: const Key('campo_cuit'), controller: _cuit, decoration: const InputDecoration(labelText: 'CUIT', hintText: '30-12345678-9')),
+                TextField(key: const Key('campo_cuit'), controller: _cuit, decoration: InputDecoration(labelText: tr('CUIT'), hintText: tr('30-12345678-9'))),
                 _campoActividad(),
               ]),
               _fila([
@@ -504,23 +505,23 @@ class _DialogoClienteState extends State<DialogoCliente> {
               ]),
               _titulo('Contacto'),
               _fila([
-                TextField(controller: _contacto, decoration: const InputDecoration(labelText: 'Persona de contacto')),
-                TextField(controller: _telefono, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'Teléfono')),
+                TextField(controller: _contacto, decoration: InputDecoration(labelText: tr('Persona de contacto'))),
+                TextField(controller: _telefono, keyboardType: TextInputType.phone, decoration: InputDecoration(labelText: tr('Teléfono'))),
               ]),
-              _fila([TextField(key: const Key('campo_email'), controller: _email, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Correo electrónico'))]),
+              _fila([TextField(key: const Key('campo_email'), controller: _email, keyboardType: TextInputType.emailAddress, decoration: InputDecoration(labelText: tr('Correo electrónico')))]),
               _titulo('Ubicación'),
-              _fila([TextField(controller: _direccion, decoration: const InputDecoration(labelText: 'Dirección'))]),
+              _fila([TextField(controller: _direccion, decoration: InputDecoration(labelText: tr('Dirección')))]),
               _fila([
                 _desplegable(etiqueta: 'Provincia', valor: _provincia, opciones: provinciasArgentinas, alCambiar: (v) => _provincia = v, clave: const Key('campo_provincia')),
-                TextField(controller: _departamento, decoration: const InputDecoration(labelText: 'Departamento')),
-                TextField(controller: _ciudad, decoration: const InputDecoration(labelText: 'Ciudad')),
+                TextField(controller: _departamento, decoration: InputDecoration(labelText: tr('Departamento'))),
+                TextField(controller: _ciudad, decoration: InputDecoration(labelText: tr('Ciudad'))),
               ]),
               _titulo('Notas'),
-              TextField(controller: _notas, maxLines: 3, maxLength: 2000, decoration: const InputDecoration(hintText: 'Ej: paga a 30 días, avisar antes de ir')),
+              TextField(controller: _notas, maxLines: 3, maxLength: 2000, decoration: InputDecoration(hintText: tr('Ej: paga a 30 días, avisar antes de ir'))),
               if (_error != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  child: Text(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600)),
+                  child: Tx(_error!, style: TextStyle(color: sonRojo, fontWeight: FontWeight.w600)),
                 ),
             ],
           ),
@@ -531,10 +532,10 @@ class _DialogoClienteState extends State<DialogoCliente> {
           TextButton.icon(
             onPressed: () => abrirAccesoCliente(context, (_datos['id'] as num).toInt(), '${_datos['razon_social'] ?? ''}'),
             icon: const Icon(Icons.link),
-            label: const Text('Acceso del cliente'),
+            label: const Tx('Acceso del cliente'),
           ),
-        TextButton(onPressed: _guardando ? null : () => Navigator.pop(context, false), child: Text('Cancelar', style: TextStyle(color: sonTextoSuave))),
-        ElevatedButton(key: const Key('guardar_cliente'), onPressed: _guardando ? null : _guardar, child: Text(_esNuevo ? 'Crear cliente' : 'Guardar')),
+        TextButton(onPressed: _guardando ? null : () => Navigator.pop(context, false), child: Tx('Cancelar', style: TextStyle(color: sonTextoSuave))),
+        ElevatedButton(key: const Key('guardar_cliente'), onPressed: _guardando ? null : _guardar, child: Tx(_esNuevo ? 'Crear cliente' : 'Guardar')),
       ],
     );
   }
