@@ -1,0 +1,148 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.ttf"); font-weight: 600; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.ttf"); font-weight: 700; }
+    #root { position: absolute; inset: 0; overflow: hidden; background: #f4f4f4; font-family: "Inter", sans-serif; color: #2e2e2e; }
+
+    /* Navegador: 1440×810 de pantalla (captura 1920×1080 a escala 0.75) + barra de 36 px */
+    #pn-nav { position: absolute; left: 240px; top: 136px; width: 1440px; height: 846px; border-radius: 20px; overflow: hidden;
+      background: #ffffff; border: 1px solid #d5d5d5; box-shadow: 0 24px 60px rgba(46, 46, 46, 0.12); }
+    .barra { position: absolute; left: 0; top: 0; right: 0; height: 36px; background: #e7e7e7; display: flex; align-items: center; gap: 8px; padding: 0 16px; }
+    .barra i { width: 12px; height: 12px; border-radius: 50%; background: #d5d5d5; display: inline-block; }
+    .barra span { margin-left: 18px; height: 22px; padding: 0 16px; border-radius: 999px; background: #f4f4f4; font-size: 14px; font-weight: 600;
+      color: #6e6e6e; display: inline-flex; align-items: center; }
+    #pn-vista { position: absolute; left: 0; top: 36px; width: 1440px; height: 810px; overflow: hidden; background: #f4f4f4; }
+    #pn-lienzo { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+    .cap { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; opacity: 0; }
+    #pn-c01 { opacity: 1; }
+    .anillo { position: absolute; border: 5px solid #ff6147; border-radius: 22px; opacity: 0; box-shadow: 0 0 0 9999px rgba(46, 46, 46, 0.0); }
+    #pn-cursor { position: absolute; left: 0; top: 0; width: 44px; height: 44px; transform-origin: 0 0; }
+    #pn-onda { position: absolute; left: 0; top: 0; width: 80px; height: 80px; border-radius: 50%; border: 5px solid #ff6147; opacity: 0; }
+
+    /* Rótulo flotante: qué se está haciendo */
+    .rotulo { position: absolute; left: 280px; top: 948px; height: 64px; padding: 0 30px; border-radius: 999px; background: #2e2e2e; color: #ffffff;
+      display: inline-flex; align-items: center; gap: 14px; font-size: 28px; font-weight: 700; opacity: 0; box-shadow: 0 12px 30px rgba(46, 46, 46, 0.18); }
+    .rotulo i { width: 12px; height: 12px; border-radius: 50%; background: #ff6147; display: inline-block; }
+  </style>
+  <div id="root" data-composition-id="panel" data-width="1920" data-height="1080">
+    <div id="pn-nav">
+      <div class="barra"><i></i><i></i><i></i><span>sonoperation.com/panel</span></div>
+      <div id="pn-vista">
+        <div id="pn-lienzo">
+          <img id="pn-c01" class="cap" src="assets/capturas/p01-login.png" alt="" />
+          <img id="pn-c02" class="cap" src="assets/capturas/p02-login-lleno.png" alt="" />
+          <img id="pn-c03" class="cap" src="assets/capturas/p03-inicio.png" alt="" />
+          <img id="pn-c04" class="cap" src="assets/capturas/p04-ordenes.png" alt="" />
+          <img id="pn-c05" class="cap" src="assets/capturas/p06-tecnicos-lista.png" alt="" />
+          <img id="pn-c06" class="cap" src="assets/capturas/p06b-orden-datos.png" alt="" />
+          <img id="pn-c07" class="cap" src="assets/capturas/p06c-orden-horario.png" alt="" />
+          <img id="pn-c08" class="cap" src="assets/capturas/p06d-orden-checklist.png" alt="" />
+          <img id="pn-c09" class="cap" src="assets/capturas/p07-orden-llena.png" alt="" />
+          <img id="pn-c10" class="cap" src="assets/capturas/p09-asignada.png" alt="" />
+          <div id="pn-a1" class="anillo"></div>
+          <div id="pn-a2" class="anillo"></div>
+          <div id="pn-a3" class="anillo"></div>
+          <div id="pn-a4" class="anillo"></div>
+          <div id="pn-a5" class="anillo"></div>
+          <div id="pn-a6" class="anillo"></div>
+          <div id="pn-a7" class="anillo"></div>
+          <div id="pn-a8" class="anillo"></div>
+          <div id="pn-onda"></div>
+          <svg id="pn-cursor" viewBox="0 0 24 24"><path d="M3 2 L3 19 L7.6 14.9 L10.6 21.6 L13.6 20.3 L10.7 13.7 L17 13.5 Z" fill="#2e2e2e" stroke="#ffffff" stroke-width="1.4" stroke-linejoin="round" /></svg>
+        </div>
+      </div>
+    </div>
+    <div id="pn-r1" class="rotulo"><i></i>Ingresar</div>
+    <div id="pn-r2" class="rotulo"><i></i>Inicio en vivo</div>
+    <div id="pn-r3" class="rotulo"><i></i>Técnicos en el mapa</div>
+    <div id="pn-r4" class="rotulo"><i></i>Órdenes de trabajo</div>
+    <div id="pn-r5" class="rotulo"><i></i>Nueva orden</div>
+    <div id="pn-r6" class="rotulo"><i></i>Asignar trabajo</div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const BASE = 0.75, VW = 1440, VH = 810;
+      gsap.set("#pn-lienzo", { x: 0, y: 0, scale: BASE });
+      gsap.set("#pn-cursor", { x: 1500, y: 820 });
+
+      // Cámara: lleva el punto (cx, cy) de la captura al centro con zoom z, sin mostrar bordes vacíos
+      function cam(t, cx, cy, z, d) {
+        const s = BASE * z;
+        let x = VW / 2 - cx * s, y = VH / 2 - cy * s;
+        x = Math.min(0, Math.max(VW - 1920 * s, x));
+        y = Math.min(0, Math.max(VH - 1080 * s, y));
+        tl.to("#pn-lienzo", { x, y, scale: s, duration: d || 0.9, ease: "power2.inOut" }, t);
+      }
+      const ver = (t, id) => tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: 0.22, ease: "none" }, t);
+      const mover = (t, x, y, d) => tl.to("#pn-cursor", { x, y, duration: d || 0.6, ease: "power2.inOut" }, t);
+      function clic(t, x, y) {
+        tl.to("#pn-cursor", { scale: 0.82, duration: 0.08, yoyo: true, repeat: 1, ease: "power1.inOut" }, t);
+        tl.fromTo("#pn-onda", { x: x - 40, y: y - 40, scale: 0.2, opacity: 0.9 }, { scale: 1.5, opacity: 0, duration: 0.5, ease: "power2.out" }, t);
+      }
+      function anillo(t, id, x, y, w, h, dur) {
+        gsap.set(id, { left: x - 10, top: y - 10, width: w + 20, height: h + 20 });
+        tl.fromTo(id, { opacity: 0, scale: 1.05 }, { opacity: 1, scale: 1, duration: 0.35, ease: "power3.out" }, t);
+        tl.to(id, { opacity: 0, duration: 0.25, ease: "none" }, t + dur);
+      }
+      function rotulo(t, id, dur) {
+        tl.fromTo(id, { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.4, ease: "power4.out" }, t);
+        tl.to(id, { opacity: 0, x: 12, duration: 0.25, ease: "power2.in" }, t + dur);
+      }
+
+      // Entrada del navegador
+      tl.fromTo("#pn-nav", { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.7, ease: "expo.out" }, 0);
+
+      // Ingreso
+      rotulo(0.4, "#pn-r1", 2.2);
+      mover(0.5, 1440, 525); clic(1.15, 1440, 525); ver(1.3, "#pn-c02");
+      mover(1.6, 1440, 665); clic(2.2, 1440, 665); ver(2.45, "#pn-c03");
+
+      // Inicio: indicadores y mapa con técnicos
+      rotulo(2.8, "#pn-r2", 3.0);
+      cam(2.8, 1096, 300, 1.2);
+      anillo(3.5, "#pn-a1", 304, 192, 1584, 198, 2.1);
+      mover(3.2, 1250, 760, 1.2);
+      rotulo(6.0, "#pn-r3", 3.4);
+      cam(5.8, 1095, 640, 1.3, 1.0);
+      anillo(6.6, "#pn-a2", 304, 414, 1184, 520, 2.4);
+      anillo(7.3, "#pn-a3", 1508, 414, 380, 290, 1.7);
+      cam(9.2, 960, 540, 1, 0.8);
+
+      // Órdenes de trabajo
+      mover(9.5, 106, 213, 0.7); clic(10.2, 106, 213); ver(10.4, "#pn-c04");
+      rotulo(10.2, "#pn-r4", 5.4);
+      cam(11.0, 1200, 560, 1.18, 0.9);
+      anillo(11.6, "#pn-a4", 1404, 299, 210, 757, 3.2);
+      cam(14.9, 960, 540, 1, 0.6);
+
+      // Nueva orden
+      mover(15.2, 1804, 91, 0.8); clic(16.1, 1804, 91); ver(16.35, "#pn-c05");
+      rotulo(16.0, "#pn-r5", 12.2);
+      cam(16.6, 960, 360, 1.55, 0.9);
+      mover(17.3, 770, 168, 0.6); clic(18.0, 770, 168); ver(18.25, "#pn-c06");
+      anillo(18.6, "#pn-a5", 710, 142, 500, 230, 1.9);
+      mover(20.3, 1066, 408, 0.6); clic(20.9, 1066, 408); ver(21.1, "#pn-c07");
+      anillo(21.3, "#pn-a6", 1020, 384, 192, 48, 1.4);
+      cam(22.6, 960, 640, 1.55, 0.9);
+      mover(22.9, 958, 535, 0.6); clic(23.45, 958, 535); ver(23.65, "#pn-c08");
+      anillo(23.9, "#pn-a7", 710, 462, 500, 145, 2.0);
+      mover(25.5, 958, 798, 0.5); clic(26.0, 958, 798); ver(26.2, "#pn-c09");
+
+      // Asignar trabajo
+      cam(27.0, 1050, 840, 1.55, 0.9);
+      mover(27.5, 1128, 958, 0.7);
+      rotulo(28.4, "#pn-r6", 3.4);
+      clic(28.9, 1128, 958); ver(29.15, "#pn-c10");
+      cam(29.3, 960, 540, 1, 0.6);
+      cam(30.0, 1508, 420, 1.6, 0.9);
+      tl.to("#pn-cursor", { opacity: 0, duration: 0.2 }, 29.6);
+      anillo(30.7, "#pn-a8", 1415, 339, 188, 72, 1.0);
+
+      // Salida hacia la app
+      tl.to("#pn-nav", { x: -260, opacity: 0, duration: 0.4, ease: "power3.in" }, 31.6);
+
+      window.__timelines["panel"] = tl;
+    })();
+  </script>
+</template>

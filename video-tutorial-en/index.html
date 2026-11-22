@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #f4f4f4; }
+      #root { width: 100%; height: 100%; position: relative; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="115" data-width="1920" data-height="1080">
+      <!-- Escenas: capturas reales del panel web y de la app del técnico (assets/capturas) -->
+      <div id="apertura" class="clip" data-composition-id="apertura" data-composition-src="compositions/apertura.html" data-start="0" data-duration="6" data-track-index="0" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index: 3"></div>
+      <div id="panel" class="clip" data-composition-id="panel" data-composition-src="compositions/panel.html" data-start="6" data-duration="32" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index: 1"></div>
+      <div id="app" class="clip" data-composition-id="app" data-composition-src="compositions/app.html" data-start="38" data-duration="40" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index: 1"></div>
+      <div id="informe" class="clip" data-composition-id="informe" data-composition-src="compositions/informe.html" data-start="78" data-duration="9" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index: 1"></div>
+      <div id="encuesta" class="clip" data-composition-id="encuesta" data-composition-src="compositions/encuesta.html" data-start="87" data-duration="7" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index: 1"></div>
+      <div id="resultados" class="clip" data-composition-id="resultados" data-composition-src="compositions/resultados.html" data-start="94" data-duration="14" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index: 1"></div>
+      <div id="cierre" class="clip" data-composition-id="cierre" data-composition-src="compositions/cierre.html" data-start="108" data-duration="7" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index: 1"></div>
+      <div id="guia" class="clip" data-composition-id="guia" data-composition-src="compositions/guia.html" data-start="6" data-duration="102" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index: 5"></div>
+
+      <!-- Voz en off: voz clonada de la autora (ElevenLabs), normalizada a -17.5 LUFS, una frase por pantalla.
+           Generado con scripts/armar_index.py en: cada frase cae en su acción. -->
+      <audio id="voz-apertura" class="clip" src="assets/voz/locucion-clon-en.mp3" data-start="0.6" data-media-start="0.0" data-duration="5.29" data-track-index="3" data-volume="1"></audio>
+      <audio id="voz-inicio" class="clip" src="assets/voz/locucion-clon-en.mp3" data-start="6.21" data-media-start="5.29" data-duration="8.19" data-track-index="4" data-volume="1"></audio>
+      <audio id="voz-ordenes" class="clip" src="assets/voz/locucion-clon-en.mp3" data-start="16.3" data-media-start="13.48" data-duration="3.97" data-track-index="3" data-volume="1"></audio>
+      <audio id="voz-nueva" class="clip" src="assets/voz/locucion-clon-en.mp3" data-start="20.89" data-media-start="17.45" data-duration="8.07" data-track-index="4" data-volume="1"></audio>
+      <audio id="voz-asignar" class="clip" src="assets/voz/locucion-clon-en.mp3" data-start="34.53" data-media-start="25.52" data-duration="5.22" data-track-index="3" data-volume="1"></audio>
+      <audio id="voz-jornada" class="clip" src="assets/voz/locucion-clon-en.mp3" data-start="40.08" data-media-start="30.74" data-duration="4.24" data-track-index="4" data-volume="1"></audio>
+      <audio id="voz-gps" class="clip" src="assets/voz/locucion-clon-en.mp3" data-start="44.58" data-media-start="34.98" data-duration="6.21" data-track-index="3" data-volume="1"></audio>
+      <audio id="voz-checklist" class="clip" src="assets/voz/locucion-clon-en.mp3" data-start="53.72" data-media-start="41.19" data-duration="4.02" data-track-index="4" data-volume="1"></audio>
+      <audio id="voz-fotos" class="clip" src="assets/voz/locucion-clon-en.mp3" data-start="59.69" data-media-start="45.21" data-duration="3.23" data-track-index="3" data-volume="1"></audio>
+      <audio id="voz-notas" class="clip" src="assets/voz/locucion-clon-en.mp3" data-start="64.74" data-media-start="48.44" data-duration="2.36" data-track-index="4" data-volume="1"></audio>
+      <audio id="voz-firmas" class="clip" src="assets/voz/locucion-clon-en.mp3" data-start="69.32" data-media-start="50.8" data-duration="6.87" data-track-index="3" data-volume="1"></audio>
+      <audio id="voz-informe" class="clip" src="assets/voz/locucion-clon-en.mp3" data-start="77.95" data-media-start="57.67" data-duration="7.02" data-track-index="4" data-volume="1"></audio>
+      <audio id="voz-encuesta" class="clip" src="assets/voz/locucion-clon-en.mp3" data-start="87.27" data-media-start="64.69" data-duration="4.65" data-track-index="3" data-volume="1"></audio>
+      <audio id="voz-resultados" class="clip" src="assets/voz/locucion-clon-en.mp3" data-start="94.8" data-media-start="69.34" data-duration="10.37" data-track-index="4" data-volume="1"></audio>
+      <audio id="voz-cierre" class="clip" src="assets/voz/locucion-clon-en.mp3" data-start="109.05" data-media-start="79.71" data-duration="2.65" data-track-index="3" data-volume="1"></audio>
+
+      <!-- Música: «educational presentation tutorial» (Monume, Pixabay), duplicada con fundido de 2 s en 59.4 s
+           (assets/musica/tutorial-loop.mp3). Baja bajo la voz y sube en el cierre. -->
+      <audio id="musica" class="clip" src="assets/musica/tutorial-loop.mp3" data-start="0" data-media-start="0" data-duration="115" data-track-index="11" data-volume="1" data-timeline-role="music" data-automation="{&quot;version&quot;: 1, &quot;lanes&quot;: [{&quot;target&quot;: &quot;volume&quot;, &quot;points&quot;: [{&quot;t&quot;: 0, &quot;v&quot;: 0}, {&quot;t&quot;: 0.6, &quot;v&quot;: 0.2}, {&quot;t&quot;: 111.8, &quot;v&quot;: 0.2}, {&quot;t&quot;: 112.4, &quot;v&quot;: 0.38}, {&quot;t&quot;: 113.6, &quot;v&quot;: 0.38}, {&quot;t&quot;: 114.95, &quot;v&quot;: 0}]}]}"></audio>
+
+      <!-- Efectos: cada uno con su causa en pantalla (clic, toque, tilde, cambio de escena, correo) -->
+      <audio id="sfx-clic-1" class="clip" src="assets/sfx/click-soft.mp3" data-start="7.15" data-duration="0.36" data-track-index="6" data-volume="0.4"></audio>
+      <audio id="sfx-clic-2" class="clip" src="assets/sfx/click-soft.mp3" data-start="8.2" data-duration="0.36" data-track-index="5" data-volume="0.4"></audio>
+      <audio id="sfx-clic-3" class="clip" src="assets/sfx/click-soft.mp3" data-start="16.2" data-duration="0.36" data-track-index="6" data-volume="0.4"></audio>
+      <audio id="sfx-clic-4" class="clip" src="assets/sfx/click-soft.mp3" data-start="22.1" data-duration="0.36" data-track-index="5" data-volume="0.4"></audio>
+      <audio id="sfx-clic-5" class="clip" src="assets/sfx/click-soft.mp3" data-start="24.0" data-duration="0.36" data-track-index="6" data-volume="0.4"></audio>
+      <audio id="sfx-clic-6" class="clip" src="assets/sfx/click-soft.mp3" data-start="26.9" data-duration="0.36" data-track-index="5" data-volume="0.4"></audio>
+      <audio id="sfx-clic-7" class="clip" src="assets/sfx/click-soft.mp3" data-start="29.45" data-duration="0.36" data-track-index="6" data-volume="0.4"></audio>
+      <audio id="sfx-clic-8" class="clip" src="assets/sfx/click-soft.mp3" data-start="32.0" data-duration="0.36" data-track-index="5" data-volume="0.4"></audio>
+      <audio id="sfx-clic-9" class="clip" src="assets/sfx/click-soft.mp3" data-start="34.9" data-duration="0.36" data-track-index="6" data-volume="0.4"></audio>
+      <audio id="sfx-clic-10" class="clip" src="assets/sfx/click-soft.mp3" data-start="41.7" data-duration="0.36" data-track-index="5" data-volume="0.4"></audio>
+      <audio id="sfx-clic-11" class="clip" src="assets/sfx/click-soft.mp3" data-start="43.0" data-duration="0.36" data-track-index="6" data-volume="0.4"></audio>
+      <audio id="sfx-clic-12" class="clip" src="assets/sfx/click-soft.mp3" data-start="55.6" data-duration="0.36" data-track-index="5" data-volume="0.4"></audio>
+      <audio id="sfx-clic-13" class="clip" src="assets/sfx/click-soft.mp3" data-start="56.9" data-duration="0.36" data-track-index="6" data-volume="0.4"></audio>
+      <audio id="sfx-clic-14" class="clip" src="assets/sfx/click-soft.mp3" data-start="59.5" data-duration="0.36" data-track-index="5" data-volume="0.4"></audio>
+      <audio id="sfx-clic-15" class="clip" src="assets/sfx/click-soft.mp3" data-start="61.0" data-duration="0.36" data-track-index="6" data-volume="0.4"></audio>
+      <audio id="sfx-clic-16" class="clip" src="assets/sfx/click-soft.mp3" data-start="62.6" data-duration="0.36" data-track-index="5" data-volume="0.4"></audio>
+      <audio id="sfx-clic-17" class="clip" src="assets/sfx/click-soft.mp3" data-start="64.9" data-duration="0.36" data-track-index="6" data-volume="0.4"></audio>
+      <audio id="sfx-clic-18" class="clip" src="assets/sfx/click-soft.mp3" data-start="65.9" data-duration="0.36" data-track-index="5" data-volume="0.4"></audio>
+      <audio id="sfx-clic-19" class="clip" src="assets/sfx/click-soft.mp3" data-start="68.5" data-duration="0.36" data-track-index="6" data-volume="0.4"></audio>
+      <audio id="sfx-clic-20" class="clip" src="assets/sfx/click-soft.mp3" data-start="69.5" data-duration="0.36" data-track-index="5" data-volume="0.4"></audio>
+      <audio id="sfx-clic-21" class="clip" src="assets/sfx/click-soft.mp3" data-start="71.7" data-duration="0.36" data-track-index="6" data-volume="0.4"></audio>
+      <audio id="sfx-clic-22" class="clip" src="assets/sfx/click-soft.mp3" data-start="72.6" data-duration="0.36" data-track-index="5" data-volume="0.4"></audio>
+      <audio id="sfx-clic-23" class="clip" src="assets/sfx/click-soft.mp3" data-start="73.7" data-duration="0.36" data-track-index="6" data-volume="0.4"></audio>
+      <audio id="sfx-clic-24" class="clip" src="assets/sfx/click-soft.mp3" data-start="74.8" data-duration="0.36" data-track-index="5" data-volume="0.4"></audio>
+      <audio id="sfx-clic-25" class="clip" src="assets/sfx/click-soft.mp3" data-start="90.0" data-duration="0.36" data-track-index="6" data-volume="0.4"></audio>
+      <audio id="sfx-clic-26" class="clip" src="assets/sfx/click-soft.mp3" data-start="98.1" data-duration="0.36" data-track-index="5" data-volume="0.4"></audio>
+      <audio id="sfx-clic-27" class="clip" src="assets/sfx/click-soft.mp3" data-start="99.25" data-duration="0.36" data-track-index="6" data-volume="0.4"></audio>
+      <audio id="sfx-clic-28" class="clip" src="assets/sfx/click-soft.mp3" data-start="100.9" data-duration="0.36" data-track-index="5" data-volume="0.4"></audio>
+      <audio id="sfx-pop-1" class="clip" src="assets/sfx/pop.mp3" data-start="55.8" data-duration="0.2" data-track-index="8" data-volume="0.22"></audio>
+      <audio id="sfx-pop-2" class="clip" src="assets/sfx/pop.mp3" data-start="57.1" data-duration="0.2" data-track-index="7" data-volume="0.22"></audio>
+      <audio id="sfx-pop-3" class="clip" src="assets/sfx/pop.mp3" data-start="90.35" data-duration="0.2" data-track-index="8" data-volume="0.22"></audio>
+      <audio id="sfx-pop-4" class="clip" src="assets/sfx/pop.mp3" data-start="90.55" data-duration="0.2" data-track-index="7" data-volume="0.22"></audio>
+      <audio id="sfx-pop-5" class="clip" src="assets/sfx/pop.mp3" data-start="90.75" data-duration="0.2" data-track-index="8" data-volume="0.22"></audio>
+      <audio id="sfx-whoosh-1" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="5.45" data-duration="0.57" data-track-index="9" data-volume="0.25"></audio>
+      <audio id="sfx-whoosh-2" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="37.55" data-duration="0.57" data-track-index="9" data-volume="0.25"></audio>
+      <audio id="sfx-whoosh-3" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="77.55" data-duration="0.57" data-track-index="9" data-volume="0.25"></audio>
+      <audio id="sfx-whoosh-4" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="86.4" data-duration="0.57" data-track-index="9" data-volume="0.25"></audio>
+      <audio id="sfx-whoosh-5" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="93.55" data-duration="0.57" data-track-index="9" data-volume="0.25"></audio>
+      <audio id="sfx-whoosh-6" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="107.55" data-duration="0.57" data-track-index="9" data-volume="0.25"></audio>
+      <audio id="sfx-correo" class="clip" src="assets/sfx/notification.mp3" data-start="83.8" data-duration="2.45" data-track-index="10" data-volume="0.22"></audio>
+      <audio id="sfx-reloj" class="clip" src="assets/sfx/click-soft.mp3" data-start="1.3" data-duration="0.36" data-track-index="10" data-volume="0.4"></audio>
+      <audio id="sfx-reloj-2" class="clip" src="assets/sfx/click-soft.mp3" data-start="109.75" data-duration="0.36" data-track-index="10" data-volume="0.4"></audio>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>
