@@ -103,6 +103,7 @@ Los originales de marca se encuentran en `design/Logos/`.
 | `src/video/`, `src/video-presentacion/` | Videos de demostración y presentación |
 | `.claude/` | Instrucciones para Claude (`CLAUDE.md`), skills y configuración local |
 | `design/Logos/` | Logos e isologo de SON (sistema de identidad visual) |
+| `design/Mockups/` | Mockups y prototipos |
 | `assets/` | Imágenes y recursos sueltos |
 
 ---
