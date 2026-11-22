@@ -104,7 +104,7 @@ Los originales de marca se encuentran en `design/Logos/`.
 | `.claude/` | Instrucciones para Claude (`CLAUDE.md`), skills y configuración local |
 | `design/Logos/` | Logos e isologo de SON (sistema de identidad visual) |
 | `design/Mockups/` | Mockups y prototipos |
-| `assets/` | Imágenes y recursos sueltos |
+| `assets/` | Capturas de pantalla, fotos, gráficos para Play Store y redes, y otros recursos para presentar SON |
 
 ---
 
