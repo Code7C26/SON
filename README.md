@@ -101,6 +101,7 @@ Los originales de marca se encuentran en `design/`.
 | `src/despliegue/` | Contenedores, proxy HTTPS y procedimiento de publicación |
 | `src/tools/` | Scripts auxiliares (armado de logos) |
 | `src/video/`, `src/video-presentacion/` | Videos de demostración y presentación |
+| `.claude/` | Instrucciones para Claude (`CLAUDE.md`), skills y configuración local |
 | `design/` | Sistema de identidad visual |
 | `assets/` | Imágenes y recursos sueltos |
 

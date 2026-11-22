@@ -1,7 +1,7 @@
 # DESIGN_PLAN.md — Rediseño visual y UX de SON
 
 
-> **Actualización de paleta (pedido de la usuaria, ya aplicada también en CLAUDE.md):** se usan **solo los colores originales de la página**: coral `#FF6147`, dorado `#D99C13`, tinta `#2E2E2E`, gris claro `#F4F4F4` y sus grises neutros (`#6E6E6E`, `#9A9A9A`, `#D5D5D5`, `#E7E7E7`; en oscuro `#262626`, `#353535`, `#3F3F3F`, `#4C4C4C`, `#B3B3B3`). Donde este plan menciona `#111827` u otros colores (`#4B5563`, `#9CA3AF`, `#E5E7EB`, `#FFE8E3`, `#D9482E`, `#16A34A`, `#DC2626`), aplica el equivalente de esta lista.
+> **Actualización de paleta (pedido de la usuaria, ya aplicada también en .claude/CLAUDE.md):** se usan **solo los colores originales de la página**: coral `#FF6147`, dorado `#D99C13`, tinta `#2E2E2E`, gris claro `#F4F4F4` y sus grises neutros (`#6E6E6E`, `#9A9A9A`, `#D5D5D5`, `#E7E7E7`; en oscuro `#262626`, `#353535`, `#3F3F3F`, `#4C4C4C`, `#B3B3B3`). Donde este plan menciona `#111827` u otros colores (`#4B5563`, `#9CA3AF`, `#E5E7EB`, `#FFE8E3`, `#D9482E`, `#16A34A`, `#DC2626`), aplica el equivalente de esta lista.
 
 ## Contexto
 SON tiene tres frentes visuales que hoy no comparten un sistema común:
