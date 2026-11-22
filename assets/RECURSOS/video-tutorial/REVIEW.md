@@ -1,6 +1,6 @@
 # Revisión: tutorial «Cómo funciona SON» (v1)
 
-Video: `renders/SON-tutorial.mp4`, 115 s (1:55), 1920 × 1080, 30 fps. Guion de voz: `GUION.md`.
+Video final: `assets/SON-tutorial-es.mp4` (carpeta `assets/` de la raíz del repositorio), 115 s (1:55), 1920 × 1080, 30 fps. Guion de voz: `GUION.md`.
 
 ## Cómo se hicieron las imágenes
 - **Todas las pantallas son capturas reales** del panel (`son_admin`) y de la app del técnico (`son_tecnico`), compiladas
