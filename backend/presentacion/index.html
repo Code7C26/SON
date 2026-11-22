@@ -116,6 +116,15 @@
     .ingresar { padding: 10px 14px; font: 600 14px/1 var(--ui); color: var(--tinta); border-radius: 999px; }
     .ingresar:hover { background: var(--fondo); }
     .solo-movil { display: none; }
+    /* Selector de idioma ES / EN */
+    .idioma { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--blanco); border: 1px solid var(--linea); flex: none; }
+    .idioma button {
+      min-width: 40px; min-height: 38px; padding: 0 10px; border: 0; border-radius: 999px; background: transparent; cursor: pointer;
+      color: var(--texto-2); font: 700 12px/1 var(--ui); letter-spacing: 0.8px;
+      transition: background 250ms var(--curva), color 250ms var(--curva);
+    }
+    .idioma button[aria-pressed="true"] { background: var(--tinta); color: var(--blanco); }
+    .idioma button[aria-pressed="false"]:hover { color: var(--tinta); }
     .menu { display: none; background: var(--fondo); border: 0; border-radius: 999px; width: 44px; height: 44px; cursor: pointer; color: var(--tinta); }
     .menu svg { width: 20px; height: 20px; }
 
@@ -387,6 +396,7 @@
       .ingresar { display: none; }
       .acciones-nav .boton { padding: 0 18px; }
       .acciones-nav .circulo { display: none; }
+      .idioma button { min-width: 34px; padding: 0 8px; }
       .hero { padding-top: 40px; }
       .kpis { gap: 24px; }
       .funciones { grid-template-columns: 1fr; }
@@ -397,6 +407,14 @@
       form { grid-template-columns: 1fr; }
       .bloque { padding: 64px 0; }
       .ficha { right: 0; }
+    }
+    @media (max-width: 480px) {
+      .barra { gap: 8px; }
+      .marca { padding-right: 0; }
+      .marca-texto { display: none; }
+      .acciones-nav { gap: 6px; }
+      .acciones-nav .boton { padding: 0 14px; font-size: 14px; }
+      .idioma button { min-width: 32px; padding: 0 6px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -419,7 +437,7 @@
       <div class="barra">
         <a class="marca" href="#inicio" aria-label="SON, inicio">
           <span class="logo"><img src="isotipo.png" alt=""></span>
-          SON
+          <span class="marca-texto">SON</span>
         </a>
         <nav id="nav" aria-label="Principal">
           <a class="enlace" href="#plataforma">Plataforma</a>
@@ -429,6 +447,10 @@
           <a class="enlace solo-movil" href="/panel/">Ingresar</a>
         </nav>
         <div class="acciones-nav">
+          <div class="idioma" role="group" aria-label="Idioma">
+            <button type="button" data-idioma="es" aria-pressed="true" title="Español">ES</button>
+            <button type="button" data-idioma="en" aria-pressed="false" title="English">EN</button>
+          </div>
           <a class="ingresar" href="/panel/">Ingresar</a>
           <a class="boton cta con-flecha" href="#contacto">Pedir demo<span class="circulo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
           <button class="menu" type="button" aria-expanded="false" aria-controls="nav" aria-label="Abrir menú">
@@ -445,7 +467,7 @@
       <div class="ancho">
         <div class="revelar visible">
           <span class="eyebrow"><span class="punto"></span>Gestión operativa en terreno</span>
-          <h1>Toda su operación técnica,<br><span class="frase" id="frase">sincronizada y bajo control</span></h1>
+          <h1>Toda su operación técnica,<br><span class="frase" id="frase" data-sin-traducir>sincronizada y bajo control</span></h1>
           <p class="baja">Órdenes, app de campo con GPS e informes en PDF en una sola plataforma.</p>
           <div class="acciones">
             <a class="boton cta con-flecha" href="#contacto">Pedir demo<span class="circulo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
@@ -663,10 +685,10 @@
               <label class="completo">Técnicos en campo
                 <select name="flota" required>
                   <option value="">Elegir</option>
-                  <option>1 a 5 técnicos</option>
-                  <option>6 a 15 técnicos</option>
-                  <option>16 a 50 técnicos</option>
-                  <option>Más de 50 técnicos</option>
+                  <option value="1 a 5 técnicos">1 a 5 técnicos</option>
+                  <option value="6 a 15 técnicos">6 a 15 técnicos</option>
+                  <option value="16 a 50 técnicos">16 a 50 técnicos</option>
+                  <option value="Más de 50 técnicos">Más de 50 técnicos</option>
                 </select>
               </label>
               <label class="completo">Mensaje<textarea name="mensaje" maxlength="1000" placeholder="Opcional"></textarea></label>
@@ -701,20 +723,23 @@
     </div>
   </footer>
 
+  <script src="idioma.js"></script>
   <script>
     (function () {
+      var t = window.SONIdioma ? window.SONIdioma.t : function (texto) { return texto; };
       var reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       // Frase rotativa del titular
       var frases = ['sincronizada y bajo control', '100% digital', 'auditada en tiempo real'];
       var frase = document.getElementById('frase');
       var indiceFrase = 0;
+      if (window.SONIdioma) window.SONIdioma.alCambiar(function () { frase.textContent = t(frases[indiceFrase]); });
       if (!reducido) {
         setInterval(function () {
           frase.classList.add('sale');
           setTimeout(function () {
             indiceFrase = (indiceFrase + 1) % frases.length;
-            frase.textContent = frases[indiceFrase];
+            frase.textContent = t(frases[indiceFrase]);
             frase.classList.remove('sale');
           }, 400);
         }, 3200);
@@ -838,7 +863,7 @@
           'Comentarios: ' + (datos.mensaje || '')
         ].join('\n');
         enviar.disabled = true;
-        textoEnviar.textContent = 'Enviando...';
+        textoEnviar.textContent = t('Enviando...');
         aviso.textContent = '';
         fetch('https://formsubmit.co/ajax/sonoperationn@gmail.com', {
           method: 'POST',
@@ -849,12 +874,12 @@
           return respuesta.json();
         }).then(function () {
           formulario.reset();
-          aviso.textContent = '¡Listo! Le escribimos a la brevedad.';
+          aviso.textContent = t('¡Listo! Le escribimos a la brevedad.');
           enviar.disabled = false;
-          textoEnviar.textContent = 'Pedir demo';
+          textoEnviar.textContent = t('Pedir demo');
         }).catch(function () {
           enviar.disabled = false;
-          textoEnviar.textContent = 'Pedir demo';
+          textoEnviar.textContent = t('Pedir demo');
           window.location.href = 'mailto:sonoperationn@gmail.com?subject=' + encodeURIComponent(datos._subject) + '&body=' + encodeURIComponent(cuerpo);
         });
       });
